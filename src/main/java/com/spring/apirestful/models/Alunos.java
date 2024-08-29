@@ -34,9 +34,11 @@ public class Alunos {
     private Integer matricula;
     
     @Size(max=16)
+    @Column(length=16)
     private Double[] atividades;
     
     @Size(max=2)
+    @Column(length=2)
     private Double[] provas;
     
     public Double[] getAtividades() {
