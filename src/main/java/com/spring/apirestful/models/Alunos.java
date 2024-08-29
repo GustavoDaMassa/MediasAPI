@@ -32,6 +32,31 @@ public class Alunos {
 
     @Column(length=9, nullable=false, unique=true)
     private Integer matricula;
+    
+    @Size(max=16)
+    private Double[] atividades;
+    
+    @Size(max=2)
+    private Double[] provas;
+    
+    public Double[] getAtividades() {
+        return atividades;
+    }
+
+
+    public void setAtividades(Double[] atividades) {
+        this.atividades = atividades;
+    }
+
+
+    public Double[] getProvas() {
+        return provas;
+    }
+
+
+    public void setProvas(Double[] provas) {
+        this.provas = provas;
+    }
 
     private Double media; 
     
@@ -67,6 +92,10 @@ public class Alunos {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
     }
 
     public Double getMedia() {
