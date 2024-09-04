@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.spring.apirestful.models.Alunos;
 
 @Repository
-public interface AlunosRepository extends JpaRepository<Alunos, Long> {
+public interface AlunosRepository extends JpaRepository<Alunos, Integer> {
     
 }

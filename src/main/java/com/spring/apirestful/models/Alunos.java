@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
-
 @Entity
 @Table(name="alunos")
 public class Alunos {
@@ -22,7 +20,7 @@ public class Alunos {
 
     @Id 
     @GeneratedValue(strategy= GenerationType.IDENTITY) 
-    private Long id; 
+    private Integer id; 
 
     @Column(nullable=false, length=100)
     @NotNull(groups= CriarAluno.class)
@@ -60,7 +58,7 @@ public class Alunos {
         this.provas = provas;
     }
 
-    private Double media; 
+    private Double media;
     
     public Alunos() {
     }
@@ -92,11 +90,11 @@ public class Alunos {
         this.matricula = matricula;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id){
+    public void setId(Integer id){
         this.id = id;
     }
 

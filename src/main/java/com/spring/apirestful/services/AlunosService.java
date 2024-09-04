@@ -14,7 +14,7 @@ public class AlunosService {
     
     private AlunosRepository alunosrepository;
     
-    public Alunos findById(Long id){
+    public Alunos findById(Integer id){
 
         Optional<Alunos> aluno = this.alunosrepository.findById(id);
 
@@ -42,7 +42,7 @@ public class AlunosService {
         return this.alunosrepository.save(newAluno);
     }
 
-    public void deleteAluno(Long id){
+    public void deleteAluno(Integer id){
         findById(id);
         try {
             this.alunosrepository.deleteById(id);       

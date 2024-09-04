@@ -31,7 +31,7 @@ public class AlunosController {
     private AlunosService alunosService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Alunos> findById (@PathVariable Long id) {
+    public ResponseEntity<Alunos> findById (@PathVariable Integer id) {
         Alunos aluno = this.alunosService.findById(id);
         return ResponseEntity.ok().body(aluno);
     }
