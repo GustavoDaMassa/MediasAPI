@@ -1,4 +1,6 @@
 package com.spring.apirestful.models;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,62 +15,59 @@ import jakarta.validation.constraints.Size;
 @Table(name="alunos")
 public class Alunos {
 
-    public interface CriarAluno {
-
-    }
-   
-
+    
     @Id 
     @GeneratedValue(strategy= GenerationType.IDENTITY) 
-    private Integer id; 
+    @Column(length=9, nullable=false, unique=true)
+    private Integer matricula; 
 
     @Column(nullable=false, length=100)
-    @NotNull(groups= CriarAluno.class)
-    @NotEmpty(groups= CriarAluno.class)
-    @Size(groups= CriarAluno.class, min=1, max=100)
+    @NotNull
+    @NotEmpty
+    @Size(min=1, max=100)
     private String nome;
 
-    @Column(length=9, nullable=false, unique=true)
-    private Integer matricula;
     
     @Size(max=16)
     @Column(length=16)
-    private Double[] atividades;
+    private List<Double> atividades;
     
     @Size(max=2)
     @Column(length=2)
-    private Double[] provas;
+    private List<Double> provas;
     
-    public Double[] getAtividades() {
+    private Double media;
+
+    
+    public List<Double>  getAtividades() {
         return atividades;
     }
 
 
-    public void setAtividades(Double[] atividades) {
+    public void setAtividades(List<Double> atividades) {
         this.atividades = atividades;
     }
 
 
-    public Double[] getProvas() {
+    public List<Double> getProvas() {
         return provas;
     }
 
 
-    public void setProvas(Double[] provas) {
+    public void setProvas(List<Double> provas) {
         this.provas = provas;
     }
 
-    private Double media;
     
     public Alunos() {
     }
     
-
+// ---------------------------- redefinir construtor ----------------------------------
     public Alunos(
-            @NotNull(groups = CriarAluno.class) @NotEmpty(groups = CriarAluno.class) @Size(groups = CriarAluno.class, min = 1, max = 100) String nome,
+            @NotNull @NotEmpty@Size( min = 1, max = 100) String nome,
             Integer matricula) {
         this.nome = nome;
-        this.matricula = matricula;
+        //this.matricula = matricula;
     }
 
     
@@ -82,20 +81,13 @@ public class Alunos {
         this.nome = nome;
     }
 
+    
     public Integer getMatricula() {
         return matricula;
     }
 
     public void setMatricula(Integer matricula) {
         this.matricula = matricula;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id){
-        this.id = id;
     }
 
     public Double getMedia() {
@@ -106,17 +98,20 @@ public class Alunos {
         this.media = media;
     }
 
-   
+    //-------------------------------------------------------------------------------
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         result = prime * result + ((matricula == null) ? 0 : matricula.hashCode());
+        result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+        result = prime * result + ((atividades == null) ? 0 : atividades.hashCode());
+        result = prime * result + ((provas == null) ? 0 : provas.hashCode());
         result = prime * result + ((media == null) ? 0 : media.hashCode());
         return result;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -127,20 +122,25 @@ public class Alunos {
         if (getClass() != obj.getClass())
             return false;
         Alunos other = (Alunos) obj;
-        if (id == null) {
-            if (other.id != null)
+        if (matricula == null) {
+            if (other.matricula != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!matricula.equals(other.matricula))
             return false;
         if (nome == null) {
             if (other.nome != null)
                 return false;
         } else if (!nome.equals(other.nome))
             return false;
-        if (matricula == null) {
-            if (other.matricula != null)
+        if (atividades == null) {
+            if (other.atividades != null)
                 return false;
-        } else if (!matricula.equals(other.matricula))
+        } else if (!atividades.equals(other.atividades))
+            return false;
+        if (provas == null) {
+            if (other.provas != null)
+                return false;
+        } else if (!provas.equals(other.provas))
             return false;
         if (media == null) {
             if (other.media != null)

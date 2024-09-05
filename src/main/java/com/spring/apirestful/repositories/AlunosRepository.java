@@ -8,4 +8,5 @@ import com.spring.apirestful.models.Alunos;
 @Repository
 public interface AlunosRepository extends JpaRepository<Alunos, Integer> {
     
+    public int getmediasvermelhas();
 }

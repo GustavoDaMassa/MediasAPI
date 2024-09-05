@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.spring.apirestful.models.Alunos;
-import com.spring.apirestful.models.Alunos.CriarAluno;
 import com.spring.apirestful.services.AlunosService;
 
 import jakarta.validation.Valid;
@@ -43,10 +42,10 @@ public class AlunosController {
     }
     
     @PostMapping
-    @Validated(CriarAluno.class)
+    @Validated
     public ResponseEntity<Void> create(@Valid @RequestBody Alunos aluno) {
         this.alunosService.createAluno(aluno);
-        URI hateos = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(aluno.getId()).toUri();
+        URI hateos = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(aluno.getMatricula()).toUri();
         
         return ResponseEntity.created(hateos).build();
     }
