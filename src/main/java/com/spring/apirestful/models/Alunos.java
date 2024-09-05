@@ -15,17 +15,16 @@ import jakarta.validation.constraints.Size;
 @Table(name="alunos")
 public class Alunos {
 
-    
-    @Id 
-    @GeneratedValue(strategy= GenerationType.IDENTITY) 
-    @Column(length=9, nullable=false, unique=true)
-    private Integer matricula; 
-
     @Column(nullable=false, length=100)
     @NotNull
     @NotEmpty
     @Size(min=1, max=100)
     private String nome;
+
+    @Id 
+    @GeneratedValue(strategy= GenerationType.IDENTITY) 
+    @Column(length=9, nullable=false, unique=true)
+    private Integer matricula; 
 
     
     @Size(max=16)
@@ -38,7 +37,23 @@ public class Alunos {
     
     private Double media;
 
+     
+    public Alunos() {
+    }
     
+    
+    
+    public Alunos(@NotNull @NotEmpty @Size(min = 1, max = 100) String nome, Integer matricula,
+            @Size(max = 16) List<Double> atividades, @Size(max = 2) List<Double> provas) {
+        this.nome = nome;
+        this.matricula = matricula;
+        this.atividades = atividades;
+        this.provas = provas;
+    }
+
+
+
+    // Getters and Setters 
     public List<Double>  getAtividades() {
         return atividades;
     }
@@ -58,17 +73,7 @@ public class Alunos {
         this.provas = provas;
     }
 
-    
-    public Alunos() {
-    }
-    
-// ---------------------------- redefinir construtor ----------------------------------
-    public Alunos(
-            @NotNull @NotEmpty@Size( min = 1, max = 100) String nome,
-            Integer matricula) {
-        this.nome = nome;
-        //this.matricula = matricula;
-    }
+   
 
     
     public String getNome() {
