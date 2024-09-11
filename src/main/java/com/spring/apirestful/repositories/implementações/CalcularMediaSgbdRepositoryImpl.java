@@ -8,8 +8,7 @@ public class CalcularMediaSgbdRepositoryImpl implements CalcularMediaSgbdReposit
     @Override
     public Double CalcularMedia(Alunos aluno) {
         // TODO Auto-generated method stub
-        
+        return 9.9;
     }
-    
-    
+        
 }

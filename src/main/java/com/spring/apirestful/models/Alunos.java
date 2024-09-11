@@ -1,4 +1,5 @@
 package com.spring.apirestful.models;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -24,15 +25,13 @@ public class Alunos {
     @Id 
     @GeneratedValue(strategy= GenerationType.IDENTITY) 
     @Column(length=9, nullable=false, unique=true)
+    @NotEmpty
+    @NotNull
+    @Size(max=9)
     private Integer matricula; 
-
-    
-    @Size(max=16)
-    @Column(length=16)
+ 
     private List<Double> atividades;
     
-    @Size(max=2)
-    @Column(length=2)
     private List<Double> provas;
     
     private Double media;
@@ -43,8 +42,7 @@ public class Alunos {
     
     
     
-    public Alunos(@NotNull @NotEmpty @Size(min = 1, max = 100) String nome, Integer matricula,
-            @Size(max = 16) List<Double> atividades, @Size(max = 2) List<Double> provas) {
+    public Alunos(@NotNull @NotEmpty @Size (min = 1, max = 100) String nome, @NotEmpty @NotNull  Integer matricula,List<Double> atividades, List<Double> provas) {
         this.nome = nome;
         this.matricula = matricula;
         this.atividades = atividades;
@@ -53,7 +51,6 @@ public class Alunos {
 
 
 
-    // Getters and Setters 
     public List<Double>  getAtividades() {
         return atividades;
     }
@@ -63,6 +60,27 @@ public class Alunos {
         this.atividades = atividades;
     }
 
+    public void setAtividade(int index, Double valor) {
+        if (this.atividades == null) {
+            this.atividades = new ArrayList<>();
+        }
+        if (index >= 0 && index < this.atividades.size()) {
+            this.atividades.set(index, valor); 
+        } else {
+            throw new IndexOutOfBoundsException("Índice fora do alcance da lista.");
+        }
+    }
+
+    public void setProvas(int index, Double valor) {
+        if (this.provas == null) {
+            this.provas = new ArrayList<>();
+        }
+        if (index >= 0 && index < this.provas.size()) {
+            this.provas.set(index, valor); 
+        } else {
+            throw new IndexOutOfBoundsException("Índice fora do alcance da lista.");
+        }
+    }
 
     public List<Double> getProvas() {
         return provas;
