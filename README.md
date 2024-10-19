@@ -12,3 +12,6 @@ Calculo da Disciplina de Sistemas Gerenciadores de Banco de Dados definada pelo 
 - MF = 0,6 * NP + NA * 0,4
 
 - todas as provas e atividades limitadas em 10 pontos.
+
+
+#### Projeto em desenvolvimento no momento.
