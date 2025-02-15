@@ -1,4 +1,9 @@
 package br.com.gustavohenrique.MediasAPI.controller.dtos;
 
-public record EmailUpdateDTO() {
+import jakarta.validation.constraints.NotBlank;
+
+public record EmailUpdateDTO(
+        @NotBlank
+        String email
+) {
 }
