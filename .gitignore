@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application.properties ###
+
+/home/gustavo/dev/java/desafios/MediasAPI/src/main/resources/application.properties
