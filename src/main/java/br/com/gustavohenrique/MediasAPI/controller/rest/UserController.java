@@ -1,15 +1,13 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.controller.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.NameUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.controller.dtos.StringUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.User;
 import br.com.gustavohenrique.MediasAPI.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -21,10 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<User>> listUsers(){
-        return ResponseEntity.ok(userService.list());
-    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid User user){
@@ -32,7 +26,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/name")
-    public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid NameUpdateDTO nameDto) {
+    public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid StringUpdateDTO nameDto) {
        try {
            return ResponseEntity.status(HttpStatus.OK).body(userService.updateName(id, nameDto));
        }catch (IllegalArgumentException e){
