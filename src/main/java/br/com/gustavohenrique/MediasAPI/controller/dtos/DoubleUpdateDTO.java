@@ -1,4 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.controller.dtos;
 
-public record DoubleUpdateDTO() {
+public record DoubleUpdateDTO(
+        double newValue
+) {
 }
