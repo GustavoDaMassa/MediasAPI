@@ -1,7 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.controller.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.StringUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.controller.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.User;
 import br.com.gustavohenrique.MediasAPI.service.UserService;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/name")
-    public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid StringUpdateDTO nameDto) {
+    public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
        try {
            return ResponseEntity.status(HttpStatus.OK).body(userService.updateName(id, nameDto));
        }catch (IllegalArgumentException e){

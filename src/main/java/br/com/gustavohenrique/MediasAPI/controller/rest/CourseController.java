@@ -1,15 +1,13 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.controller.dtos.DoubleUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.StringUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.controller.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.controller.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.service.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("{userId}/courses")
@@ -27,6 +25,8 @@ public class CourseController {
            return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createCourse(userId ,course));
        } catch ( IllegalArgumentException e){
            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+       } catch (Exception e) {
+           throw new RuntimeException(e);
        }
     }
 
@@ -49,7 +49,7 @@ public class CourseController {
     }
 
     @PatchMapping("{id}/name")
-    public ResponseEntity<?> updateCourseName(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringUpdateDTO nameDto){
+    public ResponseEntity<?> updateCourseName(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto){
         try {
             return ResponseEntity.ok(courseService.updateCourseName(userId, id, nameDto));
         } catch ( IllegalArgumentException e){
@@ -57,7 +57,7 @@ public class CourseController {
         }
     }
     @PatchMapping("{id}/method")
-    public ResponseEntity<?> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringUpdateDTO averageMethodDto){
+    public ResponseEntity<?> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO averageMethodDto){
         try {
             return ResponseEntity.ok(courseService.updateCourseAverageMethod(userId, id, averageMethodDto));
         } catch ( IllegalArgumentException e){
@@ -66,7 +66,7 @@ public class CourseController {
     }
 
     @PatchMapping("{id}/cutoffgrade")
-    public ResponseEntity<?> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid DoubleUpdateDTO cutOffGradeDto){
+    public ResponseEntity<?> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid DoubleRequestDTO cutOffGradeDto){
         try {
             return ResponseEntity.ok(courseService.updateCourseCutOffGrade(userId, id, cutOffGradeDto));
         } catch ( IllegalArgumentException e){
