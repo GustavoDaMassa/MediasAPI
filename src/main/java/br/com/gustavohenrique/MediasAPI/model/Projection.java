@@ -1,8 +1,13 @@
 package br.com.gustavohenrique.MediasAPI.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projection")
@@ -10,24 +15,28 @@ public class Projection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    Course course;
+    @Column(name = "course_id", nullable = false)
+    private Long courseId;
+
+    @OneToMany(mappedBy = "projection", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Assessment> assessment = new ArrayList<>();
 
     @NotBlank
-    String name;
+    private String name;
 
-    double finalGrade;
+    private double finalGrade;
 
     //----------------------------------------------------------
 
-    public Projection(Long id, String name, Course course, double finalGrade) {
-        this.id = id;
+    public Projection(Long courseId, String name) {
+        this.courseId = courseId;
         this.name = name;
-        this.course = course;
-        this.finalGrade = finalGrade;
+    }
+
+    public Projection() {
     }
 
     public Long getId() {
@@ -38,12 +47,12 @@ public class Projection {
         this.id = id;
     }
 
-    public Course getCourse() {
-        return course;
+    public double getFinalGrade() {
+        return finalGrade;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setFinalGrade(double finalGrade) {
+        this.finalGrade = finalGrade;
     }
 
     public String getName() {
@@ -54,11 +63,19 @@ public class Projection {
         this.name = name;
     }
 
-    public double getFinalGrade() {
-        return finalGrade;
+     public Assessment getAssessment() {
+        return new Assessment();
     }
 
-    public void setFinalGrade(double finalGrade) {
-        this.finalGrade = finalGrade;
+    public void setAssessment(Assessment assessment) {
+        this.assessment.add(assessment);
+    }
+
+    public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
     }
 }
