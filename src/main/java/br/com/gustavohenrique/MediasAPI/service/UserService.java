@@ -3,9 +3,12 @@ package br.com.gustavohenrique.MediasAPI.service;
 import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
+import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -35,5 +38,9 @@ public class UserService {
             var user  = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User Id not found"));
             userRepository.delete(user);
             return user;
+    }
+
+    public List<Users> listUsers() {
+        return userRepository.findAll();
     }
 }

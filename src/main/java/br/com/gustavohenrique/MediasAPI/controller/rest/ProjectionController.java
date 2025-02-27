@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,44 +35,23 @@ public class ProjectionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProjection(@PathVariable Long userId, @PathVariable Long courseId, @RequestBody @Valid StringRequestDTO projectionName){
-
-        try {
+    public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long userId, @PathVariable Long courseId, @RequestBody @Valid StringRequestDTO projectionName){
             return ResponseEntity.status(HttpStatus.CREATED).body(mapperDTOs.projectionDTO(projectionService.createProjection(userId,courseId,projectionName)));
-        } catch (IllegalArgumentException e){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @GetMapping
-    public ResponseEntity<?> showProjections(@PathVariable Long userId, @PathVariable Long courseId){
-
-        try {
+    public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long userId, @PathVariable Long courseId){
             return ResponseEntity.ok(projectionService.listProjection(userId,courseId).stream().map(projection -> mapperDTOs.projectionDTO(projection)).collect(Collectors.toList()));
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<?> updateProjectionName(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id, @RequestBody StringRequestDTO newProjectNameDto){
-        try {
+    public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id, @RequestBody StringRequestDTO newProjectNameDto){
             return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(projectionService.updateProjectionName(userId, courseId, id, newProjectNameDto),ProjectionDTO.class));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteProjection(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id){
-        try {
+    public ResponseEntity<ProjectionDTO> deleteProjection(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id){
             return ResponseEntity.ok(modelMapper.map(projectionService.deleteProjection(userId,courseId,id),ProjectionDTO.class));
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @DeleteMapping("/all")

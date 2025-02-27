@@ -28,7 +28,7 @@ public class CourseService {
     }
 
     @Transactional
-    public Course createCourse(Long userId, @Valid Course course) throws Exception {
+    public Course createCourse(Long userId, @Valid Course course){
         validateUser(userId);
         course.setUserId(userId);
         courseRepository.save(course);
@@ -49,7 +49,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto) throws Exception {
+    public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto){
         validateUser(userId);
         var course = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         projectionService.deleteAllProjections(userId, course.getId());

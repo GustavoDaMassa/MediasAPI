@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
+import br.com.gustavohenrique.MediasAPI.exception.FailedException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -30,7 +31,7 @@ public class AssessmentService {
         this.assessmentRepository = assessmentRepository;
     }
 
-    public void createAssessment(Long courseId, Long projectionId, String averageMethod) throws Exception {
+    public void createAssessment(Long courseId, Long projectionId, String averageMethod){
 
         var projection = projectionRepository.findByCourseIdAndId(courseId, projectionId).orElseThrow();
         ArrayList<String> methodTokens =  compileRegex(averageMethod);
@@ -64,7 +65,7 @@ public class AssessmentService {
     }
 
     @Transactional
-    public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto) throws Exception {
+    public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto){
         validateProjection(userId,courseId,projectionId);
         var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
         var course = courseRepository.findById(courseId).orElseThrow();
@@ -79,7 +80,7 @@ public class AssessmentService {
     }
 
     @Transactional
-    public void calculateFinalGrade(Projection projection, String averageMethod) throws Exception {
+    public void calculateFinalGrade(Projection projection, String averageMethod)  {
 
         ArrayList<String> polishNotation = convertToPolishNotation(averageMethod);
         Deque<Double> stackDouble = new ArrayDeque<>();
@@ -201,7 +202,7 @@ public class AssessmentService {
     }
 
     @Transactional
-    private void calculateRequiredGrade(Projection projection, String averageMethod) throws Exception {
+    private void calculateRequiredGrade(Projection projection, String averageMethod){
 
         var polishNotation = convertToPolishNotation(averageMethod);
         double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
@@ -242,9 +243,10 @@ public class AssessmentService {
                         assessment.setRequiredGrade(assessment.getMaxValue());
                         assessmentRepository.save(assessment);
                     }
+                    else assessment.setRequiredGrade(0.00);
                 }
             }
-            throw new Exception("failed! it will not be possible to reach the cut-off-grade");
+            throw new FailedException("Affs! unfortunately it will not be possible to reach the cut-off-grade");
         }
         else {
             for (int j = 0; j < polishNotation.size(); j++) {
@@ -260,7 +262,7 @@ public class AssessmentService {
         }
     }
 
-    private double simulate(double requiredGrade, Projection projection, ArrayList<String> polishNotation) throws Exception {
+    private double simulate(double requiredGrade, Projection projection, ArrayList<String> polishNotation){
 
         Deque<Double> stackDouble = new ArrayDeque<>();
         ArrayList<Double> values = new ArrayList<>();
@@ -283,7 +285,9 @@ public class AssessmentService {
                             break;
                         case "*":stackDouble.push(a*b);
                             break;
-                        case "/":stackDouble.push(a/b);
+                        case "/":
+                            if(b==0)throw new IllegalArgumentException("Cannot divide by zero");
+                            stackDouble.push(a/b);
                             break;
                     }
                 }else{

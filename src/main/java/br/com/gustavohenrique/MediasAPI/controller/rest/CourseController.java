@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,59 +29,32 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCourse(@PathVariable Long userId, @RequestBody @Valid Course course){
-       try {
+    public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid Course course){
            return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(courseService.createCourse(userId ,course), CourseDTO.class));
-       } catch ( IllegalArgumentException e){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-       } catch (Exception e) {
-           throw new RuntimeException(e);
-       }
     }
 
     @GetMapping
-    public  ResponseEntity<?> showCourses(@PathVariable Long userId){
-      try {
+    public  ResponseEntity<List<CourseDTO>> showCourses(@PathVariable Long userId){
           return ResponseEntity.ok(courseService.listCourses(userId).stream().map(course -> modelMapper.map(course,CourseDTO.class)).collect(Collectors.toList()));
-      }catch ( IllegalArgumentException e){
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-      }
     }
 
     @PatchMapping("{id}/name")
-    public ResponseEntity<?> updateCourseName(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto){
-        try {
+    public ResponseEntity<CourseDTO> updateCourseName(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto){
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseName(userId, id, nameDto), CourseDTO.class));
-        } catch ( IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
+
     @PatchMapping("{id}/method")
-    public ResponseEntity<?> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO averageMethodDto){
-        try {
+    public ResponseEntity<CourseDTO> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO averageMethodDto){
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseAverageMethod(userId, id, averageMethodDto), CourseDTO.class));
-        } catch ( IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @PatchMapping("{id}/cutoffgrade")
-    public ResponseEntity<?> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid DoubleRequestDTO cutOffGradeDto){
-        try {
+    public ResponseEntity<CourseDTO> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid DoubleRequestDTO cutOffGradeDto){
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseCutOffGrade(userId, id, cutOffGradeDto), CourseDTO.class));
-        } catch ( IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteCourse(@PathVariable Long userId, @PathVariable Long id){
-        try {
+    public ResponseEntity<CourseDTO> deleteCourse(@PathVariable Long userId, @PathVariable Long id){
             return ResponseEntity.ok(modelMapper.map(courseService.deleteCourse(userId, id), CourseDTO.class));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 }

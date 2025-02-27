@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,22 +27,12 @@ public class AssessmentController {
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<?> insertGrade(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){
-        try {
+    public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){
             return ResponseEntity.ok(modelMapper.map(assessmentService.insertGrade(userId,courseId,projectionId,id,gradeDto), AssessmentDTO.class));
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @GetMapping
-    public ResponseEntity<?> showAssessment(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId){
-        try {
+    public ResponseEntity<List<AssessmentDTO>> showAssessment(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId){
             return ResponseEntity.ok(assessmentService.listAssessment(userId,courseId,projectionId).stream().map(assessment -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()));
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 }

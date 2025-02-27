@@ -30,7 +30,7 @@ public class ProjectionService {
     }
 
     @Transactional
-    public Projection createProjection(Long userId, Long courseId, @Valid StringRequestDTO projectionName) throws Exception {
+    public Projection createProjection(Long userId, Long courseId, @Valid StringRequestDTO projectionName){
         validateCourse(userId, courseId);
         var projection = new Projection(courseId,projectionName.string());
         var course = courseRepository.findByUserIdAndId(userId,courseId).orElseThrow();

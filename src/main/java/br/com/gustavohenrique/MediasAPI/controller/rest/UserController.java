@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -31,31 +34,24 @@ public ResponseEntity<UserDTO> createUser(@RequestBody @Valid Users users){
         return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(users), UserDTO.class));
     }
 
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> showUsers(){
+        return ResponseEntity.ok(userService.listUsers().stream().map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
+    }
+
     @PatchMapping("/{id}/name")
-    public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
-       try {
+    public ResponseEntity<UserDTO> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
            return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userService.updateName(id, nameDto), UserDTO.class));
-       }catch (IllegalArgumentException e){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-       }
     }
 
     @PatchMapping("/{id}/email")
-    public ResponseEntity<?> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO){
-        try {
+    public ResponseEntity<UserDTO> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO){
             return ResponseEntity.ok(modelMapper.map(userService.updateEmail(id, emailDTO), UserDTO.class));
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id){
-        try {
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id){
             return ResponseEntity.ok(modelMapper.map(userService.deleteUser(id), UserDTO.class));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
 }

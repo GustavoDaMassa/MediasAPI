@@ -34,7 +34,7 @@ public class LocalConfig {
         Users users2 = new Users(null,"Henrique","gustavohenrique3gb@gmail.com.br","aula321");
         userRepository.saveAll(List.of(users1, users2));
 
-        Course course1 = new Course(null, users1.getId(), "Banco de Dados","0.6*Prova+0.4*Seminário",6.00);
+        Course course1 = new Course(null, users1.getId(), "Banco de Dados","0.6*Prova+0.4*Seminario",6.00);
         Course course2 = new Course(null, users1.getId(), "Sistemas Gerenciadores de Banco de Dados","@M[3](P1;P2;P3;P4)/3",6.00);
         courseRepository.saveAll(List.of(course1,course2));
 

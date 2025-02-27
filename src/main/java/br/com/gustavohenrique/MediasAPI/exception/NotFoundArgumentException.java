@@ -1,8 +1,8 @@
 package br.com.gustavohenrique.MediasAPI.exception;
 
-public class InvalidArgumentException extends RuntimeException {
+public class NotFoundArgumentException extends RuntimeException {
 
-    public InvalidArgumentException(String message) {
+    public NotFoundArgumentException(String message) {
         super(message);
     }
 }
