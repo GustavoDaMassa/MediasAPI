@@ -29,9 +29,9 @@ public class AssessmentService {
         this.assessmentRepository = assessmentRepository;
     }
 
-    public void createAssessment(Long projectionId, String averageMethod) throws Exception {
-        var projection = projectionRepository.findById(projectionId).orElseThrow();
+    public void createAssessment(Long courseId, Long projectionId, String averageMethod) throws Exception {
 
+        var projection = projectionRepository.findByCourseIdAndProjectionId(courseId, projectionId).orElseThrow();
         ArrayList<String> methodTokens =  compileRegex(averageMethod);
         defineIdentifiers(averageMethod, projection);
         calculateFinalGrade(projection,averageMethod.trim());
@@ -65,7 +65,7 @@ public class AssessmentService {
     @Transactional
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto) throws Exception {
         validateProjection(userId,courseId,projectionId);
-        var assessment = assessmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
+        var assessment = assessmentRepository.findByProjectionIdAndAssessmentId(projectionId,id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findById(projectionId).orElseThrow();
 
@@ -314,8 +314,8 @@ public class AssessmentService {
 
     private void validateProjection(Long userId, Long courseId, Long projectionId){
         if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found ue ");
-        else if(!courseRepository.existsById(courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found");
-        if(!projectionRepository.existsById(projectionId))throw  new IllegalArgumentException("Projection Id "+projectionId+" not found");
+        else if(!courseRepository.existsByUserIdAndCourseId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found");
+        if(!projectionRepository.existsByCourseIdAndProjectionId(courseId,projectionId))throw  new IllegalArgumentException("Projection Id "+projectionId+" not found");
 
     }
 }

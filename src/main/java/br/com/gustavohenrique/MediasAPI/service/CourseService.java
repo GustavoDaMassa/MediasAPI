@@ -42,7 +42,7 @@ public class CourseService {
 
     public Course updateCourse(Long userId, Long id, Course newCourse) {
         validateUser(userId);
-        var course = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
+        var course = courseRepository.findByUserIdAndCourseId(userId,id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
         course.setName(newCourse.getName());
         course.setAverageMethod(newCourse.getAverageMethod());
         course.setCutOffGrade(newCourse.getCutOffGrade());
@@ -52,32 +52,31 @@ public class CourseService {
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
 
-        var course = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
+        var course = courseRepository.findByUserIdAndCourseId(userId,id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
         course.setName(nameDto.string());
         return courseRepository.save(course);
     }
 
     public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto) {
         validateUser(userId);
-        var course = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
+        var course = courseRepository.findByUserIdAndCourseId(userId,id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
         course.setAverageMethod(averageMethodDto.string());
         return courseRepository.save(course);
     }
     public Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto) {
         validateUser(userId);
-        var course = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
+        var course = courseRepository.findByUserIdAndCourseId(userId,id).orElseThrow(() -> new IllegalArgumentException("Course id "+ id+" not found"));
         course.setCutOffGrade(cutOffGradeDto.value());
         return courseRepository.save(course);
     }
     public Course deleteCourse(Long userId, Long id) {
         validateUser(userId);
-        var course  = courseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Course Id "+id+" not found"));
+        var course  = courseRepository.findByUserIdAndCourseId(userId,id).orElseThrow(() -> new IllegalArgumentException("Course Id "+id+" not found"));
         courseRepository.deleteById(id);
         return course;
     }
 
     private void validateUser(Long userId) {
-        if(userRepository.existsById(userId)) return;
-        else throw new IllegalArgumentException("User id "+ userId +" not found");
+        if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+ userId +" not found");
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+@Getter @Setter
 @Entity
 @Table(name = "assessment", uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier","projection_id"})})
 public class Assessment {

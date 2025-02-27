@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
@@ -19,4 +20,6 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
 
     @Query(value = "SELECT MAX(max_value) FROM assessment WHERE projection_id = :projection",nativeQuery = true)
     Double getBiggerMaxValue(@Param("projection") Long projection);
+
+    Optional<Assessment> findByProjectionIdAndAssessmentId(Long projectionId, Long id);
 }
