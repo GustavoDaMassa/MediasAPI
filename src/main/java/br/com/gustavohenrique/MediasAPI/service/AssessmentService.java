@@ -51,7 +51,7 @@ public class AssessmentService {
             if(m.find()) assessment.setMaxValue(Double.parseDouble(m.group().replaceAll(",",".")));
             assessment.setIdentifier(matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""));
             assessment.setProjection(projection);
-            projection.setAssessment(assessmentRepository.save(assessment));
+            projection.addAssessment(assessmentRepository.save(assessment));
 
         }
     }

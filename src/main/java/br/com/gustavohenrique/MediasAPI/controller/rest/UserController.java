@@ -2,7 +2,7 @@ package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
-import br.com.gustavohenrique.MediasAPI.model.User;
+import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.service.UserService;
 import jakarta.validation.Valid;
@@ -27,8 +27,8 @@ public class UserController {
 
 
     @PostMapping
-public ResponseEntity<UserDTO> createUser(@RequestBody @Valid User user){
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(user), UserDTO.class));
+public ResponseEntity<UserDTO> createUser(@RequestBody @Valid Users users){
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(users), UserDTO.class));
     }
 
     @PatchMapping("/{id}/name")
