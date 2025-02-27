@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 @Entity
-@Table(name = "assessment")
+@Table(name = "assessment", uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier","projection_id"})})
 public class Assessment {
 
     @Id
@@ -23,8 +26,10 @@ public class Assessment {
 
     double requiredGrade;
 
+    @Setter
     private boolean fixed = false;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "projection_id", nullable = false)
     @JsonBackReference
@@ -43,59 +48,4 @@ public class Assessment {
     public Assessment() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public double getGrade() {
-        return grade;
-    }
-
-    public void setGrade(double grade) {
-        this.grade = grade;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public double getRequiredGrade() {
-        return requiredGrade;
-    }
-
-    public void setRequiredGrade(double requiredGrade) {
-        this.requiredGrade = requiredGrade;
-    }
-
-    public boolean isFixed() {
-        return fixed;
-    }
-
-    public void setFixed(boolean fixed) {
-        this.fixed = fixed;
-    }
-
-    public Projection getProjection() {
-        return projection;
-    }
-
-    public void setProjection(Projection projection) {
-        this.projection = projection;
-    }
 }
