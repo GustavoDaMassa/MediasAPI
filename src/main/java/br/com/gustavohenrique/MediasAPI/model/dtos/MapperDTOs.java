@@ -14,6 +14,6 @@ public class MapperDTOs {
     private ModelMapper modelMapper;
 
     public ProjectionDTO projectionDTO(Projection projection){
-        return new ProjectionDTO(projection.getName(), projection.getAssessment().stream().map(assessment -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()),projection.getFinalGrade());
+        return new ProjectionDTO(projection.getId(), projection.getName(), projection.getAssessment().stream().map(assessment -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()),projection.getFinalGrade());
     }
 }

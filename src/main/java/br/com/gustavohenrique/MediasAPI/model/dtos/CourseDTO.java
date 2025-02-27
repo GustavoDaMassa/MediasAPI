@@ -7,13 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class CourseDTO {
-    @NotBlank
-    String name;
+
+    private Long id;
 
     @NotBlank
-    String averageMethod;
+    private String name;
 
-    double cutOffGrade = 6.00;
+    @NotBlank
+    private String averageMethod;
+
+    private double cutOffGrade = 6.00;
 }

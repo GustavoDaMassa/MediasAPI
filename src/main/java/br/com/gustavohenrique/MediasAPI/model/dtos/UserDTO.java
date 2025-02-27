@@ -12,11 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor @AllArgsConstructor
 public class UserDTO {
 
+    private Long id;
+
     @NotBlank
-    String name;
+    private String name;
 
     @NotBlank
     @Email
     @Column(unique = true)
-    String email;
+    private String email;
 }
