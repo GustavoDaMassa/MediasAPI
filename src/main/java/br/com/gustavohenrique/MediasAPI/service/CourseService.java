@@ -1,13 +1,14 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
-import br.com.gustavohenrique.MediasAPI.controller.dtos.DoubleRequestDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,9 +26,10 @@ public class CourseService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public Course createCourse(Long userId, @Valid Course course) throws Exception {
         validateUser(userId);
-        course.setUser(userId);
+        course.setUserId(userId);
         courseRepository.save(course);
         projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
         return courseRepository.save(course);

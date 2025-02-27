@@ -1,7 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
-import br.com.gustavohenrique.MediasAPI.controller.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.User;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -19,7 +19,6 @@ public class UserService {
     public User create(User user) {
         return userRepository.save(user);
     }
-
 
     public User updateName(Long id, @Valid StringRequestDTO nameDto) {
         User newUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User Id not found"));
