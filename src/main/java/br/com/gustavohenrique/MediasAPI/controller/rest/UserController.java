@@ -1,10 +1,13 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.controller.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.controller.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.User;
+import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.service.UserService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private final UserService userService;
 
@@ -21,14 +27,14 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid User user){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(user));
+public ResponseEntity<UserDTO> createUser(@RequestBody @Valid User user){
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(user), UserDTO.class));
     }
 
     @PatchMapping("/{id}/name")
     public ResponseEntity<?> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
        try {
-           return ResponseEntity.status(HttpStatus.OK).body(userService.updateName(id, nameDto));
+           return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userService.updateName(id, nameDto), UserDTO.class));
        }catch (IllegalArgumentException e){
            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
        }
@@ -37,7 +43,7 @@ public class UserController {
     @PatchMapping("/{id}/email")
     public ResponseEntity<?> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO){
         try {
-            return ResponseEntity.ok(userService.updateEmail(id, emailDTO));
+            return ResponseEntity.ok(modelMapper.map(userService.updateEmail(id, emailDTO), UserDTO.class));
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -46,7 +52,7 @@ public class UserController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id){
         try {
-            return ResponseEntity.ok(userService.deleteUser(id));
+            return ResponseEntity.ok(modelMapper.map(userService.deleteUser(id), UserDTO.class));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
