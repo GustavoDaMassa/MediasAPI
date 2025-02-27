@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.controller.dtos;
+package br.com.gustavohenrique.MediasAPI.model.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 

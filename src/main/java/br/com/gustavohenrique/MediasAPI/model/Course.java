@@ -3,8 +3,14 @@ package br.com.gustavohenrique.MediasAPI.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "course")
 public class Course {
@@ -23,57 +29,4 @@ public class Course {
         String averageMethod;
 
         double cutOffGrade = 6.00;
-
-        double maxGrade = 10.00;
-
-        public Course(double cutOffGrade, String averageMethod, String name, Long userId, Long id) {
-                this.cutOffGrade = cutOffGrade;
-                this.averageMethod = averageMethod;
-                this.name = name;
-                this.userId = userId;
-                this.id = id;
-        }
-
-        public Course() {
-        }
-
-        public Long getId() {
-                return id;
-        }
-
-        public void setId(Long id) {
-                this.id = id;
-        }
-
-        public Long getUser() {
-                return userId;
-        }
-
-        public void setUser(Long userId) {
-                this.userId = userId;
-        }
-
-        public String getName() {
-                return name;
-        }
-
-        public void setName(String name) {
-                this.name = name;
-        }
-
-        public String getAverageMethod() {
-                return averageMethod;
-        }
-
-        public void setAverageMethod(String averageMethod) {
-                this.averageMethod = averageMethod;
-        }
-
-        public double getCutOffGrade() {
-                return cutOffGrade;
-        }
-
-        public void setCutOffGrade(double cutOffGrade) {
-                this.cutOffGrade = cutOffGrade;
-        }
 }
