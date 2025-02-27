@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
+import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
@@ -46,14 +47,14 @@ public class ProjectionService {
     @Transactional
     public Projection updateProjectionName(Long userId, Long courseId, Long id, StringRequestDTO newProjectionName) {
         validateCourse(userId, courseId);
-        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
+        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
         projection.setName(newProjectionName.string());
         return projection;
     }
 
     public Projection deleteProjection(Long userId, Long courseId, Long id) {
         validateCourse(userId,courseId);
-        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
+        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
         projectionRepository.deleteById(id);
         return projection;
     }
@@ -65,8 +66,8 @@ public class ProjectionService {
     }
 
     private void validateCourse(Long userId, Long courseId){
-        if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found");
-        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found for the user id "+userId);
+        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
+        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
     }
 }
 

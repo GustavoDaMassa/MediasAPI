@@ -7,6 +7,7 @@ import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,7 @@ public class AssessmentService {
     @Transactional
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto) throws Exception {
         validateProjection(userId,courseId,projectionId);
-        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
+        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findById(projectionId).orElseThrow();
 
@@ -114,7 +115,7 @@ public class AssessmentService {
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
 
-                        if(maxValueInt > values.size()) throw new Exception("It is not possible to select more values than those provided");
+                        if(maxValueInt > values.size()) throw new IllegalArgumentException("It is not possible to select more values than those provided");
 
                         for (int j = 0; j < maxValueInt; j++) {
                             result += Collections.max(values);
@@ -296,7 +297,7 @@ public class AssessmentService {
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
 
-                        if(maxValueInt > values.size()) throw new Exception("It is not possible to select more values than those provided");
+                        if(maxValueInt > values.size()) throw new IllegalArgumentException("It is not possible to select more values than those provided");
 
                         for (int j = 0; j < maxValueInt; j++) {
                             result += Collections.max(values);
@@ -312,9 +313,9 @@ public class AssessmentService {
     }
 
     private void validateProjection(Long userId, Long courseId, Long projectionId){
-        if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found ue ");
-        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found");
-        if(!projectionRepository.existsByCourseIdAndId(courseId,projectionId))throw  new IllegalArgumentException("Projection Id "+projectionId+" not found");
+        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
+        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
+        if(!projectionRepository.existsByCourseIdAndId(courseId,projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found for the course id "+courseId);
 
     }
 }

@@ -33,7 +33,7 @@ public class UserService {
 
     public Users deleteUser(Long id) {
             var user  = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User Id not found"));
-            userRepository.deleteById(id);
+            userRepository.delete(user);
             return user;
     }
 }
