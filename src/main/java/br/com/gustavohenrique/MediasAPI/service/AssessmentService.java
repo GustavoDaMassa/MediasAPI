@@ -1,6 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
-import br.com.gustavohenrique.MediasAPI.controller.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
@@ -8,6 +8,7 @@ import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -15,7 +16,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class AssessmentService {
-
 
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
@@ -29,19 +29,22 @@ public class AssessmentService {
         this.assessmentRepository = assessmentRepository;
     }
 
-
     public void createAssessment(Long projectionId, String averageMethod) throws Exception {
-
         var projection = projectionRepository.findById(projectionId).orElseThrow();
-        ArrayList<String> methodTokens =  compileRegex(averageMethod.trim());
 
+        ArrayList<String> methodTokens =  compileRegex(averageMethod);
+        defineIdentifiers(averageMethod, projection);
+        calculateFinalGrade(projection,averageMethod.trim());
+        calculateRequiredGrade(projection,averageMethod.trim());
+    }
+
+    @Transactional
+    private void defineIdentifiers(String averageMethod, Projection projection) {
         String identifierRegex = "(?<!@)\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?";
         Pattern pattern = Pattern.compile(identifierRegex);
-        Matcher matcher = pattern.matcher(averageMethod);
-
+        Matcher matcher = pattern.matcher(averageMethod.replaceAll("\\s",""));
         while (matcher.find()){
             var assessment = new Assessment();
-
             Pattern p = Pattern.compile("(?<=\\[)(\\d+(([.,])?\\d+)?)");
             Matcher m = p.matcher(matcher.group());
 
@@ -51,10 +54,7 @@ public class AssessmentService {
             projection.setAssessment(assessmentRepository.save(assessment));
 
         }
-        calculateFinalGrade(projection,averageMethod.trim());
-        calculateRequiredGrade(projection,averageMethod.trim());
     }
-
 
     public List<Assessment> listAssessment(Long userId, Long courseId, Long projectionId) {
         validateProjection(userId,courseId,projectionId);
@@ -62,31 +62,32 @@ public class AssessmentService {
         return assessmentRepository.findByProjection(projection);
     }
 
-
+    @Transactional
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto) throws Exception {
         validateProjection(userId,courseId,projectionId);
         var assessment = assessmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findById(projectionId).orElseThrow();
 
-        assessment.setGrade(gradeDto.value());
+        if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
+        else throw new IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
         assessment.setFixed(true);
         calculateRequiredGrade(projection, course.getAverageMethod());
         calculateFinalGrade(projectionRepository.findById(projectionId).orElseThrow(),course.getAverageMethod());
         return assessment;
     }
 
+    @Transactional
     public void calculateFinalGrade(Projection projection, String averageMethod) throws Exception {
 
         ArrayList<String> polishNotation = convertToPolishNotation(averageMethod);
         Deque<Double> stackDouble = new ArrayDeque<>();
         ArrayList<Double> values = new ArrayList<>();
-
         for (int i = 0; i < polishNotation.size(); i++) {
             String token = polishNotation.get(i);
             if(token.matches("(\\d+(([.,])?\\d+)?)"))stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
             else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                stackDouble.push(assessmentRepository.findByIndentifier(token,projection.getId()).getGrade());
+                stackDouble.push(assessmentRepository.findByIndentifier(token.replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId()).getGrade());
             }
             else {
                 if(token.matches("[+*\\-/]")){
@@ -108,7 +109,7 @@ public class AssessmentService {
                         values.add(stackDouble.pop());
 
                         Pattern amountMaxValueRegex = Pattern.compile("(?<=\\[)\\d+");
-                        Matcher maxValue = amountMaxValueRegex.matcher(token);
+                        Matcher maxValue = amountMaxValueRegex.matcher(token.replaceAll("\\s",""));
 
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
@@ -134,13 +135,13 @@ public class AssessmentService {
         ArrayList<String> methodTokens = compileRegex(averageMethod.trim());
         Deque<String> stack = new ArrayDeque<>();
         ArrayList<String> polishNotation = new ArrayList<>();
-
         for (int i = 0; i < methodTokens.size() ; i++) {
             String token = methodTokens.get(i);
             if(stack.isEmpty()&&token.matches("[*+/\\-]|@M(\\[\\d+]\\()?"))stack.push(token);// empty or token is a delimiter
             else{
                 if (token.matches("[+\\-]")) {
-                    while (!stack.peek().matches(";|\\(|@M(\\[\\d+]\\()?")||stack.isEmpty()) {
+                    while (!stack.isEmpty()) {
+                        if (stack.peek().matches(";|\\(|@M(\\[\\d+]\\()?"))break;
                         polishNotation.add(stack.pop());
                     }
                     stack.push(token);
@@ -171,11 +172,9 @@ public class AssessmentService {
         return polishNotation;
     }
 
-
     public void deleteAllAssessment(){
         assessmentRepository.deleteAll();
     }
-
 
     private ArrayList<String> compileRegex(String averageMethod) {
         //^(\d+(([.,])?\d+)?)(?=[\+\-\/\*])|(?<=[\(\+\-\*\/;])(\d+(([.,])?\d+)?)(?=[\)\/\*\+\-;])|(?<=[\+\-\*\/](\d+(([.,])?\d+)?)$|[\/\*\+\-\(\);]|(?<=[\/\*\+\-\)\(;])@M(\[\d+\]\()?|^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
@@ -188,30 +187,28 @@ public class AssessmentService {
         String regex = String.format("%s|%s|%s",coefficientsRegex,delimitersRegex,identifierRegex);
 
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(averageMethod.trim());
+        Matcher matcher = pattern.matcher(averageMethod.replaceAll("\\s",""));
 
-        ArrayList<String> methodTokens = new ArrayList<String>();
+        ArrayList<String> methodTokens = new ArrayList<>();
         while (matcher.find()) {
             methodTokens.add(matcher.group());
         }
-        if(averageMethod.replaceAll(regex,"").isEmpty())return methodTokens;
+        if(averageMethod.replaceAll("\\s","").replaceAll(regex,"").isEmpty())return methodTokens;
         else {
-            throw new IllegalArgumentException("Method for calculating averages not accepted, formula terms are invalid: "+averageMethod.replaceAll(regex,"-"));
+            throw new IllegalArgumentException("Method for calculating averages not accepted, formula terms are invalid: "+averageMethod.replaceAll("\\s","").replaceAll(regex,"-"));
         }
     }
 
-
+    @Transactional
     private void calculateRequiredGrade(Projection projection, String averageMethod) throws Exception {
 
         var polishNotation = convertToPolishNotation(averageMethod);
         double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
         var course = courseRepository.findById(projection.getCourseId()).orElseThrow();
         double cutOffGrade = course.getCutOffGrade();
-
         double requiredGrade = 0;
         double result = 0;
         int i;
-
         for ( i = 0; i <= biggerMaxValue*100; i+=100) {
              requiredGrade = (double) i/100;
              result = simulate(requiredGrade, projection, polishNotation);
@@ -220,6 +217,10 @@ public class AssessmentService {
         if (result > cutOffGrade) {
             int j;
             for ( j = i-10; j > i-100; j-=10) {
+                if(j<=0){
+                    requiredGrade = 0;
+                    break;
+                }
                 requiredGrade = (double) j/100;
                 result = simulate(requiredGrade, projection, polishNotation);
                 if (result <= cutOffGrade) break;
@@ -232,16 +233,27 @@ public class AssessmentService {
                 }
             }
         }
-        if(result<cutOffGrade)throw new Exception("failed! it will not be possible to reach the cut-off-grade");
+        if(result<cutOffGrade){
+            for (int j = 0; j < polishNotation.size(); j++) {
+                if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")) {
+                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j).replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""), projection.getId());
+                    if (!assessment.isFixed()) {
+                        assessment.setRequiredGrade(assessment.getMaxValue());
+                        assessmentRepository.save(assessment);
+                    }
+                }
+            }
+            throw new Exception("failed! it will not be possible to reach the cut-off-grade");
+        }
         else {
             for (int j = 0; j < polishNotation.size(); j++) {
                 if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j),projection.getId());
+                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j).replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
                     if (!assessment.isFixed()){
                         assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
                         assessmentRepository.save(assessment);
-                        System.out.println(assessment);
                     }
+                    else assessment.setRequiredGrade(0.00);
                 }
             }
         }
@@ -251,12 +263,11 @@ public class AssessmentService {
 
         Deque<Double> stackDouble = new ArrayDeque<>();
         ArrayList<Double> values = new ArrayList<>();
-
         for (int i = 0; i < polishNotation.size(); i++) {
             String token = polishNotation.get(i);
             if(token.matches("(\\d+(([.,])?\\d+)?)"))stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
             else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                var assessment = assessmentRepository.findByIndentifier(token,projection.getId());
+                var assessment = assessmentRepository.findByIndentifier(token.replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
                 System.out.println(token);
                 if(assessment.isFixed())stackDouble.push(assessment.getGrade());
                 else stackDouble.push(Double.min(requiredGrade,assessment.getMaxValue()));
@@ -281,7 +292,7 @@ public class AssessmentService {
                         values.add(stackDouble.pop());
 
                         Pattern amountMaxValueRegex = Pattern.compile("(?<=\\[)\\d+");
-                        Matcher maxValue = amountMaxValueRegex.matcher(token);
+                        Matcher maxValue = amountMaxValueRegex.matcher(token.replaceAll("\\s",""));
 
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
@@ -300,7 +311,6 @@ public class AssessmentService {
         }
         return stackDouble.getFirst();
     }
-
 
     private void validateProjection(Long userId, Long courseId, Long projectionId){
         if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found ue ");
