@@ -47,15 +47,6 @@ public class CourseController {
       }
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid Course newCourse){
-        try {
-            return ResponseEntity.ok(modelMapper.map(courseService.updateCourse(userId, id, newCourse), CourseDTO.class));
-        } catch ( IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
     @PatchMapping("{id}/name")
     public ResponseEntity<?> updateCourseName(@PathVariable Long userId ,@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto){
         try {
@@ -70,6 +61,8 @@ public class CourseController {
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseAverageMethod(userId, id, averageMethodDto), CourseDTO.class));
         } catch ( IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -32,7 +32,7 @@ public class ProjectionService {
     public Projection createProjection(Long userId, Long courseId, @Valid StringRequestDTO projectionName) throws Exception {
         validateCourse(userId, courseId);
         var projection = new Projection(courseId,projectionName.string());
-        var course = courseRepository.findByUserIdAndCourseId(userId,courseId).orElseThrow();
+        var course = courseRepository.findByUserIdAndId(userId,courseId).orElseThrow();
         projectionRepository.save(projection);
         assessmentService.createAssessment(courseId,projection.getId(),course.getAverageMethod());
         return projection;
@@ -46,26 +46,27 @@ public class ProjectionService {
     @Transactional
     public Projection updateProjectionName(Long userId, Long courseId, Long id, StringRequestDTO newProjectionName) {
         validateCourse(userId, courseId);
-        var projection = projectionRepository.findByCourseIdAndProjectionId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
+        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
         projection.setName(newProjectionName.string());
         return projection;
     }
 
     public Projection deleteProjection(Long userId, Long courseId, Long id) {
         validateCourse(userId,courseId);
-        var projection = projectionRepository.findByCourseIdAndProjectionId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
+        var projection = projectionRepository.findByCourseIdAndId(courseId,id).orElseThrow(()-> new IllegalArgumentException("Projection id "+id+" not found"));
         projectionRepository.deleteById(id);
         return projection;
     }
 
+    @Transactional
     public void deleteAllProjections(Long userId, Long courseId) {
         validateCourse(userId, courseId);
-        projectionRepository.deleteAll();
+        projectionRepository.deleteAllByCourseId(courseId);
     }
 
     private void validateCourse(Long userId, Long courseId){
         if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found");
-        else if(!courseRepository.existsByUserIdAndCourseId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found for the user id "+userId);
+        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found for the user id "+userId);
     }
 }
 

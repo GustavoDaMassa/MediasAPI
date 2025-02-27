@@ -31,11 +31,11 @@ public class AssessmentService {
 
     public void createAssessment(Long courseId, Long projectionId, String averageMethod) throws Exception {
 
-        var projection = projectionRepository.findByCourseIdAndProjectionId(courseId, projectionId).orElseThrow();
+        var projection = projectionRepository.findByCourseIdAndId(courseId, projectionId).orElseThrow();
         ArrayList<String> methodTokens =  compileRegex(averageMethod);
         defineIdentifiers(averageMethod, projection);
-        calculateFinalGrade(projection,averageMethod.trim());
         calculateRequiredGrade(projection,averageMethod.trim());
+        calculateFinalGrade(projection,averageMethod.trim());
     }
 
     @Transactional
@@ -65,15 +65,15 @@ public class AssessmentService {
     @Transactional
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto) throws Exception {
         validateProjection(userId,courseId,projectionId);
-        var assessment = assessmentRepository.findByProjectionIdAndAssessmentId(projectionId,id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
+        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new IllegalArgumentException("Assessment id "+id+" not found"));
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findById(projectionId).orElseThrow();
 
         if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
         else throw new IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
         assessment.setFixed(true);
-        calculateRequiredGrade(projection, course.getAverageMethod());
         calculateFinalGrade(projectionRepository.findById(projectionId).orElseThrow(),course.getAverageMethod());
+        calculateRequiredGrade(projection, course.getAverageMethod());
         return assessment;
     }
 
@@ -216,7 +216,7 @@ public class AssessmentService {
         }
         if (result > cutOffGrade) {
             int j;
-            for ( j = i-10; j > i-100; j-=10) {
+            for ( j = i-10; j >= i-100; j-=10) {
                 if(j<=0){
                     requiredGrade = 0;
                     break;
@@ -226,7 +226,7 @@ public class AssessmentService {
                 if (result <= cutOffGrade) break;
             }
             if(result<cutOffGrade){
-                for (int k = j; k < j+10 ; k++) {
+                for (int k = j+10; k <= j+10 ; k++) {
                     requiredGrade = (double) k/100;
                     result = simulate(requiredGrade,projection, polishNotation);
                     if(result>=cutOffGrade)break;
@@ -268,7 +268,6 @@ public class AssessmentService {
             if(token.matches("(\\d+(([.,])?\\d+)?)"))stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
             else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
                 var assessment = assessmentRepository.findByIndentifier(token.replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
-                System.out.println(token);
                 if(assessment.isFixed())stackDouble.push(assessment.getGrade());
                 else stackDouble.push(Double.min(requiredGrade,assessment.getMaxValue()));
             }
@@ -314,8 +313,8 @@ public class AssessmentService {
 
     private void validateProjection(Long userId, Long courseId, Long projectionId){
         if(!userRepository.existsById(userId))throw new IllegalArgumentException("User id "+userId+" not found ue ");
-        else if(!courseRepository.existsByUserIdAndCourseId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found");
-        if(!projectionRepository.existsByCourseIdAndProjectionId(courseId,projectionId))throw  new IllegalArgumentException("Projection Id "+projectionId+" not found");
+        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new IllegalArgumentException("Course id "+courseId+" not found");
+        if(!projectionRepository.existsByCourseIdAndId(courseId,projectionId))throw  new IllegalArgumentException("Projection Id "+projectionId+" not found");
 
     }
 }

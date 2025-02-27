@@ -12,8 +12,10 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
 
     List<Projection> findByCourseId(Long courseId);
 
-    Optional<Projection> findByCourseIdAndProjectionId(Long courseId, Long id);
+    Optional<Projection> findByCourseIdAndId(Long courseId, Long id);
 
-    boolean existsByCourseIdAndProjectionId(Long courseId, Long projectionId);
+    boolean existsByCourseIdAndId(Long courseId, Long id);
+
+    void deleteAllByCourseId(Long courseId);
 
 }
