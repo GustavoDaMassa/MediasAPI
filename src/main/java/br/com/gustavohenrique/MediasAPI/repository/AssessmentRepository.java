@@ -22,4 +22,6 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
     Double getBiggerMaxValue(@Param("projection") Long projection);
 
     Optional<Assessment> findByProjectionIdAndId(Long projectionId, Long id);
+
+    boolean existsByProjectionAndIdentifier(Projection projection, String identifier);
 }

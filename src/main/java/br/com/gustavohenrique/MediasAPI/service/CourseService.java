@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
+import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
@@ -30,6 +31,7 @@ public class CourseService {
     @Transactional
     public Course createCourse(Long userId, @Valid Course course){
         validateUser(userId);
+        if(courseRepository.existsByUserIdAndName(userId,course.getName()))throw new DataIntegrityException(course.getName());
         course.setUserId(userId);
         courseRepository.save(course);
         projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
@@ -43,7 +45,7 @@ public class CourseService {
 
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
-
+        if (courseRepository.existsByUserIdAndName(userId,nameDto.string()))throw new DataIntegrityException(nameDto.string());
         var course = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setName(nameDto.string());
         return courseRepository.save(course);

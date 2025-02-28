@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
+import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.FailedException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
@@ -49,7 +50,7 @@ public class AssessmentService {
             var assessment = new Assessment();
             Pattern p = Pattern.compile("(?<=\\[)(\\d+(([.,])?\\d+)?)");
             Matcher m = p.matcher(matcher.group());
-
+            if(assessmentRepository.existsByProjectionAndIdentifier(projection,matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?","")))continue;
             if(m.find()) assessment.setMaxValue(Double.parseDouble(m.group().replaceAll(",",".")));
             assessment.setIdentifier(matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""));
             assessment.setProjection(projection);

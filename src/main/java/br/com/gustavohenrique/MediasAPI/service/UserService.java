@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
+import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
@@ -20,6 +21,7 @@ public class UserService {
     }
 
     public Users create(Users users) {
+        if (userRepository.existsByEmail(users.getEmail()))throw new DataIntegrityException(users.getEmail());
         return userRepository.save(users);
     }
 
@@ -30,6 +32,7 @@ public class UserService {
     }
     public Users updateEmail(Long id, @Valid EmailUpdateDTO emailDTO) {
         Users newUsers = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User Id not found"));
+        if (userRepository.existsByEmail(emailDTO.email()))throw new DataIntegrityException(emailDTO.email());
         newUsers.setEmail(emailDTO.email());
         return userRepository.save(newUsers);
     }

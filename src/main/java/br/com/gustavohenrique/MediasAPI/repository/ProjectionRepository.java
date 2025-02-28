@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.repository;
 
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +18,7 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
     boolean existsByCourseIdAndId(Long courseId, Long id);
 
     void deleteAllByCourseId(Long courseId);
+
+    boolean existsByCourseIdAndName(Long courseId, String name);
 
 }
