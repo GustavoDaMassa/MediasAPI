@@ -36,12 +36,14 @@ public ResponseEntity<UserDTO> createUser(@RequestBody @Valid Users users){
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> showUsers(){
-        return ResponseEntity.ok(userService.listUsers().stream().map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.listUsers().stream().
+                map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
     }
 
     @PatchMapping("/{id}/name")
     public ResponseEntity<UserDTO> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
-           return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userService.updateName(id, nameDto), UserDTO.class));
+           return ResponseEntity.status(HttpStatus.OK).body(modelMapper
+                   .map(userService.updateName(id, nameDto), UserDTO.class));
     }
 
     @PatchMapping("/{id}/email")

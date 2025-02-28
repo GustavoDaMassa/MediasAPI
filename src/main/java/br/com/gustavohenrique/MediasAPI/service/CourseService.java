@@ -7,6 +7,7 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import com.sun.source.tree.WhileLoopTree;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,14 +47,16 @@ public class CourseService {
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
         if (courseRepository.existsByUserIdAndName(userId,nameDto.string()))throw new DataIntegrityException(nameDto.string());
-        var course = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+        var course = courseRepository.findByUserIdAndId(userId,id)
+                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setName(nameDto.string());
         return courseRepository.save(course);
     }
 
     public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto){
         validateUser(userId);
-        var course = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+        var course = courseRepository.findByUserIdAndId(userId,id)
+                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         projectionService.deleteAllProjections(userId, course.getId());
         course.setAverageMethod(averageMethodDto.string());
         courseRepository.save(course);
@@ -62,16 +65,20 @@ public class CourseService {
     }
     public Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto) {
         validateUser(userId);
-        var course = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+        var course = courseRepository.findByUserIdAndId(userId,id)
+                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setCutOffGrade(cutOffGradeDto.value());
         return courseRepository.save(course);
     }
     public Course deleteCourse(Long userId, Long id) {
         validateUser(userId);
-        var course  = courseRepository.findByUserIdAndId(userId,id).orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+        var course  = courseRepository.findByUserIdAndId(userId,id)
+                .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
+        projectionService.deleteAllProjections(userId, course.getId());
         courseRepository.deleteById(id);
         return course;
     }
+
 
     private void validateUser(Long userId) {
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
