@@ -54,10 +54,7 @@ class UserServiceTest {
         when(userRepository.save(any(Users.class))).thenReturn(user);
 
         var createdUser = userService.create(user);
-        assertEquals(user.getId(),createdUser.getId());
-        assertEquals(user.getName(), createdUser.getName());
-        assertEquals(user.getEmail(), createdUser.getEmail());
-        assertEquals(user.getPassword(), createdUser.getPassword());
+        assertAll(user, createdUser);
         verify( userRepository).save(user);
     }
 
@@ -86,10 +83,7 @@ class UserServiceTest {
 
         var updateUser = userService.updateName(newUser.getId(), nameDto);
 
-        assertEquals(newUser.getId(),updateUser.getId());
-        assertEquals(newUser.getName(), updateUser.getName());
-        assertEquals(newUser.getEmail(), updateUser.getEmail());
-        assertEquals(newUser.getPassword(), updateUser.getPassword());
+        assertAll(newUser, updateUser);
         verify(userRepository).save(any(Users.class));
         verify(userRepository).findById(newUser.getId());
     }
@@ -111,15 +105,12 @@ class UserServiceTest {
     @Test//___________________--------------------------------------------------------------
     void updateEmail() {
         var emailDTO = new EmailUpdateDTO("gustavo3gb@gmail.com");
-        var newUser = new Users(5L, "Gustavo Pereira", emailDTO.email(),"aula321");
+        var newUser = new Users(null, "Gustavo Pereira", emailDTO.email(),"aula321");
 
         when(userRepository.save(any(Users.class))).thenReturn(newUser);
         var updateUser = userService.updateEmail(newUser.getId(),emailDTO);
 
-        assertEquals(1,updateUser.getId());
-        assertEquals(newUser.getName(), updateUser.getName());
-        assertEquals(newUser.getEmail(), updateUser.getEmail());
-        assertEquals(newUser.getPassword(), updateUser.getPassword());
+        assertAll(newUser,updateUser);
         verify( userRepository, times(1)).save(any(Users.class));
     }
 
@@ -129,20 +120,42 @@ class UserServiceTest {
 
         var deletedUser = userService.deleteUser(user.getId());
 
-        assertEquals(user.getId(),deletedUser.getId());
-        assertEquals(user.getName(), deletedUser.getName());
-        assertEquals(user.getEmail(), deletedUser.getEmail());
-        assertEquals(user.getPassword(), deletedUser.getPassword());
+        assertAll(user, deletedUser);
         verify(userRepository, times(1)).delete(any(Users.class));
     }
 
     @Test
-    void listUsers() {
+    @DisplayName("Should return a list of Users")
+    void listUsersFindAllSuccessfully() {
         Users users1 = new Users(1L,"Gustavo","gustavo.pereira@discente.ufg.br","aula321");
         Users users2 = new Users(2L,"Henrique","gustavohenrique3gb@gmail.com.br","aula321");
         Users users3 = new Users(3L,"Gustavo Henrique","gustavo3gb@gmail.com","aula321");
 
+        when(userRepository.findAll()).thenReturn(List.of(users1,users2,users3));
 
+        List<Users> users = userService.listUsers();
+
+        assertAll(users1,users.get(0));
+        assertAll(users2,users.get(1));
+        assertAll(users3,users.get(2));
+        assertEquals(3,users.size());
+        verify(userRepository).findAll();
+        assertEquals(Users.class,users.get(0).getClass());
     }
 
+    @Test
+    @DisplayName("Should return an empty list")
+    void listUsersEmpty() {
+        when(userRepository.findAll()).thenReturn(List.of());
+        List<Users> users = userService.listUsers();
+        assertNull(users);
+        verify(userRepository).findAll();
+    }
+
+    private static void assertAll(Users expectedUser, Users actualUser) {
+        assertEquals(expectedUser.getId(), actualUser.getId());
+        assertEquals(expectedUser.getName(), actualUser.getName());
+        assertEquals(expectedUser.getEmail(), actualUser.getEmail());
+        assertEquals(expectedUser.getPassword(), actualUser.getPassword());
+    }
 }
