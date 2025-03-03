@@ -13,31 +13,31 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(NotFoundArgumentException.class)
     public ResponseEntity<StandardError> notFound(NotFoundArgumentException e, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StandardError(LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(), e.getMessage(),request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new StandardError(HttpStatus.NOT_FOUND.value(), e.getMessage(),request.getRequestURI()));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<StandardError> illegalArgument (IllegalArgumentException e, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( new StandardError(LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(), e.getMessage(),request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body( new StandardError(HttpStatus.BAD_REQUEST.value(), e.getMessage(),request.getRequestURI()));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<StandardError> noSuchElement(NoSuchElementException e, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(HttpStatus.BAD_REQUEST.value(),
                 "The equation has operators without arguments",request.getRequestURI() ));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(FailedException.class)
-    public ResponseEntity<String> failed(FailedException e){
-        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+    public ResponseEntity<StandardError> failed(FailedException e, HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body( new StandardError(HttpStatus.OK.value(), e.getMessage(),request.getRequestURI()));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(DataIntegrityException.class)
     public ResponseEntity<StandardError> DataIntegrity(DataIntegrityException e, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(), e.getMessage(), request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new StandardError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request.getRequestURI()));
     }
 }

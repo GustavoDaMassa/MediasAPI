@@ -7,11 +7,16 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter @Setter
-@AllArgsConstructor
 public class StandardError {
 
     private LocalDateTime timestamp;
     private Integer statusCode;
     private String error;
     private String path;
+
+    public StandardError(Integer statusCode, String error,String path){
+        this.statusCode = statusCode;
+        this.error = error;
+        this.path = path;
+    }
 }
