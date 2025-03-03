@@ -318,7 +318,8 @@ public class AssessmentService {
 
     private void validateProjection(Long userId, Long courseId, Long projectionId){
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
-        else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
+        var user = userRepository.findById(userId).orElseThrow();
+        if(!courseRepository.existsByUserAndId(user,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
         var course = courseRepository.findById(courseId).orElseThrow();
         if(!projectionRepository.existsByCourseAndId(course,projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found for the course id "+courseId);
 

@@ -35,7 +35,8 @@ public class ProjectionService {
     @Transactional
     public Projection createProjection(Long userId, Long courseId, @Valid StringRequestDTO projectionName){
         validateCourse(userId, courseId);
-        var course = courseRepository.findByUserIdAndId(userId,courseId).orElseThrow();
+        var user = userRepository.findById(userId).orElseThrow();
+        var course = courseRepository.findByUserAndId(user,courseId).orElseThrow();
         if (projectionRepository.existsByCourseAndName(course,projectionName.string())) {
             throw new DataIntegrityException(projectionName.string());
         }
@@ -81,7 +82,8 @@ public class ProjectionService {
 
     private void validateCourse(Long userId, Long courseId){
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
-        else if(!courseRepository.existsByUserIdAndId(userId,courseId))
+        var user = userRepository.findById(userId).orElseThrow();
+        if(!courseRepository.existsByUserAndId(user,courseId))
             throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
     }
 }

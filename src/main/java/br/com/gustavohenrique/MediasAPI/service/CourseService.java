@@ -7,7 +7,6 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
-import com.sun.source.tree.WhileLoopTree;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +31,9 @@ public class CourseService {
     @Transactional
     public Course createCourse(Long userId, @Valid Course course){
         validateUser(userId);
-        if(courseRepository.existsByUserIdAndName(userId,course.getName()))throw new DataIntegrityException(course.getName());
-        course.setUserId(userId);
+        var user = userRepository.findById(userId).orElseThrow();
+        if(courseRepository.existsByUserdAndName(user,course.getName()))throw new DataIntegrityException(course.getName());
+        course.setUser(user);
         courseRepository.save(course);
         projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
         return courseRepository.save(course);
@@ -41,13 +41,15 @@ public class CourseService {
 
     public List<Course> listCourses(Long userId) {
         validateUser(userId);
-        return courseRepository.findByUserId(userId);
+        var user = userRepository.findById(userId).orElseThrow();
+        return courseRepository.findByUser(user);
     }
 
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
-        if (courseRepository.existsByUserIdAndName(userId,nameDto.string()))throw new DataIntegrityException(nameDto.string());
-        var course = courseRepository.findByUserIdAndId(userId,id)
+        var user = userRepository.findById(userId).orElseThrow();
+        if (courseRepository.existsByUserdAndName(user,nameDto.string()))throw new DataIntegrityException(nameDto.string());
+        var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setName(nameDto.string());
         return courseRepository.save(course);
@@ -55,7 +57,8 @@ public class CourseService {
 
     public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto){
         validateUser(userId);
-        var course = courseRepository.findByUserIdAndId(userId,id)
+        var user = userRepository.findById(userId).orElseThrow();
+        var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         projectionService.deleteAllProjections(userId, course.getId());
         course.setAverageMethod(averageMethodDto.string());
@@ -65,14 +68,16 @@ public class CourseService {
     }
     public Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto) {
         validateUser(userId);
-        var course = courseRepository.findByUserIdAndId(userId,id)
+        var user = userRepository.findById(userId).orElseThrow();
+        var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setCutOffGrade(cutOffGradeDto.value());
         return courseRepository.save(course);
     }
     public Course deleteCourse(Long userId, Long id) {
         validateUser(userId);
-        var course  = courseRepository.findByUserIdAndId(userId,id)
+        var user = userRepository.findById(userId).orElseThrow();
+        var course  = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
         projectionService.deleteAllProjections(userId, course.getId());
         courseRepository.deleteById(id);

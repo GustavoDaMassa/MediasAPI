@@ -17,16 +17,18 @@ public class Course {
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        Long id;
+        private Long id;
 
-        @Column(name = "user_id", nullable = false)
-        Long userId;
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_course_user"
+                ,foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"))
+        private Users user;
 
         @NotBlank
-        String name;
+        private String name;
 
         @NotBlank
-        String averageMethod;
+        private String averageMethod;
 
-        double cutOffGrade = 6.00;
+        private double cutOffGrade = 6.00;
 }
