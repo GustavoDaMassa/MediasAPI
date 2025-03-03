@@ -22,8 +22,9 @@ public class Projection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "course_id", nullable = false)
-    private Long courseId;
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false, foreignKey = @ForeignKey(name = "fk_projection_course", foreignKeyDefinition = "FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE"))
+    private Course course;
 
     @Getter
     @OneToMany(mappedBy = "projection", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -36,8 +37,8 @@ public class Projection {
 
     //----------------------------------------------------------
 
-    public Projection(Long courseId, String name) {
-        this.courseId = courseId;
+    public Projection(Course course, String name) {
+        this.course = course;
         this.name = name;
     }
 

@@ -1,6 +1,5 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
-import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.FailedException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
@@ -33,8 +32,8 @@ public class AssessmentService {
     }
 
     public void createAssessment(Long courseId, Long projectionId, String averageMethod){
-
-        var projection = projectionRepository.findByCourseIdAndId(courseId, projectionId).orElseThrow();
+        var course = courseRepository.findById(courseId).orElseThrow();
+        var projection = projectionRepository.findByCourseAndId(course, projectionId).orElseThrow();
         ArrayList<String> methodTokens =  compileRegex(averageMethod);
         defineIdentifiers(averageMethod, projection);
         calculateRequiredGrade(projection,averageMethod.trim());
@@ -207,7 +206,7 @@ public class AssessmentService {
 
         var polishNotation = convertToPolishNotation(averageMethod);
         double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
-        var course = courseRepository.findById(projection.getCourseId()).orElseThrow();
+        var course = projection.getCourse();
         double cutOffGrade = course.getCutOffGrade();
         double requiredGrade = 0;
         double result = 0;
@@ -320,7 +319,8 @@ public class AssessmentService {
     private void validateProjection(Long userId, Long courseId, Long projectionId){
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
         else if(!courseRepository.existsByUserIdAndId(userId,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
-        if(!projectionRepository.existsByCourseIdAndId(courseId,projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found for the course id "+courseId);
+        var course = courseRepository.findById(courseId).orElseThrow();
+        if(!projectionRepository.existsByCourseAndId(course,projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found for the course id "+courseId);
 
     }
 }
