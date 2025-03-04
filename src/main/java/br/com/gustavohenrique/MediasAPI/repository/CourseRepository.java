@@ -4,6 +4,9 @@ import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,6 +21,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findByUserAndId(Users user, Long id);
 
-    boolean existsByUserdAndName(Users user, @NotBlank String name);
+    boolean existsByUserAndName(Users user, @NotBlank String name);
+
+    @Modifying
+    @Query(value = "DELETE FROM course WHERE id = :id",nativeQuery = true)
+    void deleteCourse(@Param("id") Long id);
 
 }

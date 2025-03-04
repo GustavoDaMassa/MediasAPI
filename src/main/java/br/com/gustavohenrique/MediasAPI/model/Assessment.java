@@ -31,8 +31,8 @@ public class Assessment {
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "projection_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "projection_id", nullable = false, foreignKey = @ForeignKey(name = "fk_assessment_projection",
+            foreignKeyDefinition = "FOREIGN KEY (projection_id) REFERENCES projection(id) ON DELETE CASCADE"))
     Projection projection;
     // -------------------------------------------------------
 

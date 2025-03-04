@@ -10,6 +10,7 @@ import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,17 +23,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-
+    @Transactional
     public Users create(Users users) {
         if (userRepository.existsByEmail(users.getEmail()))throw new DataIntegrityException(users.getEmail());
         return userRepository.save(users);
     }
-
+    @Transactional
     public Users updateName(Long id, @Valid StringRequestDTO nameDto) {
         Users newUsers = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
         newUsers.setName(nameDto.string());
         return userRepository.save(newUsers);
     }
+    @Transactional
     public Users updateEmail(Long id, @Valid EmailUpdateDTO emailDTO) {
         Users newUsers = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
         if (userRepository.existsByEmail(emailDTO.email()))throw new DataIntegrityException(emailDTO.email());
@@ -40,6 +42,7 @@ public class UserService {
         return userRepository.save(newUsers);
     }
 
+    @Transactional
     public Users deleteUser(Long id) {
             var user  = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
             userRepository.delete(user);

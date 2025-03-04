@@ -23,7 +23,8 @@ public class Projection {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false, foreignKey = @ForeignKey(name = "fk_projection_course", foreignKeyDefinition = "FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE"))
+    @JoinColumn(name = "course_id", nullable = false, foreignKey = @ForeignKey(name = "fk_projection_course",
+            foreignKeyDefinition = "FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE"))
     private Course course;
 
     @Getter

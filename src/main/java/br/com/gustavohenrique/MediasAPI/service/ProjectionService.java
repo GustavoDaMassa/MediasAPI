@@ -49,7 +49,7 @@ public class ProjectionService {
     public List<Projection> listProjection(Long userId, Long courseId) {
         validateCourse(userId,courseId);
         Course course = courseRepository.findById(courseId).orElseThrow();
-        return projectionRepository.findByCourseId(course);
+        return projectionRepository.findByCourse(course);
     }
 
     @Transactional
@@ -64,20 +64,21 @@ public class ProjectionService {
         return projection;
     }
 
+    @Transactional
     public Projection deleteProjection(Long userId, Long courseId, Long id) {
         validateCourse(userId,courseId);
+
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
                 (()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
-        projectionRepository.deleteById(id);
+        projectionRepository.deleteProjection(id);
         return projection;
     }
 
     @Transactional
     public void deleteAllProjections(Long userId, Long courseId) {
         validateCourse(userId, courseId);
-        var course = courseRepository.findById(courseId).orElseThrow();
-        projectionRepository.deleteAllByCourse(course);
+        projectionRepository.deleteAllByCourse(courseId);
     }
 
     private void validateCourse(Long userId, Long courseId){

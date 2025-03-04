@@ -174,10 +174,6 @@ public class AssessmentService {
         return polishNotation;
     }
 
-    public void deleteAllAssessment(){
-        assessmentRepository.deleteAll();
-    }
-
     private ArrayList<String> compileRegex(String averageMethod) {
         //^(\d+(([.,])?\d+)?)(?=[\+\-\/\*])|(?<=[\(\+\-\*\/;])(\d+(([.,])?\d+)?)(?=[\)\/\*\+\-;])|(?<=[\+\-\*\/](\d+(([.,])?\d+)?)$|[\/\*\+\-\(\);]|(?<=[\/\*\+\-\)\(;])@M(\[\d+\]\()?|^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
         String doubleRegex = "(\\d+(([.,])?\\d+)?)";

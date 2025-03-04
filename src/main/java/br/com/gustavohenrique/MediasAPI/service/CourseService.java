@@ -32,7 +32,7 @@ public class CourseService {
     public Course createCourse(Long userId, @Valid Course course){
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
-        if(courseRepository.existsByUserdAndName(user,course.getName()))throw new DataIntegrityException(course.getName());
+        if(courseRepository.existsByUserAndName(user,course.getName()))throw new DataIntegrityException(course.getName());
         course.setUser(user);
         courseRepository.save(course);
         projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
@@ -44,17 +44,17 @@ public class CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         return courseRepository.findByUser(user);
     }
-
+    @Transactional
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
-        if (courseRepository.existsByUserdAndName(user,nameDto.string()))throw new DataIntegrityException(nameDto.string());
+        if (courseRepository.existsByUserAndName(user,nameDto.string()))throw new DataIntegrityException(nameDto.string());
         var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
         course.setName(nameDto.string());
         return courseRepository.save(course);
     }
-
+    @Transactional
     public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto){
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
@@ -66,6 +66,7 @@ public class CourseService {
         projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
         return course;
     }
+    @Transactional
     public Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto) {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
@@ -74,13 +75,14 @@ public class CourseService {
         course.setCutOffGrade(cutOffGradeDto.value());
         return courseRepository.save(course);
     }
+
+    @Transactional
     public Course deleteCourse(Long userId, Long id) {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
         var course  = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
-        projectionService.deleteAllProjections(userId, course.getId());
-        courseRepository.deleteById(id);
+        courseRepository.deleteCourse(id);
         return course;
     }
 

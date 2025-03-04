@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +28,9 @@ public class Users {
     @Email
     @Column(unique = true)
     String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Course> course;
 
 
     @NotBlank

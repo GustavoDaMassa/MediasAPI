@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,8 +29,11 @@ public class Course {
         @NotBlank
         private String name;
 
+
+        @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+        private List<Projection> projection;
+
         @NotBlank
         private String averageMethod;
-
         private double cutOffGrade = 6.00;
 }
