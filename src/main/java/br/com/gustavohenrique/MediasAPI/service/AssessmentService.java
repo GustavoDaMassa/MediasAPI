@@ -1,6 +1,5 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
-import br.com.gustavohenrique.MediasAPI.exception.FailedException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
@@ -33,9 +32,10 @@ public class AssessmentService {
     }
 
     @Transactional
-    public void createAssessment(Long courseId, Long projectionId){
-        var course = courseRepository.findById(courseId).orElseThrow();
-        var projection = projectionRepository.findByCourseAndId(course, projectionId).orElseThrow();
+    public void createAssessment(Long projectionId){
+        validateProjection(projectionId);
+        var projection = projectionRepository.findById(projectionId).orElseThrow();
+        var course = projection.getCourse();
         defineIdentifiers(course.getAverageMethod(), projection);
         calculateFinalGrade(projection,course.getAverageMethod());
         calculateRequiredGrade(projection,course);
@@ -59,18 +59,18 @@ public class AssessmentService {
         }
     }
 
-    public List<Assessment> listAssessment(Long userId, Long courseId, Long projectionId) {
-        validateProjection(userId,courseId,projectionId);
+    public List<Assessment> listAssessment(Long projectionId) {
+        validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
         return assessmentRepository.findByProjection(projection);
     }
 
     @Transactional
-    public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto){
-        validateProjection(userId,courseId,projectionId);
-        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
-        var course = courseRepository.findById(courseId).orElseThrow();
+    public Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto){
+        validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
+        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
+        var course = assessment.getProjection().getCourse();
 
         if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
         else throw new IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
@@ -313,12 +313,7 @@ public class AssessmentService {
         return stackDouble.getFirst();
     }
 
-    private void validateProjection(Long userId, Long courseId, Long projectionId){
-        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
-        var user = userRepository.findById(userId).orElseThrow();
-        if(!courseRepository.existsByUserAndId(user,courseId)) throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
-        var course = courseRepository.findById(courseId).orElseThrow();
-        if(!projectionRepository.existsByCourseAndId(course,projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found for the course id "+courseId);
-
+    private void validateProjection(Long projectionId){
+        if(!projectionRepository.existsById(projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
     }
 }

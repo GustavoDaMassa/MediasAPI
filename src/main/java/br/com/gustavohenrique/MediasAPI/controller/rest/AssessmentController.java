@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("{userId}/courses/{courseId}/projections/{projectionId}/assessment")
+@RequestMapping("/{projectionId}/assessment")
 public class AssessmentController {
 
     @Autowired
@@ -26,13 +26,13 @@ public class AssessmentController {
         this.assessmentService = assessmentService;
     }
 
-    @PatchMapping("{id}")
-    public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){
-            return ResponseEntity.ok(modelMapper.map(assessmentService.insertGrade(userId,courseId,projectionId,id,gradeDto), AssessmentDTO.class));
+    @PatchMapping("/{id}")
+    public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){
+            return ResponseEntity.ok(modelMapper.map(assessmentService.insertGrade(projectionId,id,gradeDto), AssessmentDTO.class));
     }
 
     @GetMapping
-    public ResponseEntity<List<AssessmentDTO>> showAssessment(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long projectionId){
-            return ResponseEntity.ok(assessmentService.listAssessment(userId,courseId,projectionId).stream().map(assessment -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()));
+    public ResponseEntity<List<AssessmentDTO>> showAssessment(@PathVariable Long projectionId){
+            return ResponseEntity.ok(assessmentService.listAssessment(projectionId).stream().map(assessment -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()));
     }
 }
