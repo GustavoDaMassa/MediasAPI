@@ -18,8 +18,6 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
 
     Optional<Projection> findByCourseAndId(Course course, Long id);
 
-    boolean existsByCourseAndId(Course course, Long id);
-
     @Modifying
     @Query(value = "DELETE FROM projection WHERE course_id = :courseId",nativeQuery = true)
     void deleteAllByCourse(@Param("courseId") Long courseId);

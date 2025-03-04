@@ -17,8 +17,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findByUser(Users user);
 
-    boolean existsByUserAndId(Users user, Long id);
-
     Optional<Course> findByUserAndId(Users user, Long id);
 
     boolean existsByUserAndName(Users user, @NotBlank String name);
