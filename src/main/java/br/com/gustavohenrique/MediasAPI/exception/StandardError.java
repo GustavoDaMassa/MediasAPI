@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter @Setter
 public class StandardError {
 
-    private LocalDateTime timestamp;
+    private LocalDateTime timestamp = LocalDateTime.now();
     private Integer statusCode;
     private String error;
     private String path;
