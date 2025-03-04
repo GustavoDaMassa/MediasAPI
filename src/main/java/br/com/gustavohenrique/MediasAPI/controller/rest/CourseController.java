@@ -1,10 +1,13 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
+import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.dtos.CourseDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.service.CourseService;
+import br.com.gustavohenrique.MediasAPI.service.ProjectionService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +24,11 @@ public class CourseController {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
+    private ProjectionService projectionService;
 
-    private final CourseService courseService;
-
-    public CourseController(CourseService courseService) {
-        this.courseService = courseService;
-    }
 
     @PostMapping
     public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid Course course){
@@ -65,4 +67,10 @@ public class CourseController {
     public ResponseEntity<CourseDTO> deleteCourse(@PathVariable Long userId, @PathVariable Long id){
             return ResponseEntity.ok(modelMapper.map(courseService.deleteCourse(userId, id), CourseDTO.class));
     }
+
+    @GetMapping("/projections")
+    public ResponseEntity<List<ProjectionDTO>> showAllProjections(@PathVariable Long userId){
+        return ResponseEntity.ok(projectionService.listAllProjection(userId).stream().map(projection -> modelMapper.map(projection,ProjectionDTO.class)).collect(Collectors.toList()));
+    }
+
 }

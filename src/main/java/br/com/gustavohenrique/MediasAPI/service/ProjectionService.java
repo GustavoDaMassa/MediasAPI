@@ -3,6 +3,8 @@ package br.com.gustavohenrique.MediasAPI.service;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
+import br.com.gustavohenrique.MediasAPI.model.dtos.CourseDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
@@ -80,6 +82,11 @@ public class ProjectionService {
     private void validateCourse(Long courseId){
         if(!courseRepository.existsById(courseId))
             throw new NotFoundArgumentException("Course id "+courseId+" not found");
+    }
+
+    public List<Projection> listAllProjection(Long userId) {
+        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
+        return projectionRepository.findAllByUserId(userId);
     }
 }
 

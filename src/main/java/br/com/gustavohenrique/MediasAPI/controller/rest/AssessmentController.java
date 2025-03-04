@@ -20,11 +20,9 @@ public class AssessmentController {
     @Autowired
     private ModelMapper modelMapper;
 
-    private final AssessmentService assessmentService;
+    @Autowired
+    private AssessmentService assessmentService;
 
-    public AssessmentController(AssessmentService assessmentService) {
-        this.assessmentService = assessmentService;
-    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){
