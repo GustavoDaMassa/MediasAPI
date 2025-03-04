@@ -19,14 +19,11 @@ public class CourseService {
 
     @Autowired
     private ProjectionService projectionService;
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
-
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository) {
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     public Course createCourse(Long userId, @Valid Course course){
@@ -82,7 +79,6 @@ public class CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         var course  = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
-        //projectionService.deleteAllProjections(userId, course.getId());
         courseRepository.deleteCourse(id);
         return course;
     }

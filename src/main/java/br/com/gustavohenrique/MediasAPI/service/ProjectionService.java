@@ -21,16 +21,13 @@ public class ProjectionService {
     @Autowired
     private AssessmentService assessmentService;
 
-    private final UserRepository userRepository;
-    private  final CourseRepository courseRepository;
-    private  final ProjectionRepository projectionRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private ProjectionRepository projectionRepository;
 
-    public ProjectionService(UserRepository userRepository, CourseRepository courseRepository,
-                             ProjectionRepository projectionRepository) {
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
-        this.projectionRepository = projectionRepository;
-    }
 
     @Transactional
     public Projection createProjection(Long courseId, @Valid StringRequestDTO projectionName){

@@ -5,7 +5,6 @@ import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
-import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

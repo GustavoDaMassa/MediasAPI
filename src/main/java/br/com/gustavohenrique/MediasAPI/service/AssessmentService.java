@@ -5,10 +5,9 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
-import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
-import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +18,10 @@ import java.util.regex.Pattern;
 @Service
 public class AssessmentService {
 
-    private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
-    private  final ProjectionRepository projectionRepository;
-    private final AssessmentRepository assessmentRepository;
-
-    public AssessmentService(UserRepository userRepository, CourseRepository courseRepository, ProjectionRepository projectionRepository, AssessmentRepository assessmentRepository) {
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
-        this.projectionRepository = projectionRepository;
-        this.assessmentRepository = assessmentRepository;
-    }
+    @Autowired
+    private ProjectionRepository projectionRepository;
+    @Autowired
+    private AssessmentRepository assessmentRepository;
 
     @Transactional
     public void createAssessment(Long projectionId){
@@ -50,7 +42,8 @@ public class AssessmentService {
             var assessment = new Assessment();
             Pattern p = Pattern.compile("(?<=\\[)(\\d+(([.,])?\\d+)?)");
             Matcher m = p.matcher(matcher.group());
-            if(assessmentRepository.existsByProjectionAndIdentifier(projection,matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?","")))continue;
+            if(assessmentRepository.existsByProjectionAndIdentifier(projection,matcher.group()
+                    .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?","")))continue;
             if(m.find()) assessment.setMaxValue(Double.parseDouble(m.group().replaceAll(",",".")));
             assessment.setIdentifier(matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""));
             assessment.setProjection(projection);
@@ -69,11 +62,13 @@ public class AssessmentService {
     public Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto){
         validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
-        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
+        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() ->
+                new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
         var course = assessment.getProjection().getCourse();
 
         if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
-        else throw new IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
+        else throw new
+                IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
         assessment.setFixed(true);
         calculateFinalGrade(projection,course.getAverageMethod());
         calculateRequiredGrade(projection,course);
@@ -88,9 +83,11 @@ public class AssessmentService {
         ArrayList<Double> values = new ArrayList<>();
         for (int i = 0; i < polishNotation.size(); i++) {
             String token = polishNotation.get(i);
-            if(token.matches("(\\d+(([.,])?\\d+)?)"))stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
+            if(token.matches("(\\d+(([.,])?\\d+)?)"))
+                stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
             else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                stackDouble.push(assessmentRepository.findByIndentifier(token.replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId()).getGrade());
+                stackDouble.push(assessmentRepository.findByIndentifier(token
+                        .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId()).getGrade());
             }
             else {
                 if(token.matches("[+*\\-/]")){
@@ -117,7 +114,8 @@ public class AssessmentService {
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
 
-                        if(maxValueInt > values.size()) throw new IllegalArgumentException("It is not possible to select more values than those provided");
+                        if(maxValueInt > values.size()) throw new
+                                IllegalArgumentException("It is not possible to select more values than those provided");
 
                         for (int j = 0; j < maxValueInt; j++) {
                             result += Collections.max(values);
@@ -176,7 +174,9 @@ public class AssessmentService {
     }
 
     private ArrayList<String> compileRegex(String averageMethod) {
-        //^(\d+(([.,])?\d+)?)(?=[\+\-\/\*])|(?<=[\(\+\-\*\/;])(\d+(([.,])?\d+)?)(?=[\)\/\*\+\-;])|(?<=[\+\-\*\/](\d+(([.,])?\d+)?)$|[\/\*\+\-\(\);]|(?<=[\/\*\+\-\)\(;])@M(\[\d+\]\()?|^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
+        //^(\d+(([.,])?\d+)?)(?=[\+\-\/\*])|(?<=[\(\+\-\*\/;])(\d+(([.,])?\d+)?)(?=[\)\/\*\+\-;])|
+        // (?<=[\+\-\*\/](\d+(([.,])?\d+)?)$|[\/\*\+\-\(\);]|(?<=[\/\*\+\-\)\(;])@M(\[\d+\]\()?|
+        // ^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
         String doubleRegex = "(\\d+(([.,])?\\d+)?)";
         String operatorsRegex = "\\+\\-\\*\\/";
         String featuresRegex = "@M";
@@ -251,7 +251,8 @@ public class AssessmentService {
                 if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
                     var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
                             .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
-                    if (!assessment.isFixed())assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
+                    if (!assessment.isFixed())
+                        assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
                     else assessment.setRequiredGrade(0.00);
                     assessmentRepository.save(assessment);
                 }
@@ -265,9 +266,11 @@ public class AssessmentService {
         ArrayList<Double> values = new ArrayList<>();
         for (int i = 0; i < polishNotation.size(); i++) {
             String token = polishNotation.get(i);
-            if(token.matches("(\\d+(([.,])?\\d+)?)"))stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
+            if(token.matches("(\\d+(([.,])?\\d+)?)"))
+                stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
             else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                var assessment = assessmentRepository.findByIndentifier(token.replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
+                var assessment = assessmentRepository.findByIndentifier(token
+                        .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
                 if(assessment.isFixed())stackDouble.push(assessment.getGrade());
                 else stackDouble.push(Double.min(requiredGrade,assessment.getMaxValue()));
             }
@@ -298,7 +301,8 @@ public class AssessmentService {
                         int maxValueInt = 1;
                         if(maxValue.find())maxValueInt = Integer.parseInt(maxValue.group());
 
-                        if(maxValueInt > values.size()) throw new IllegalArgumentException("It is not possible to select more values than those provided");
+                        if(maxValueInt > values.size()) throw new
+                                IllegalArgumentException("It is not possible to select more values than those provided");
 
                         for (int j = 0; j < maxValueInt; j++) {
                             result += Collections.max(values);
@@ -314,6 +318,7 @@ public class AssessmentService {
     }
 
     private void validateProjection(Long projectionId){
-        if(!projectionRepository.existsById(projectionId))throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
+        if(!projectionRepository.existsById(projectionId))
+            throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
     }
 }
