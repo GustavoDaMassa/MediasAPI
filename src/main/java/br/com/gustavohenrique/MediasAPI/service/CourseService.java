@@ -82,6 +82,7 @@ public class CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         var course  = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
+        //projectionService.deleteAllProjections(userId, course.getId());
         courseRepository.deleteCourse(id);
         return course;
     }

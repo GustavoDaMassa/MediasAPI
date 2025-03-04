@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.service;
 
 import br.com.gustavohenrique.MediasAPI.exception.FailedException;
+import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -31,12 +32,13 @@ public class AssessmentService {
         this.assessmentRepository = assessmentRepository;
     }
 
-    public void createAssessment(Long courseId, Long projectionId, String averageMethod){
+    @Transactional
+    public void createAssessment(Long courseId, Long projectionId){
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course, projectionId).orElseThrow();
-        defineIdentifiers(averageMethod, projection);
-        calculateFinalGrade(projection,averageMethod.trim());
-        calculateRequiredGrade(projection,averageMethod.trim());
+        defineIdentifiers(course.getAverageMethod(), projection);
+        calculateFinalGrade(projection,course.getAverageMethod());
+        calculateRequiredGrade(projection,course);
     }
 
     @Transactional
@@ -63,7 +65,7 @@ public class AssessmentService {
         return assessmentRepository.findByProjection(projection);
     }
 
-
+    @Transactional
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto){
         validateProjection(userId,courseId,projectionId);
         var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
@@ -73,8 +75,8 @@ public class AssessmentService {
         if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
         else throw new IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
         assessment.setFixed(true);
-        calculateFinalGrade(projectionRepository.findById(projectionId).orElseThrow(),course.getAverageMethod());
-        calculateRequiredGrade(projection, course.getAverageMethod());
+        calculateFinalGrade(projection,course.getAverageMethod());
+        calculateRequiredGrade(projection,course);
         return assessment;
     }
 
@@ -201,11 +203,10 @@ public class AssessmentService {
     }
 
     @Transactional
-    private void calculateRequiredGrade(Projection projection, String averageMethod){
+    private void calculateRequiredGrade(Projection projection, Course course){
 
-        var polishNotation = convertToPolishNotation(averageMethod);
+        var polishNotation = convertToPolishNotation(course.getAverageMethod());
         double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
-        var course = projection.getCourse();
         double cutOffGrade = course.getCutOffGrade();
         double requiredGrade = 0;
         double result = 0;
@@ -234,9 +235,16 @@ public class AssessmentService {
                 }
             }
         }
-        if(result<cutOffGrade){
-            throw new FailedException("Affs! unfortunately it will not be possible to reach the cut-off-grade"
-                    ,polishNotation,projection.getId(),this.assessmentRepository);
+        if(result<cutOffGrade){//------------------ tratar caso em que a nota de corte não vai ser alcançada
+            for (int j = 0; j < polishNotation.size(); j++) {
+                if(polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")) {
+                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
+                            .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""), projection.getId());
+                    if (!assessment.isFixed())assessment.setRequiredGrade(assessment.getMaxValue());
+                    else assessment.setRequiredGrade(0.00);
+                    assessmentRepository.save(assessment);
+                }
+            }
         }
         else {
             for (int j = 0; j < polishNotation.size(); j++) {

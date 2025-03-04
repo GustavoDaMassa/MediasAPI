@@ -16,4 +16,5 @@ public class ProjectionDTO {
     private String name;
     private List<AssessmentDTO> assessment;
     private double finalGrade;
+    private String courseName;
 }

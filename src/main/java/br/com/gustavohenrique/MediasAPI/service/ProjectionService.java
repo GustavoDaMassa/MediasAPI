@@ -42,7 +42,7 @@ public class ProjectionService {
         }
         var projection = new Projection(course,projectionName.string());
         projectionRepository.save(projection);
-        assessmentService.createAssessment(courseId,projection.getId(),course.getAverageMethod());
+        assessmentService.createAssessment(courseId,projection.getId());
         return projection;
     }
 

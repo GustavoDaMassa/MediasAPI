@@ -16,7 +16,6 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new StandardError(HttpStatus.NOT_FOUND.value(), e.getMessage(),request.getRequestURI()));
     }
-
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<StandardError> illegalArgument (IllegalArgumentException e, HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -28,13 +27,6 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(HttpStatus.BAD_REQUEST.value(),
                 "The equation has operators without arguments",request.getRequestURI() ));
     }
-
-    @org.springframework.web.bind.annotation.ExceptionHandler(FailedException.class)
-    public ResponseEntity<StandardError> failed(FailedException e, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body( new StandardError(HttpStatus.OK.value(), e.getMessage(),request.getRequestURI()));
-    }
-
     @org.springframework.web.bind.annotation.ExceptionHandler(DataIntegrityException.class)
     public ResponseEntity<StandardError> DataIntegrity(DataIntegrityException e, HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
