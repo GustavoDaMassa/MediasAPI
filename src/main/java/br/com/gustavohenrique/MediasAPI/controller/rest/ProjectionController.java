@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("{userId}/courses/{courseId}/projections")
+@RequestMapping("/{courseId}/projections")
 public class ProjectionController {
 
 
@@ -35,27 +35,27 @@ public class ProjectionController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long userId, @PathVariable Long courseId, @RequestBody @Valid StringRequestDTO projectionName){
-            return ResponseEntity.status(HttpStatus.CREATED).body(mapperDTOs.projectionDTO(projectionService.createProjection(userId,courseId,projectionName)));
+    public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long courseId, @RequestBody @Valid StringRequestDTO projectionName){
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapperDTOs.projectionDTO(projectionService.createProjection(courseId,projectionName)));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long userId, @PathVariable Long courseId){
-            return ResponseEntity.ok(projectionService.listProjection(userId,courseId).stream().map(projection -> mapperDTOs.projectionDTO(projection)).collect(Collectors.toList()));
+    public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long courseId){
+            return ResponseEntity.ok(projectionService.listProjection(courseId).stream().map(projection -> mapperDTOs.projectionDTO(projection)).collect(Collectors.toList()));
     }
 
-    @PatchMapping("{id}")
-    public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id, @RequestBody StringRequestDTO newProjectNameDto){
-            return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(projectionService.updateProjectionName(userId, courseId, id, newProjectNameDto),ProjectionDTO.class));
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long courseId, @PathVariable Long id, @RequestBody StringRequestDTO newProjectNameDto){
+            return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(projectionService.updateProjectionName(courseId, id, newProjectNameDto),ProjectionDTO.class));
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<ProjectionDTO> deleteProjection(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id){
-            return ResponseEntity.ok(modelMapper.map(projectionService.deleteProjection(userId,courseId,id),ProjectionDTO.class));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProjectionDTO> deleteProjection(@PathVariable Long courseId, @PathVariable Long id){
+            return ResponseEntity.ok(modelMapper.map(projectionService.deleteProjection(courseId,id),ProjectionDTO.class));
     }
 
     @DeleteMapping("/all")
-    public void deleteAllProjections(@PathVariable Long userId, @PathVariable Long courseId){
-        projectionService.deleteAllProjections(userId,courseId);
+    public void deleteAllProjections(@PathVariable Long courseId){
+        projectionService.deleteAllProjections(courseId);
     }
 }

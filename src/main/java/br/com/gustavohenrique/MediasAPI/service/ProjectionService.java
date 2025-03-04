@@ -33,28 +33,27 @@ public class ProjectionService {
     }
 
     @Transactional
-    public Projection createProjection(Long userId, Long courseId, @Valid StringRequestDTO projectionName){
-        validateCourse(userId, courseId);
-        var user = userRepository.findById(userId).orElseThrow();
-        var course = courseRepository.findByUserAndId(user,courseId).orElseThrow();
+    public Projection createProjection(Long courseId, @Valid StringRequestDTO projectionName){
+        validateCourse(courseId);
+        var course = courseRepository.findById(courseId).orElseThrow();
         if (projectionRepository.existsByCourseAndName(course,projectionName.string())) {
             throw new DataIntegrityException(projectionName.string());
         }
         var projection = new Projection(course,projectionName.string());
         projectionRepository.save(projection);
-        assessmentService.createAssessment(courseId,projection.getId());
+        assessmentService.createAssessment(projection.getId());
         return projection;
     }
 
-    public List<Projection> listProjection(Long userId, Long courseId) {
-        validateCourse(userId,courseId);
+    public List<Projection> listProjection(Long courseId) {
+        validateCourse(courseId);
         Course course = courseRepository.findById(courseId).orElseThrow();
         return projectionRepository.findByCourse(course);
     }
 
     @Transactional
-    public Projection updateProjectionName(Long userId, Long courseId, Long id, StringRequestDTO newProjectionName) {
-        validateCourse(userId, courseId);
+    public Projection updateProjectionName(Long courseId, Long id, StringRequestDTO newProjectionName) {
+        validateCourse(courseId);
         var course = courseRepository.findById(courseId).orElseThrow();
         if (projectionRepository.existsByCourseAndName(course,newProjectionName.string()))
             throw new DataIntegrityException(newProjectionName.string());
@@ -65,8 +64,8 @@ public class ProjectionService {
     }
 
     @Transactional
-    public Projection deleteProjection(Long userId, Long courseId, Long id) {
-        validateCourse(userId,courseId);
+    public Projection deleteProjection(Long courseId, Long id) {
+        validateCourse(courseId);
 
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
@@ -76,16 +75,14 @@ public class ProjectionService {
     }
 
     @Transactional
-    public void deleteAllProjections(Long userId, Long courseId) {
-        validateCourse(userId, courseId);
+    public void deleteAllProjections(Long courseId) {
+        validateCourse(courseId);
         projectionRepository.deleteAllByCourse(courseId);
     }
 
-    private void validateCourse(Long userId, Long courseId){
-        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+userId+" not found");
-        var user = userRepository.findById(userId).orElseThrow();
-        if(!courseRepository.existsByUserAndId(user,courseId))
-            throw new NotFoundArgumentException("Course id "+courseId+" not found for the user id "+userId);
+    private void validateCourse(Long courseId){
+        if(!courseRepository.existsById(courseId))
+            throw new NotFoundArgumentException("Course id "+courseId+" not found");
     }
 }
 

@@ -35,7 +35,7 @@ public class CourseService {
         if(courseRepository.existsByUserAndName(user,course.getName()))throw new DataIntegrityException(course.getName());
         course.setUser(user);
         courseRepository.save(course);
-        projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
+        projectionService.createProjection(course.getId(), new StringRequestDTO(course.getName()));
         return courseRepository.save(course);
     }
 
@@ -60,10 +60,10 @@ public class CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
-        projectionService.deleteAllProjections(userId, course.getId());
+        projectionService.deleteAllProjections(course.getId());
         course.setAverageMethod(averageMethodDto.string());
         courseRepository.save(course);
-        projectionService.createProjection(userId, course.getId(), new StringRequestDTO(course.getName()));
+        projectionService.createProjection(course.getId(), new StringRequestDTO(course.getName()));
         return course;
     }
     @Transactional
