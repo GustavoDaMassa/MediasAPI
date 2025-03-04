@@ -34,14 +34,13 @@ public class AssessmentService {
     public void createAssessment(Long courseId, Long projectionId, String averageMethod){
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course, projectionId).orElseThrow();
-        ArrayList<String> methodTokens =  compileRegex(averageMethod);
         defineIdentifiers(averageMethod, projection);
-        calculateRequiredGrade(projection,averageMethod.trim());
         calculateFinalGrade(projection,averageMethod.trim());
+        calculateRequiredGrade(projection,averageMethod.trim());
     }
 
     @Transactional
-    private void defineIdentifiers(String averageMethod, Projection projection) {
+    public void defineIdentifiers(String averageMethod, Projection projection) {
         String identifierRegex = "(?<!@)\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?";
         Pattern pattern = Pattern.compile(identifierRegex);
         Matcher matcher = pattern.matcher(averageMethod.replaceAll("\\s",""));
@@ -64,7 +63,7 @@ public class AssessmentService {
         return assessmentRepository.findByProjection(projection);
     }
 
-    @Transactional
+
     public Assessment insertGrade(Long userId, Long courseId, Long projectionId, Long id, DoubleRequestDTO gradeDto){
         validateProjection(userId,courseId,projectionId);
         var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() -> new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
@@ -179,8 +178,10 @@ public class AssessmentService {
         String doubleRegex = "(\\d+(([.,])?\\d+)?)";
         String operatorsRegex = "\\+\\-\\*\\/";
         String featuresRegex = "@M";
-        String coefficientsRegex = String.format("^%s(?=[%s])|(?<=[%s\\(;])%s(?=[%s\\);])|(?<=[%s])%s$",doubleRegex,operatorsRegex,operatorsRegex,doubleRegex,operatorsRegex,operatorsRegex,doubleRegex);
-        String delimitersRegex = String.format("[%s\\(\\)\\;]|(?<=[%s\\)\\(;])%s(\\[\\d+\\]\\()?|^%s(\\[\\d+\\]\\()?",operatorsRegex,operatorsRegex,featuresRegex,featuresRegex);
+        String coefficientsRegex = String.format("^%s(?=[%s])|(?<=[%s\\(;])%s(?=[%s\\);])|(?<=[%s])%s$",
+                doubleRegex,operatorsRegex,operatorsRegex,doubleRegex,operatorsRegex,operatorsRegex,doubleRegex);
+        String delimitersRegex = String.format("[%s\\(\\)\\;]|(?<=[%s\\)\\(;])%s(\\[\\d+\\]\\()?|^%s(\\[\\d+\\]\\()?",
+                operatorsRegex,operatorsRegex,featuresRegex,featuresRegex);
         String identifierRegex = String.format("(?<!@)\\w*[A-Za-z]\\w*(\\[%s\\])?",doubleRegex);
         String regex = String.format("%s|%s|%s",coefficientsRegex,delimitersRegex,identifierRegex);
 
@@ -191,9 +192,11 @@ public class AssessmentService {
         while (matcher.find()) {
             methodTokens.add(matcher.group());
         }
-        if(averageMethod.replaceAll("\\s","").replaceAll(regex,"").isEmpty())return methodTokens;
+        if(averageMethod.replaceAll("\\s","").replaceAll(regex,"").isEmpty())
+            return methodTokens;
         else {
-            throw new IllegalArgumentException("Method for calculating averages not accepted, formula terms are invalid: "+averageMethod.replaceAll("\\s","").replaceAll(regex,"-"));
+            throw new IllegalArgumentException("Method for calculating averages not accepted, formula terms are invalid:"+
+                    " "+averageMethod.replaceAll("\\s","").replaceAll(regex,"-"));
         }
     }
 
@@ -232,27 +235,17 @@ public class AssessmentService {
             }
         }
         if(result<cutOffGrade){
-            for (int j = 0; j < polishNotation.size(); j++) {
-                if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")) {
-                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j).replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""), projection.getId());
-                    if (!assessment.isFixed()) {
-                        assessment.setRequiredGrade(assessment.getMaxValue());
-                        assessmentRepository.save(assessment);
-                    }
-                    else assessment.setRequiredGrade(0.00);
-                }
-            }
-            throw new FailedException("Affs! unfortunately it will not be possible to reach the cut-off-grade");
+            throw new FailedException("Affs! unfortunately it will not be possible to reach the cut-off-grade"
+                    ,polishNotation,projection.getId(),this.assessmentRepository);
         }
         else {
             for (int j = 0; j < polishNotation.size(); j++) {
                 if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j).replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
-                    if (!assessment.isFixed()){
-                        assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
-                        assessmentRepository.save(assessment);
-                    }
+                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
+                            .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
+                    if (!assessment.isFixed())assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
                     else assessment.setRequiredGrade(0.00);
+                    assessmentRepository.save(assessment);
                 }
             }
         }

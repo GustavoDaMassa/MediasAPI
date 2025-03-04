@@ -30,13 +30,15 @@ public class UserService {
     }
     @Transactional
     public Users updateName(Long id, @Valid StringRequestDTO nameDto) {
-        Users newUsers = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+        Users newUsers = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
         newUsers.setName(nameDto.string());
         return userRepository.save(newUsers);
     }
     @Transactional
     public Users updateEmail(Long id, @Valid EmailUpdateDTO emailDTO) {
-        Users newUsers = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+        Users newUsers = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
         if (userRepository.existsByEmail(emailDTO.email()))throw new DataIntegrityException(emailDTO.email());
         newUsers.setEmail(emailDTO.email());
         return userRepository.save(newUsers);
@@ -44,7 +46,8 @@ public class UserService {
 
     @Transactional
     public Users deleteUser(Long id) {
-            var user  = userRepository.findById(id).orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+            var user  = userRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
             userRepository.delete(user);
             return user;
     }
