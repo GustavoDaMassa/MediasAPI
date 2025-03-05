@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.service;
+package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;

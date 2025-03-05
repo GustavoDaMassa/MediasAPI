@@ -4,7 +4,7 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
-import br.com.gustavohenrique.MediasAPI.service.UserService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.UserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

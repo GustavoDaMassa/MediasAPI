@@ -1,13 +1,12 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.dtos.CourseDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
-import br.com.gustavohenrique.MediasAPI.service.CourseService;
-import br.com.gustavohenrique.MediasAPI.service.ProjectionService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.CourseService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.ProjectionService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

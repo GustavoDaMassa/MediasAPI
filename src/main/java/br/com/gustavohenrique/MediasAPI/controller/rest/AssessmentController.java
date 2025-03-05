@@ -3,10 +3,9 @@ package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.model.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
-import br.com.gustavohenrique.MediasAPI.service.AssessmentService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.AssessmentServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class AssessmentController {
     private ModelMapper modelMapper;
 
     @Autowired
-    private AssessmentService assessmentService;
+    private AssessmentServiceImpl assessmentService;
 
 
     @PatchMapping("/{id}")

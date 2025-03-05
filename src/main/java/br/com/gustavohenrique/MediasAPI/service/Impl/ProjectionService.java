@@ -1,10 +1,8 @@
-package br.com.gustavohenrique.MediasAPI.service;
+package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
-import br.com.gustavohenrique.MediasAPI.model.dtos.CourseDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
@@ -21,7 +19,7 @@ import java.util.List;
 public class ProjectionService {
 
     @Autowired
-    private AssessmentService assessmentService;
+    private AssessmentServiceImpl assessmentService;
 
     @Autowired
     private UserRepository userRepository;
