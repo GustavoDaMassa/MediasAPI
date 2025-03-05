@@ -6,6 +6,8 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
+    private final CourseService courseService;
+    private final UserRepository userRepository;
     @Autowired
-    private CourseService courseService;
-
-    @Autowired
-    private UserRepository userRepository;
+    public UserServiceImpl(CourseService courseService, UserRepository userRepository) {
+        this.courseService = courseService;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public Users create(Users users) {

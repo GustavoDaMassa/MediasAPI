@@ -4,6 +4,7 @@ package br.com.gustavohenrique.MediasAPI.controller.rest;
 import br.com.gustavohenrique.MediasAPI.model.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.service.Impl.AssessmentServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/{projectionId}/assessment")
 public class AssessmentController {
 
+    private final ModelMapper modelMapper;
+    private final AssessmentService assessmentService;
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private AssessmentServiceImpl assessmentService;
-
+    public AssessmentController(ModelMapper modelMapper, AssessmentService assessmentService) {
+        this.modelMapper = modelMapper;
+        this.assessmentService = assessmentService;
+    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long projectionId, @PathVariable Long id, @RequestBody DoubleRequestDTO gradeDto){

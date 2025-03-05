@@ -7,6 +7,8 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,15 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class CourseService {
+public class CourseServiceImpl implements CourseService {
 
+    private final ProjectionService projectionService;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     @Autowired
-    private ProjectionService projectionService;
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private UserRepository userRepository;
-
+    public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository, UserRepository userRepository) {
+        this.projectionService = projectionService;
+        this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public Course createCourse(Long userId, @Valid Course course){

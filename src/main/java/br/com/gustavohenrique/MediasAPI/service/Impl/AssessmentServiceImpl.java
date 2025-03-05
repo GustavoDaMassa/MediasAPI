@@ -6,7 +6,7 @@ import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.IAssessmentService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-public class AssessmentServiceImpl implements IAssessmentService{
+public class AssessmentServiceImpl implements AssessmentService {
 
     private final ProjectionRepository projectionRepository;
     private final AssessmentRepository assessmentRepository;
@@ -68,7 +68,7 @@ public class AssessmentServiceImpl implements IAssessmentService{
         return assessment;
     }
 
-    public void validateProjection(Long projectionId){
+    private void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
             throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
     }

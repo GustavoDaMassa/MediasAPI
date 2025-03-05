@@ -6,8 +6,8 @@ import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
-import br.com.gustavohenrique.MediasAPI.service.Impl.CourseService;
-import br.com.gustavohenrique.MediasAPI.service.Impl.UserService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.CourseServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,10 +28,10 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
-    private CourseService courseService;
+    private CourseServiceImpl courseService;
 
     @Mock
     private  UserRepository userRepository;

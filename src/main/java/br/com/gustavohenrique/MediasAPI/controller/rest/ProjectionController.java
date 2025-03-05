@@ -1,9 +1,10 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.model.dtos.MapperDTOs;
+import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
-import br.com.gustavohenrique.MediasAPI.service.Impl.ProjectionService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,32 +20,35 @@ import java.util.stream.Collectors;
 public class ProjectionController {
 
 
-    @Autowired
-    private ModelMapper modelMapper;
 
-    @Autowired
-    private MapperDTOs mapperDTOs;
-
-
+    private final ModelMapper modelMapper;
+    private final MapDTO mapDTO;
     private final ProjectionService projectionService;
-
-    public ProjectionController(ProjectionService projectionService) {
+    @Autowired
+    public ProjectionController(ModelMapper modelMapper, MapDTO mapDTO, ProjectionService projectionService) {
+        this.modelMapper = modelMapper;
+        this.mapDTO = mapDTO;
         this.projectionService = projectionService;
     }
 
     @PostMapping
-    public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long courseId, @RequestBody @Valid StringRequestDTO projectionName){
-            return ResponseEntity.status(HttpStatus.CREATED).body(mapperDTOs.projectionDTO(projectionService.createProjection(courseId,projectionName)));
+    public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long courseId,
+                                                          @RequestBody @Valid StringRequestDTO projectionName){
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(mapDTO.projectionDTO(projectionService.createProjection(courseId,projectionName)));
     }
 
     @GetMapping
     public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long courseId){
-            return ResponseEntity.ok(projectionService.listProjection(courseId).stream().map(projection -> mapperDTOs.projectionDTO(projection)).collect(Collectors.toList()));
+            return ResponseEntity.ok(projectionService.listProjection(courseId).stream()
+                    .map(mapDTO::projectionDTO).collect(Collectors.toList()));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long courseId, @PathVariable Long id, @RequestBody StringRequestDTO newProjectNameDto){
-            return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(projectionService.updateProjectionName(courseId, id, newProjectNameDto),ProjectionDTO.class));
+    public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long courseId, @PathVariable Long id,
+                                                              @RequestBody StringRequestDTO newProjectNameDto){
+            return ResponseEntity.status(HttpStatus.OK).body(modelMapper
+                    .map(projectionService.updateProjectionName(courseId, id, newProjectNameDto),ProjectionDTO.class));
     }
 
     @DeleteMapping("/{id}")

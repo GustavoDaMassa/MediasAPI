@@ -8,6 +8,8 @@ import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,18 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class ProjectionService {
+public class ProjectionServiceImpl implements ProjectionService {
 
+    private final AssessmentService assessmentService;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final ProjectionRepository projectionRepository;
     @Autowired
-    private AssessmentServiceImpl assessmentService;
-
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private ProjectionRepository projectionRepository;
-
+    public ProjectionServiceImpl(AssessmentService assessmentService, UserRepository userRepository,
+                                 CourseRepository courseRepository, ProjectionRepository projectionRepository) {
+        this.assessmentService = assessmentService;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+        this.projectionRepository = projectionRepository;
+    }
 
     @Transactional
     public Projection createProjection(Long courseId, @Valid StringRequestDTO projectionName){
@@ -63,7 +67,6 @@ public class ProjectionService {
     @Transactional
     public Projection deleteProjection(Long courseId, Long id) {
         validateCourse(courseId);
-
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
                 (()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
@@ -77,14 +80,14 @@ public class ProjectionService {
         projectionRepository.deleteAllByCourse(courseId);
     }
 
-    private void validateCourse(Long courseId){
-        if(!courseRepository.existsById(courseId))
-            throw new NotFoundArgumentException("Course id "+courseId+" not found");
-    }
-
     public List<Projection> listAllProjection(Long userId) {
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
         return projectionRepository.findAllByUserId(userId);
+    }
+
+    private void validateCourse(Long courseId){
+        if(!courseRepository.existsById(courseId))
+            throw new NotFoundArgumentException("Course id "+courseId+" not found");
     }
 }
 

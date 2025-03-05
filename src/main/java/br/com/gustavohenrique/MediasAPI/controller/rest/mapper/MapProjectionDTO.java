@@ -1,6 +1,8 @@
-package br.com.gustavohenrique.MediasAPI.model.dtos;
+package br.com.gustavohenrique.MediasAPI.controller.rest.mapper;
 
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import br.com.gustavohenrique.MediasAPI.model.dtos.AssessmentDTO;
+import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,10 +10,13 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Component
-public class MapperDTOs {
+public class MapProjectionDTO implements MapDTO{
 
+    private final ModelMapper modelMapper;
     @Autowired
-    private ModelMapper modelMapper;
+    public MapProjectionDTO(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
     public ProjectionDTO projectionDTO(Projection projection){
         return new ProjectionDTO(projection.getId(), projection.getName(), projection.getAssessment()

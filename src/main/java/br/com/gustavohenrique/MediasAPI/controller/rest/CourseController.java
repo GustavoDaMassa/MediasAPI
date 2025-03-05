@@ -5,8 +5,10 @@ import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
-import br.com.gustavohenrique.MediasAPI.service.Impl.CourseService;
-import br.com.gustavohenrique.MediasAPI.service.Impl.ProjectionService;
+import br.com.gustavohenrique.MediasAPI.service.Impl.CourseServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Impl.ProjectionServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +23,16 @@ import java.util.stream.Collectors;
 @RequestMapping("{userId}/courses")
 public class CourseController {
 
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private ProjectionService projectionService;
 
+    private final ModelMapper modelMapper;
+    private final CourseService courseService;
+    private final ProjectionService projectionService;
+    @Autowired
+    public CourseController(ModelMapper modelMapper, CourseService courseService, ProjectionService projectionService) {
+        this.modelMapper = modelMapper;
+        this.courseService = courseService;
+        this.projectionService = projectionService;
+    }
 
     @PostMapping
     public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid Course course){
