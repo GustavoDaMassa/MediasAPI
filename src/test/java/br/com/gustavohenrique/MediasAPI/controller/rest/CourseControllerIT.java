@@ -2,6 +2,7 @@ package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.exception.StandardError;
 import br.com.gustavohenrique.MediasAPI.model.Course;
+import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.model.dtos.CourseDTO;
 import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
@@ -17,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,7 +40,9 @@ class CourseControllerIT {
     @Test
     @DisplayName(" IT Should return an courseDto when create a course successfully")
     void createCourseSuccessfully() throws Exception {
-        var course = new Course(null,null,"Matemática","P3+P4",6.0);
+        var user = new Users();
+        var projection = new Projection();
+        var course = new Course(1L,user,"Matematica", List.of(projection),"P1+P2",6);
         var courseDTO = new CourseDTO(1L,course.getName(),course.getAverageMethod(),6.0);
         mockMvc.perform(post("/1/courses").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(course)))
@@ -52,7 +57,9 @@ class CourseControllerIT {
     @Test
     @DisplayName(" IT Should return an exception when Name already exist")
     void createCourseAlreadyExist() throws Exception {
-        var course = new Course(null,null,"Banco de Dados","P3+P4",6.0);
+        var user = new Users();
+        var projection = new Projection();
+        var course = new Course(1L,user,"Matematica", List.of(projection),"P1+P2",6);
         var exception = new StandardError(400,
                 "The attribute Banco de Dados already exist for this context","/1/courses");
         mockMvc.perform(post("/1/courses").contentType(MediaType.APPLICATION_JSON)

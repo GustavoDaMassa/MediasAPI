@@ -44,7 +44,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Should return the user created.")
     void createAndReturnUserSuccessfully() {
-        var user = new Users(null,"Gustavo Henrique","pereira@discente.ufg.br","aula321");
+        var user = new Users("Gustavo Henrique","pereira@discente.ufg.br","aula321");
 
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepository.save(any(Users.class))).thenReturn(user);
@@ -57,7 +57,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Should return exception if the email already exist.")
     void createUserExceptionEmailNotAvailable() {
-        var user = new Users(null,"Gustavo Henrique","pereira@discente.ufg.br","aula321");
+        var user = new Users("Gustavo Henrique","pereira@discente.ufg.br","aula321");
 
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
@@ -72,7 +72,7 @@ class UserServiceTest {
     @DisplayName("Should return user updated successfully")
     void updateUsersNameSuccessfully() {
         var nameDto = new StringRequestDTO("Gustavo Pereira");
-        var newUser = new Users(1L,nameDto.string(),"pereira@discente.ufg.br","aula321");
+        var newUser = new Users(nameDto.string(),"pereira@discente.ufg.br","aula321");
 
         when(userRepository.findById(newUser.getId())).thenReturn(Optional.of(newUser));
         when(userRepository.save(any(Users.class))).thenReturn(newUser);
@@ -88,20 +88,20 @@ class UserServiceTest {
     @DisplayName("Should return an Exception when the user id not exist")
     void updateNameUserNotFound() {
         var nameDto = new StringRequestDTO("Gustavo Pereira");
-        var newUser = new Users(1L,nameDto.string(),"pereira@discente.ufg.br","aula321");
+        var newUser = new Users(nameDto.string(),"pereira@discente.ufg.br","aula321");
 
         when(userRepository.findById(newUser.getId())).thenThrow(NotFoundArgumentException.class);
 
         assertThrows(NotFoundArgumentException.class, () -> userService.updateName(newUser.getId(), nameDto));
 
         verify(userRepository,never()).save(any(Users.class));
-        verify(userRepository).findById(newUser.getId());
+         verify(userRepository).findById(newUser.getId());
     }
 
     @Test//___________________--------------------------------------------------------------
     void updateEmail() {
         var emailDTO = new EmailUpdateDTO("gustavo3gb@gmail.com");
-        var newUser = new Users(null, "Gustavo Pereira", emailDTO.email(),"aula321");
+        var newUser = new Users( "Gustavo Pereira", emailDTO.email(),"aula321");
 
         when(userRepository.save(any(Users.class))).thenReturn(newUser);
         var updateUser = userService.updateEmail(newUser.getId(),emailDTO);
@@ -112,7 +112,7 @@ class UserServiceTest {
 
     @Test//---------------------------------------------------------------------
     void deleteUser() {
-        var user = new Users(3L,"Gustavo Pereira","gustavo3gb@gmail.com","aula321");
+        var user = new Users("Gustavo Pereira","gustavo3gb@gmail.com","aula321");
 
         var deletedUser = userService.deleteUser(user.getId());
 
@@ -123,9 +123,9 @@ class UserServiceTest {
     @Test
     @DisplayName("Should return a list of Users")
     void listUsersFindAllSuccessfully() {
-        Users users1 = new Users(1L,"Gustavo","gustavo.pereira@discente.ufg.br","aula321");
-        Users users2 = new Users(2L,"Henrique","gustavohenrique3gb@gmail.com.br","aula321");
-        Users users3 = new Users(3L,"Gustavo Henrique","gustavo3gb@gmail.com","aula321");
+        Users users2 = new Users("Henrique","gustavohenrique3gb@gmail.com.br","aula321");
+        Users users3 = new Users("Gustavo Henrique","gustavo3gb@gmail.com","aula321");
+        Users users1 = new Users("Gustavo","gustavo.pereira@discente.ufg.br","aula321");
 
         when(userRepository.findAll()).thenReturn(List.of(users1,users2,users3));
 
