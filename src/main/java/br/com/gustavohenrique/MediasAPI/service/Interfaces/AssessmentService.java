@@ -1,7 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.service.Interfaces;
 
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
-import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 
 import java.util.List;
 

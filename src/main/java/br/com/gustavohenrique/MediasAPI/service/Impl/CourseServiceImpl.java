@@ -2,8 +2,8 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
-import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;

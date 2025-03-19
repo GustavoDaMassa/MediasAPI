@@ -1,8 +1,8 @@
 package br.com.gustavohenrique.MediasAPI.service.Interfaces;
 
 import br.com.gustavohenrique.MediasAPI.model.Course;
-import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;

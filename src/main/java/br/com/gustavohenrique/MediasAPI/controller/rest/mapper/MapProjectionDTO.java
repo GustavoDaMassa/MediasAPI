@@ -1,8 +1,8 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.mapper;
 
 import br.com.gustavohenrique.MediasAPI.model.Projection;
-import br.com.gustavohenrique.MediasAPI.model.dtos.AssessmentDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

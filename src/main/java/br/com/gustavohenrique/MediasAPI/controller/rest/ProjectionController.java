@@ -1,9 +1,8 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapDTO;
-import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapProjectionDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;

@@ -1,9 +1,9 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.model.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.model.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
-import br.com.gustavohenrique.MediasAPI.model.dtos.UserDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;

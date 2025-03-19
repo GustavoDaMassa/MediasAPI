@@ -1,7 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 
-import br.com.gustavohenrique.MediasAPI.model.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
@@ -68,7 +68,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         return assessment;
     }
 
-    private void validateProjection(Long projectionId){
+    public void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
             throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
     }

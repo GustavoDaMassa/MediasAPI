@@ -2,7 +2,6 @@ package br.com.gustavohenrique.MediasAPI.repository;
 
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
-import br.com.gustavohenrique.MediasAPI.model.dtos.ProjectionDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

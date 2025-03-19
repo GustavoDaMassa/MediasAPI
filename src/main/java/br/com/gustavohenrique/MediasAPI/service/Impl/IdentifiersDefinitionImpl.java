@@ -35,7 +35,6 @@ public class IdentifiersDefinitionImpl implements IIdentifiersDefinition {
             assessment.setIdentifier(matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""));
             assessment.setProjection(projection);
             projection.addAssessment(assessmentRepository.save(assessment));
-
         }
     }
 }

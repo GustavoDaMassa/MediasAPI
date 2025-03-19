@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.model.dtos;
+package br.com.gustavohenrique.MediasAPI.dtos;
 
 public record DoubleRequestDTO(
         double value
