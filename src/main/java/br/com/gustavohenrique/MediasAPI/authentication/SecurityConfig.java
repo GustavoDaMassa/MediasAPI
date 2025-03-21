@@ -51,10 +51,10 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll())
-//                        .requestMatchers(HttpMethod.POST,"/authenticate").permitAll()
-//                        .requestMatchers(HttpMethod.POST,"/users").permitAll()
-//                        .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST,"/authenticate").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/users").permitAll()
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(conf->conf.jwt(Customizer.withDefaults()));
         return  httpSecurity.build();
