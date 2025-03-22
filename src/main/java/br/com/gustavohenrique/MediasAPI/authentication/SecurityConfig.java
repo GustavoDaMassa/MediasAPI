@@ -61,7 +61,6 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(conf->conf.jwt(Customizer.withDefaults()));
         return  httpSecurity.build();
     }

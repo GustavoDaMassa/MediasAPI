@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.authentication;
 
 import br.com.gustavohenrique.MediasAPI.dtos.AuthDto;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,14 +16,10 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @Operation(summary = "Autenticar usuário", description = "Através do email e senha do usuário é retornado um token (JWT)" +
+            "de acesso para as demais requisições.")
     @PostMapping
     public String authenticate(@RequestBody AuthDto user){
         return authenticationService.authenticate(user);
-    }
-
-    @GetMapping
-    public String test() {
-        System.out.println("🔹 Teste de rota chamado!");
-        return "Funcionando!";
     }
 }
