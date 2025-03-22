@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
+import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
@@ -23,18 +24,20 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     @Autowired
-    public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository, UserRepository userRepository) {
+    public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository,
+                             UserRepository userRepository) {
         this.projectionService = projectionService;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
     }
 
     @Transactional
-    public Course createCourse(Long userId, @Valid Course course){
+    public Course createCourse(Long userId, @Valid RequestCourseDto courseDto){
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
-        if(courseRepository.existsByUserAndName(user,course.getName()))throw new DataIntegrityException(course.getName());
-        course.setUser(user);
+        if(courseRepository.existsByUserAndName(user,courseDto.name()))throw new DataIntegrityException(courseDto.name());
+        var course = new Course(null,
+                user, courseDto.name(), null, courseDto.averageMethod(), courseDto.cutOffGrade());
         courseRepository.save(course);
         projectionService.createProjection(course.getId(), new StringRequestDTO(course.getName()));
         return courseRepository.save(course);

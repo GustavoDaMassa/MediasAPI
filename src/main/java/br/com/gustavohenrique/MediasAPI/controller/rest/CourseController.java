@@ -1,9 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
-import br.com.gustavohenrique.MediasAPI.dtos.CourseDTO;
-import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
-import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
-import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.*;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
@@ -33,7 +30,7 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid Course course){
+    public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid RequestCourseDto course){
            return ResponseEntity.status(HttpStatus.CREATED)
                    .body(modelMapper.map(courseService.createCourse(userId ,course), CourseDTO.class));
     }

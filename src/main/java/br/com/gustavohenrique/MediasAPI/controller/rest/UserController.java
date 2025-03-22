@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest;
 
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
@@ -29,15 +30,15 @@ public class UserController {
     }
 
 
-    @PostMapping
-public ResponseEntity<UserDTO> createUser(@RequestBody @Valid Users users){
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(users), UserDTO.class));
-    }
-
     @GetMapping
     public ResponseEntity<List<UserDTO>> showUsers(){
         return ResponseEntity.ok(userService.listUsers().stream().
                 map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
+    }
+
+    @PostMapping
+public ResponseEntity<UserDTO> createUser(@RequestBody @Valid LogOnDto users){
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(users), UserDTO.class));
     }
 
     @PatchMapping("/{id}/name")

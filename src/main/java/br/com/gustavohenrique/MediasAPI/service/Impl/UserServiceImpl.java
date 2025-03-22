@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
+import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
@@ -30,10 +31,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public Users create(Users users) {
-        if (userRepository.existsByEmail(users.getEmail()))throw new DataIntegrityException(users.getEmail());
-        users.setPassword(passwordEncoder.encode(users.getPassword()));
-        return userRepository.save(users);
+    public Users create(LogOnDto users) {
+        if (userRepository.existsByEmail(users.email()))throw new DataIntegrityException(users.email());
+        Users newUser = new Users(null,users.name(), users.email(),null, users.password());
+        newUser.setPassword(passwordEncoder.encode(users.password()));
+        return userRepository.save(newUser);
     }
     @Transactional
     public Users updateName(Long id, @Valid StringRequestDTO nameDto) {
