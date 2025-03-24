@@ -1,0 +1,33 @@
+
+services:
+  api:
+    build: .
+    container_name: medias-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://medias-mysql:3306/medias
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=custo
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - db
+    networks:
+      - medias-rede
+
+  db:
+    image: mysql:8.0
+    container_name: medias-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: custo
+      MYSQL_DATABASE: medias
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - medias-rede
+
+networks:
+  medias-rede:
+
+volumes:
+  mysql_data:
