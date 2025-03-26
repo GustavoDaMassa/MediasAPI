@@ -141,7 +141,7 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
    ```json
     {
         "name":"SGBD",
-        "averageMethod":"(0.4*(@M[12](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9;AT10;AT11;AT12;AT13;AT14;AT15;AT16)/12))+(0,6*(AV1+AV2[10]/2))",
+        "averageMethod":"(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
         "cutOffGrade": 6.0
     }
 
@@ -157,9 +157,9 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
     {
         "id": 2,
         "name": "SGBD",
-        "averageMethod": "(0.4*(@M[12](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9;AT10;AT11;AT12;AT13;AT14;AT15;AT16)/12))+(0,6*(AV1+AV2[10]/2))",
-        "cutOffGrade": 6.0
-    }
+        "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
+        "cutOffGrade": 6
+}
 
 ![img_6.png](img_6.png)
 
@@ -168,164 +168,20 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 - **Response**
   ```json
     [
-        {
-            "id": 1,
-            "name": "BD 1",
-            "averageMethod": "(P2+P3*2)/3",
-            "cutOffGrade": 6.0
-        },
-        {
-            "id": 2,
-            "name": "SGBD",
-            "averageMethod": "(0.4*(@M[12](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9;AT10;AT11;AT12;AT13;AT14;AT15;AT16)/12))+(0,6*(AV1+AV2[10]/2))",
-            "cutOffGrade": 6.0
-        }
+       {
+          "id": 1,
+          "name": "BD 1",
+          "averageMethod": "(P2+P3*2)/3",
+          "cutOffGrade": 6
+       },
+       {
+          "id": 2,
+          "name": "SGBD",
+          "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
+          "cutOffGrade": 6
+       }
     ]
 
-![img_10.png](img_10.png)
-
-- **Parâmetro**: `userId` - id do usuário;
-- **Lista todos os cursos juntamente com suas projeções e as atividades.**
-- **Response**
-  ```json
-  [
-    {
-        "id": 1,
-        "name": "BD 1",
-        "assessment": [
-            {
-                "id": 1,
-                "identifier": "P2",
-                "grade": 0.0,
-                "requiredGrade": 6.0
-            },
-            {
-                "id": 2,
-                "identifier": "P3",
-                "grade": 0.0,
-                "requiredGrade": 6.0
-            }
-        ],
-        "finalGrade": 0.0,
-        "courseName": "BD 1"
-    },
-    {
-        "id": 2,
-        "name": "SGBD",
-        "assessment": [
-            {
-                "id": 3,
-                "identifier": "AT1",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 4,
-                "identifier": "AT2",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 5,
-                "identifier": "AT3",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 6,
-                "identifier": "AT4",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 7,
-                "identifier": "AT5",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 8,
-                "identifier": "AT6",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 9,
-                "identifier": "AT7",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 10,
-                "identifier": "AT8",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 11,
-                "identifier": "AT9",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 12,
-                "identifier": "AT10",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 13,
-                "identifier": "AT11",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 14,
-                "identifier": "AT12",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 15,
-                "identifier": "AT13",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 16,
-                "identifier": "AT14",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 17,
-                "identifier": "AT15",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 18,
-                "identifier": "AT16",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 19,
-                "identifier": "AV1",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            },
-            {
-                "id": 20,
-                "identifier": "AV2",
-                "grade": 0.0,
-                "requiredGrade": 4.7
-            }
-        ],
-        "finalGrade": 0.0,
-        "courseName": "SGBD"
-    }
-]
 
 
 ![img_7.png](img_7.png)
@@ -350,7 +206,7 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ![img_8.png](img_8.png)
 
-- **Altera a forma como o método de cálculo da média final é definida. Deleta as projeções equivalentes e criar uma nova atualizada.**
+- **Altera a forma como o método de cálculo da média final é definida. Deleta as projeções equivalentes e criar uma nova atualizada com um novo id pra essa projeção.**
 - **Parâmetros**:
     - `userId` - id do usuário;
     - `id` - id da disciplina.
@@ -387,6 +243,71 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "cutOffGrade": 7.0
     }
 
+![img_10.png](img_10.png)
+
+- **Parâmetro**: `userId` - id do usuário;
+- **Lista todos os cursos juntamente com suas projeções e as atividades.**
+- **Response**
+  ```json
+  [
+     {
+          "id": 2,
+          "name": "SGBD",
+          "assessment":[
+              {
+                 "id": 3,
+                 "identifier": "AT1",
+                 "grade": 0,
+                 "requiredGrade": 4.7
+              },
+              {
+                 "id": 4,
+                 "identifier": "AT2",
+                 "grade": 0,
+                 "requiredGrade": 4.7
+              },
+                    .
+                    .
+                    .
+                    .
+                    .
+              {
+                 "id": 12,
+                 "identifier": "AV1",
+                 "grade": 0,
+                 "requiredGrade": 4.7
+              },
+              {
+                 "id": 13,
+                 "identifier": "AV2",
+                 "grade": 0,
+                 "requiredGrade": 4.7
+              }
+          ],
+          "finalGrade": 0,
+          "courseName": "SGBD"
+     },
+     {
+          "id": 4,
+          "name": "BD",
+          "assessment": [
+              {
+                 "id": 16,
+                 "identifier": "P2",
+                 "grade": 0,
+                 "requiredGrade": 7
+              },
+              {
+                 "id": 17,
+                 "identifier": "P3",
+                 "grade": 0,
+                 "requiredGrade": 7
+              }
+          ],
+          "finalGrade": 0,
+          "courseName": "BD"
+     }
+  ]
 
 
 ![img_11.png](img_11.png)
@@ -405,46 +326,287 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ![img_12.png](img_12.png)
 
+-**Cria uma nova projeção e automaticamente suas avaliações de acordo com a definição do curso.**
+- **Parâmetro**: `courseId` - id da disciplina;
+- **Request Body**
+    ```json
+      {
+          "string": "projeção 2"
+      }
+- **Response**
+    ```json
+    {
+        "id": 5,
+        "name": "projeção 2",
+            .
+            .
+            .
+        "finalGrade": 0.0,
+        "courseName": "SGBD"
+    }
 ![img_13.png](img_13.png)
 
+- **retorna todas as projeções de um determinido curso com uma lista de avaliações equivalentes.**
+- **Parâmetro**: `courseId` - id da disciplina;
+  - **Response**
+      ```json
+    [
+        {
+          "id": 2,
+          "name": "SGBD",
+          "assessment": [
+              {
+                  "id": 3,
+                  "identifier": "AT1",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              },
+              {
+                  .
+                  .
+                  .
+                  .
+              {
+                  "id": 10,
+                  "identifier": "AT8",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              },
+              {
+                  "id": 11,
+                  "identifier": "AT9",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              },
+              {
+                  "id": 12,
+                  "identifier": "AV1",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              },
+              {
+                  "id": 13,
+                  "identifier": "AV2",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              }
+          ],
+          "finalGrade": 0.0,
+          "courseName": "SGBD"
+        },
+        {
+          "id": 5,
+          "name": "projeção 2",
+          "assessment": [
+              {
+                  "id": 18,
+                  "identifier": "AT1",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              },
+                  .
+                  .
+                  .
+                  .
+              {
+                  "id": 28,
+                  "identifier": "AV2",
+                  "grade": 0.0,
+                  "requiredGrade": 4.7
+              }
+          ],
+          "finalGrade": 0.0,
+          "courseName": "SGBD"
+        }
+    ]
 ![img_14.png](img_14.png)
 
+-**retorna todas as projeções de um determinido curso com umalista de avaliações equivalentes.**
+- **Parâmetro**: `courseId` - id da disciplina;
+- **Parâmetro**: `id` - id da projeção;
+- **Request Body**
+    ```json
+      {
+          "string":"Projeção otimista"
+      }
+- **Response**
+    ```json
+    {
+       "id": 5,
+      "name": "Projeção otimista",
+         .
+         .
+         .
+      "courseName": "SGBD"
+    }
 ![img_15.png](img_15.png)
+
+- **Deleta apenas a projeção especificada.**
+- **Parâmetro**: `courseId` - id da disciplina;
+- **Parâmetro**: `id` - id da projeção;
+- **Response**
+    ```json
+    {
+      "id": 5,
+      "name": "Projeção otimista",
+         .
+         .
+         .
+      "courseName": "SGBD"
+    }
 
 ![img_16.png](img_16.png)
 
-### assessment-controller
+- **Deleta todas as projeções do curso, incluindo a projeção default.**
+- **Parâmetro**: `courseId` - id da disciplina;
 
-![img_17.png](img_17.png)
+### assessment-controller
 
 ![img_18.png](img_18.png)
 
+- **Lista todas as avaliações de uma projeção.**
+- **Parâmetro**: `projectionId` - id da projeção;
+- **Response**
+    ```json
+  [
+       {
+          "id": 3,
+          "identifier": "AT1",
+          "grade": 0.0,
+          "requiredGrade": 4.7
+       },
+       {
+          "id": 4,
+          "identifier": "AT2",
+          "grade": 0.0,
+          "requiredGrade": 4.7
+       },
+       {
+          .
+          .
+          .
+          .
+       {
+          "id": 13,
+          "identifier": "AV2",
+          "grade": 0.0,
+          "requiredGrade": 4.7
+        }
+  ]
 
-## Tecnologias
-
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Spring MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
-- [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
-- [Mysql](https://dev.mysql.com/downloads/)
-- [Workbench](https://www.mysql.com/products/workbench/)
-- [Postman](https://postman.com/)
-- [Git](https://git-scm.com/)
-- [H2 DataBase](https://www.h2database.com/html/main.html)
-- [Bean Validation](https://beanvalidation.org/)
 
 
-## Práticas adotadas
+![img_17.png](img_17.png)
 
-- SOLID
-- API REST
-- Consultas com Spring Data JPA
-- Injeção de Dependências
-- Tratamento de respostas de erro
-- Geração automática do Swagger com a OpenAPI 3
-- Testes automatizados
-- Banco de dados relacional
+- **Posta a nota adquirida. Automaticamente a média final é calculada juntamente com o quanto de pontuação ainda falta em cada avaliação ainda não realizada, para atingir a nota de corte.**
+- **Parâmetro**: `projectionId` - id da projeção;
+- **Parâmetro**: `id` - id da avaliação;
+- **Request Body**
+    ```json
+  {
+      "value": 7
+  }
+  
+- **Response**
+    ```json
+    {
+       "id": 12,
+       "identifier": "AV1",
+       "grade": 7.0,
+       "requiredGrade": 0.0
+  }
 
+### 📌 Após esse fluxo podemos realizar uma requisição para o end-point `/{courseId}/projections` com o método HTTP `GET` e observa:
+
+- **o cálculo automático para a média final;**
+- **O cálculo para as notas requeridas.**
+  - aquelas em que a nota está definida recebe o valor zero;
+  - São calculadas de forma uniforme.
+
+- **Response**
+    ```json
+      [
+    {
+        "id": 2,
+        "name": "SGBD",
+        "assessment": [
+            {
+                "id": 3,
+                "identifier": "AT1",
+                "grade": 6.0,
+                "requiredGrade": 0.0
+            },
+            {
+                "id": 4,
+                "identifier": "AT2",
+                "grade": 5.0,
+                "requiredGrade": 0.0
+            },
+            {
+                "id": 5,
+                "identifier": "AT3",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 6,
+                "identifier": "AT4",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 7,
+                "identifier": "AT5",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 8,
+                "identifier": "AT6",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 9,
+                "identifier": "AT7",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 10,
+                "identifier": "AT8",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 11,
+                "identifier": "AT9",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            },
+            {
+                "id": 12,
+                "identifier": "AV1",
+                "grade": 7.0,
+                "requiredGrade": 0.0
+            },
+            {
+                "id": 13,
+                "identifier": "AV2",
+                "grade": 0.0,
+                "requiredGrade": 1.9
+            }
+        ],
+        "finalGrade": 4.933333333333334,
+        "courseName": "SGBD"
+    }
+  ]
+
+- Cálculo : 0.4*((**6**+**5**+0+0+0+0)/6)+0,6*(**7**+(0/2))
+
+
+## Modelo de Dados
+## Tratamento de Erros
 ## Como executar
 
 - Clonar repositório git
@@ -478,3 +640,32 @@ docker run --name place-service -p 8080:8080  -d place-service:0.0.1-SNAPSHOT
 A API poderá ser acessada em http://localhost:8080/tasks.
 
 ### [swagger do projeto](http://localhost:8080/swagger-ui.html)
+
+## Motivação e Solução 
+
+
+
+## Práticas adotadas
+
+- SOLID
+- API REST
+- Consultas com Spring Data JPA
+- Injeção de Dependências
+- Tratamento de respostas de erro
+- Geração automática do Swagger com a OpenAPI 3
+- Testes automatizados
+- Banco de dados relacional
+
+## Tecnologias
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Spring MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
+- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
+- [Mysql](https://dev.mysql.com/downloads/)
+- [Workbench](https://www.mysql.com/products/workbench/)
+- [Postman](https://postman.com/)
+- [Git](https://git-scm.com/)
+- [H2 DataBase](https://www.h2database.com/html/main.html)
+- [Bean Validation](https://beanvalidation.org/)
+
