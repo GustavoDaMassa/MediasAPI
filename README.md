@@ -1,10 +1,14 @@
 <h1 align="center">
-  Médias API
+  Médias API 
 </h1>
+
+<p align="center">
+  <img src="images/img_19.png" alt="Descrição da Imagem">
+</p>
 
 # 📌 API Rest de Gestão de Notas e Projeções Acadêmicas
 
-## 🎯 Apresentação
+## Apresentação
 
 Esta API foi desenvolvida para oferecer uma solução completa na gestão de notas acadêmicas. Com ela, os usuários podem armazenar suas avaliações e obter automaticamente a média final de cada disciplina. Ela foi idealizada com o objetivo core de permitir projeções estratégicas para um melhor planejamento do desempenho acadêmico.
 
@@ -56,7 +60,7 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ### user-controller
 
-![img.png](img.png)
+![img.png](images/img.png)
 - **Cria um novo perfil de usuário, não é necessário autenticação.** 
 
 - **Request Body:**
@@ -73,9 +77,10 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
        "name": "Gustavo Henrique",
        "email": "gustavo.pereira@discente.ufg.br"
    }
-  
 
-![img_2.png](img_2.png)
+
+---
+![img_2.png](images/img_2.png)
 - **Retorna uma lista com todos os usuários e seus respectivos id's que serão usados como parâmetros em demais requisições;**
 - **Response**
   ```json
@@ -87,7 +92,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         }
     ]
 
-![img_1.png](img_1.png)
+---
+![img_1.png](images/img_1.png)
 - **Parâmetro**: `id` - id do usuário;
 - **Request Body:**
    ```json
@@ -103,7 +109,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "email": "gustavo.pereira@discente.ufg.br"
     }
 
-![img_3.png](img_3.png)
+---
+![img_3.png](images/img_3.png)
 
 - **Parâmetro**: `id` - id do usuário;
 - **Request Body:**
@@ -120,7 +127,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "email": "gustavohenrique3gb@gmail.com"
     }
 
-![img_4.png](img_4.png)
+---
+![img_4.png](images/img_4.png)
 
 - **Parâmetro**: `id` - id do usuário;
 - **Response**
@@ -133,7 +141,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ### course-controller
 
-![img_5.png](img_5.png)
+---
+![img_5.png](images/img_5.png)
 
 - **Cria um novo curso, e através do método de cálculo das médias cria automaticamente uma projeção com o mesmo nome, identificando e instânciando as avaliações definidas.**
 - **Parâmetro**: `userId` - id do usuário;
@@ -145,12 +154,20 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "cutOffGrade": 6.0
     }
 
-- **AverageMethod funcionalidades:**
+- **`AverageMethod:`**
   - Constantes são representadas por valores `double`;
-  - Identificadores podem conter números, e devem conter uma ou mais letras;
-  - Identificadores podem ter o sufixo `[n]` indicando a nota máxima da avaliação, **n** é um `double`, caso não seja informado assume o valor default `10`;
-  - `@M[n](i1;i2;...;im)` é uma funcionalidade extra além das operações aritméticas, ela faz o somatório das n maiores notas fornecidas entres os parênteses, `m>=n` ;
-  - `cutOffGrade` também é opcional, valor default `6.0`
+  - Identificadores podem conter números;
+  - Identificadores devem conter uma ou mais letras;
+  - Identificadores podem ter o sufixo `[N]` indicando a nota máxima da avaliação;
+    - **N** é um `double`; 
+    - caso não seja informado assume o valor default `10`.
+  - `@M[n](i1;i2;...;im)` é uma funcionalidade extra além das operações aritméticas;
+    - Ela faz o somatório das n maiores notas fornecidas dentre os parênteses;
+    - `m>=n` ;
+    - n é um `int`.
+  - `cutOffGrade` também é opcional;
+    - valor default `6.0`.
+  - É feito a analise sintática e semântica da fòrmula.
 
 - **Response**
   ```json
@@ -161,7 +178,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "cutOffGrade": 6
 }
 
-![img_6.png](img_6.png)
+---
+![img_6.png](images/img_6.png)
 
 - **Lista todos os cursos do usuário.**
 - **Parâmetro**: `userId` - id do usuário;
@@ -184,7 +202,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 
 
-![img_7.png](img_7.png)
+---
+![img_7.png](images/img_7.png)
 
 - **Parâmetros**: 
   - `userId` - id do usuário;
@@ -204,7 +223,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
     }
 
 
-![img_8.png](img_8.png)
+---
+![img_8.png](images/img_8.png)
 
 - **Altera a forma como o método de cálculo da média final é definida. Deleta as projeções equivalentes e criar uma nova atualizada com um novo id pra essa projeção.**
 - **Parâmetros**:
@@ -224,7 +244,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "cutOffGrade": 6.0
     }
 
-![img_9.png](img_9.png)
+---
+![img_9.png](images/img_9.png)
 
 - **Parâmetros**:
     - `userId` - id do usuário;
@@ -243,7 +264,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "cutOffGrade": 7.0
     }
 
-![img_10.png](img_10.png)
+---
+![img_10.png](images/img_10.png)
 
 - **Parâmetro**: `userId` - id do usuário;
 - **Lista todos os cursos juntamente com suas projeções e as atividades.**
@@ -310,7 +332,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
   ]
 
 
-![img_11.png](img_11.png)
+---
+![img_11.png](images/img_11.png)
 
 - **Parâmetro**: `userId` - id do usuário;
 - **Response**
@@ -324,7 +347,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ### projection-controller
 
-![img_12.png](img_12.png)
+---
+![img_12.png](images/img_12.png)
 
 -**Cria uma nova projeção e automaticamente suas avaliações de acordo com a definição do curso.**
 - **Parâmetro**: `courseId` - id da disciplina;
@@ -344,7 +368,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
         "finalGrade": 0.0,
         "courseName": "SGBD"
     }
-![img_13.png](img_13.png)
+---
+![img_13.png](images/img_13.png)
 
 - **retorna todas as projeções de um determinido curso com uma lista de avaliações equivalentes.**
 - **Parâmetro**: `courseId` - id da disciplina;
@@ -419,7 +444,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
           "courseName": "SGBD"
         }
     ]
-![img_14.png](img_14.png)
+---
+![img_14.png](images/img_14.png)
 
 -**retorna todas as projeções de um determinido curso com umalista de avaliações equivalentes.**
 - **Parâmetro**: `courseId` - id da disciplina;
@@ -439,7 +465,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
          .
       "courseName": "SGBD"
     }
-![img_15.png](img_15.png)
+---
+![img_15.png](images/img_15.png)
 
 - **Deleta apenas a projeção especificada.**
 - **Parâmetro**: `courseId` - id da disciplina;
@@ -455,14 +482,16 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
       "courseName": "SGBD"
     }
 
-![img_16.png](img_16.png)
+---
+![img_16.png](images/img_16.png)
 
 - **Deleta todas as projeções do curso, incluindo a projeção default.**
 - **Parâmetro**: `courseId` - id da disciplina;
 
+---
 ### assessment-controller
 
-![img_18.png](img_18.png)
+![img_18.png](images/img_18.png)
 
 - **Lista todas as avaliações de uma projeção.**
 - **Parâmetro**: `projectionId` - id da projeção;
@@ -495,8 +524,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
   ]
 
 
-
-![img_17.png](img_17.png)
+---
+![img_17.png](images/img_17.png)
 
 - **Posta a nota adquirida. Automaticamente a média final é calculada juntamente com o quanto de pontuação ainda falta em cada avaliação ainda não realizada, para atingir a nota de corte.**
 - **Parâmetro**: `projectionId` - id da projeção;
@@ -516,7 +545,10 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
        "requiredGrade": 0.0
   }
 
-### 📌 Após esse fluxo podemos realizar uma requisição para o end-point `/{courseId}/projections` com o método HTTP `GET` e observa:
+---
+
+### 📌 Observando os resultados
+Após esse fluxo podemos realizar uma requisição para o end-point `/{courseId}/projections` com o método HTTP `GET` e observa:
 
 - **o cálculo automático para a média final;**
 - **O cálculo para as notas requeridas.**
@@ -604,9 +636,32 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 - Cálculo : 0.4*((**6**+**5**+0+0+0+0)/6)+0,6*(**7**+(0/2))
 
-
+--- 
 ## Modelo de Dados
-## Tratamento de Erros
+
+![img.png](images/img.png)
+
+- Usuário possui N --> Disciplinas;
+- Disciplina possui N --> Projeções;
+- Projeção possui N --> Avaliações;
+
+---
+
+##  Tratamento de Exceções
+
+A API retorna respostas padronizadas para erros e exceções. Abaixo estão os códigos de erro e suas descrições:
+
+###  Exceções customizadas
+
+| StatusCode | Exceção            | Error example |
+|------------|--------------------|-----------|
+| 404        | `NotFoundArgumentException`  | Course id 30 not found for UserId 2 |
+| 400        | `IllegalArgumentException` | It is not possible to select more values than those provided |
+| 400        | `NoSuchElementException`    | The equation has operators without arguments |
+| 400        | `DataIntegrityException`     | The attribute SGBD already exist for this context |
+| 500        | `InternalServerError` | Internal Server Error |
+
+---
 ## Como executar
 
 - Clonar repositório git
