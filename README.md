@@ -45,7 +45,7 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
  Para obter um token, o usuário deve fazer uma requisição POST para o endpoint `/authenticate` com suas credenciais. O token retornado deve ser incluído no cabeçalho Authorization de todas as requisições subsequentes, exceto para cadastro.
 
-![img_2.png](images/img_2.png)
+![img.png](img.png)
 
 - **O usuário é autenticado através do email que é único no sistema, rota pública;**
 - **Auth Type:** `Bearer Token`
@@ -60,7 +60,7 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 ### user-controller
 
-![img.png](images/img.png)
+![img_1.png](img_1.png)
 - **Cria um novo perfil de usuário, não é necessário autenticação.** 
 
 - **Request Body:**
@@ -447,7 +447,6 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 ---
 ![img_14.png](images/img_14.png)
 
--**retorna todas as projeções de um determinido curso com umalista de avaliações equivalentes.**
 - **Parâmetro**: `courseId` - id da disciplina;
 - **Parâmetro**: `id` - id da projeção;
 - **Request Body**
