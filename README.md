@@ -16,6 +16,8 @@ A característica exclusiva desta API está na personalização do método de c�
 
 Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar projeções para cada aluno ou cenário e realizar o lançamento de notas.
 
+Entenda um pouco mais sobre o escopo da **[solução](#motivação-e-solução-)** aplicada.
+
 ---
 
 ## Principais funcionalidades:
@@ -30,14 +32,19 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 ## Utilizando a API: 
  #### Antes de detalharmos os endpoints e a autenticação, é importante entender o fluxo de uso da API:
 
-- **Login**: O usuário cria seu perfil se cadastrando no sistema.
+### **Login**: 
+  - O usuário cria seu perfil se cadastrando no sistema.
 
-- **Autenticação**: A API valida as credenciais e, se bem-sucedida, retorna um token JWT.
-- **Disciplinas**: o usuário pode criar e editar suas disciplinas personalizadas.
-- **Projeções**: Uma projeção é criada automaticamente na definição do método de cálculo no passo anterior. Usuários podem criar, editar e visualizar outras projeções.
-- **Avaliações**: Também criadas automaticamente a cada projeção. Usuários podem lançar notas.
+### **Autenticação**: 
+  - A API valida as credenciais e, se bem-sucedida, retorna um token JWT.
+### **Disciplinas**: 
+  - o usuário pode criar e editar suas disciplinas personalizadas.
+### **Projeções**: 
+  - Uma projeção é criada automaticamente na definição do método de cálculo no passo anterior. Usuários podem criar, editar e visualizar outras projeções.
+### **Avaliações**:
+  - Também criadas automaticamente a cada projeção. Usuários podem lançar notas.
 
- #### caso deseje compilar e navegar por si só no sistema siga para [como executar](#como-executar)
+ ### caso deseje compilar e navegar por si só no sistema siga para [como executar](#como-executar)
 
 ---
 
@@ -644,6 +651,8 @@ Após esse fluxo podemos realizar uma requisição para o end-point `/{courseId}
 - Disciplina possui N --> Projeções;
 - Projeção possui N --> Avaliações;
 
+Todos os id são chaves primárias. Entidades possuem uma constraint de unicidade entre seus respectivos `name` e `id`, no caso de Assessment essa unicidade é entre o `identifier` e seu `id`.
+
 ---
 
 ##  Tratamento de Exceções
@@ -683,12 +692,13 @@ A API retorna respostas padronizadas para erros e exceções. Abaixo estão os c
 
 A Aplicação utiliza o Docker e é disponibilizada dentro de um container com a imagem da api e do banco de dados ao qual se conecta.
 
+#### Dependências:
+
+- [Docker](#docker);
+- [Docker Compose](#docker-compose).
+
 ### Opção 1
 
-#### Dependências:
-  
-  - [Docker](#docker);
-  - [Docker Compose](#docker-compose).
 
 #### Passos para rodar:
   
@@ -706,10 +716,10 @@ docker compose up --build -d
 docker compose down
 ```
 ### Opção 2
- caso deseje rodar com mais facilidade sem a necessidade de clonar o repositório 
+ **caso deseje rodar com mais facilidade sem a necessidade de clonar o repositório**
 
-- Baixe o arquivo [docker compose](./Compose%20docker%20/docker-compose.yaml)
-  - esse arquivo sobe uma instância da aplicação de acordo com a versão mais recente presente no [docker hub](https://hub.docker.com/r/gustavodamassa/medias-api/tags);
+- Baixe o arquivo  [docker compose](./Compose%20docker%20/docker-compose.yaml)
+  - esse arquivo cria uma instância da aplicação de acordo com a versão mais recente presente no repositório [docker hub](https://hub.docker.com/r/gustavodamassa/medias-api/tags);
   - **mantenha o nome do arquivo.**
 - execute o seguinte comando no repositório em que o arquivo foi baixado
 ```
@@ -718,42 +728,12 @@ docker compose up
 ### Aplicação no ar 
 
   após executada você pode navegar por ela realizando requisições através do:
- ##### - [Swagger do projeto](http://localhost:8080/swagger-ui/index.html)
+ ### - [Swagger do projeto](http://localhost:8080/swagger-ui/index.html)
   - ou por algum API Client de preferência em **localhost:8080**
 
+### Dependências
 
-## Motivação e Solução 
-
-
-
-## Práticas adotadas
-
-- SOLID
-- API REST
-- Consultas com Spring Data JPA
-- Injeção de Dependências
-- Tratamento de respostas de erro
-- Geração automática do Swagger com a OpenAPI 3
-- Testes automatizados
-- Banco de dados relacional
-
-## Tecnologias
-
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Spring MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
-- [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
-- [Mysql](https://dev.mysql.com/downloads/)
-- [Workbench](https://www.mysql.com/products/workbench/)
-- [Postman](https://postman.com/)
-- [Git](https://git-scm.com/)
-- [H2 DataBase](https://www.h2database.com/html/main.html)
-- [Bean Validation](https://beanvalidation.org/)
-
----
-## Dependências
-
-###  Docker:
+####  Docker:
 Instalar conforme o sistema operacional:
 
 - Linux (Ubuntu/Debian):
@@ -767,10 +747,74 @@ Instalar conforme o sistema operacional:
 
 - Windows/Mac: Baixar e instalar o [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-###  Docker Compose:
+####  Docker Compose:
 
-- Linux 
+- Linux
 ```
   sudo apt install docker-compose -y
 ```
 - Windowns/mac: o Docker Compose já vem no Docker Desktop.
+
+---
+## Motivação e Solução 
+
+Durante a jornada acadêmica na universidade, gerenciar as notas ou até mesmo apenas armazená-las é um processo que pode ser automatizado de maneira eficiente. No entanto, como cada professor e disciplina definem seus próprios métodos de avaliação e critérios de desempenho de acordo com suas preferências e abordagens, há uma grande variabilidade e flexibilidade nesse processo.
+
+Para que a aplicação possa suportar essas definições personalizadas, foi implementada uma solução baseada no processamento de expressões regulares, permitindo a identificação e manipulação dinâmica de variáveis, constantes e operadores. Dessa forma, o cálculo das médias finais é automatizado de maneira flexível e adaptável a diferentes regras de avaliação.
+
+Outro desafio foi a implementação desse cálculo dinâmico. A solução adotada utiliza a notação polonesa inversa (RPN), que elimina a necessidade de parênteses ao definir a ordem correta de precedência diretamente em sua estrutura. Além disso, foi empregada uma adaptação do algoritmo Shunting Yard, utilizando pilhas e listas como estruturas de dados para garantir a correta avaliação das expressões.
+
+```
+^(\d+(([.,])?\d+)?)(?=[\+\-\*\/])|(?<=[\+\-\*\/\(;])(\d+(([.,])?\d+)?)(?=[\+\-\*\/\);])|(?<=[\+\-\*\/])(\d+(([.,])?\d+)?)$|[\+\-\*\/\(\)\;]|(?<=[\+\-\*\/\)\(;])@M(\[\d+\]\()?|^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
+```
+- ferramenta para engenharia de Regex:  [regexr](https://regexr.com/)
+
+---
+
+## Práticas Adotadas
+
+- **Arquitetura e Design**
+  - API REST com divisão em camadas
+  - Aplicação dos princípios SOLID
+  - Injeção de Dependências
+  - Uso do padrão Data Transfer Object (DTO)
+
+- **Validação e Segurança**
+  - Validações personalizadas e uso do Bean Validation
+  - Implementação de autenticação e autorização via JWT
+
+- **Tratamento de Erros e Respostas**
+  - Captura e tratamento de erros padronizados
+
+- **Documentação**
+  - Documentação da API com diagramas e exemplos
+  - Documentação técnica dos endpoints com OpenAPI 3
+
+- **Testes e Qualidade de Código**
+  - Testes automatizados com criação de mocks e ambiente separado
+
+- **Banco de Dados**
+  - Modelagem do banco de dados relacional com definições de constraints
+  - Consultas JPQL e SQL nativo com Spring Data JPA
+
+- **Ferramentas e Deploy**
+  - Uso de API Client e Database Client durante o desenvolvimento
+  - Encapsulamento da aplicação com Docker, criando imagens e containers personalizados
+  - Versionamento de código com Git
+  
+### Tecnologias
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
+- [Maven](https://maven.apache.org/)
+- [H2 DataBase](https://www.h2database.com/html/main.html)
+- [Bean Validation](https://beanvalidation.org/)
+- [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
+- [JUnit](https://junit.org/junit5/)
+- [Mysql](https://dev.mysql.com/downloads/)
+- [Workbench](https://www.mysql.com/products/workbench/)
+- [Postman](https://postman.com/)
+- [Docker](https://www.docker.com/products/docker-hub/)
+- [Git](https://git-scm.com/)
+
+---
