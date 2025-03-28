@@ -156,8 +156,8 @@ Tanto estudantes quanto  docentes podem utilizá-la para gerenciar notas, criar 
 
 - **`AverageMethod:`**
   - Constantes são representadas por valores `double`;
-  - Identificadores podem conter números;
-  - Identificadores devem conter uma ou mais letras;
+  - Identificadores podem conter números, o caracter especial `_` e pelo menos uma letra;
+ 
   - Identificadores podem ter o sufixo `[N]` indicando a nota máxima da avaliação;
     - **N** é um `double`; 
     - caso não seja informado assume o valor default `10`.
@@ -652,48 +652,75 @@ A API retorna respostas padronizadas para erros e exceções. Abaixo estão os c
 
 ###  Exceções customizadas
 
-| StatusCode | Exceção            | Error example |
-|------------|--------------------|-----------|
-| 404        | `NotFoundArgumentException`  | Course id 30 not found for UserId 2 |
+| StatusCode | Exceção            | Error example                                             |
+|------------|--------------------|-----------------------------------------------------------|
+| 404        | `NotFoundArgumentException`  | Course id 30 not found for UserId 2                       |
 | 400        | `IllegalArgumentException` | It is not possible to select more values than those provided |
-| 400        | `NoSuchElementException`    | The equation has operators without arguments |
-| 400        | `DataIntegrityException`     | The attribute SGBD already exist for this context |
-| 500        | `InternalServerError` | Internal Server Error |
+| 400        | `NoSuchElementException`    | The equation has operators without arguments              |
+| 400        | `DataIntegrityException`     | The attribute SGBD already exist for this context         |
+| 500        | `InternalServerError` | possible division by zero detected                                     |
 
+### Exemplo:
+- **Método**: POST;
+- **URI** {userId}/courses
+  - **Request:**
+  ```json
+  {
+      "name":"Grego",
+      "averageMethod":" 2,5(P_1)+3 / 2,5*(P2#)3 ",
+      "cutOffGrade": 6.0
+  }
+- **Response:**
+  ```json
+  {
+    "statusCode": 400,
+    "error": "Method for calculating averages not accepted, formula terms are invalid: 2,5----------#-3",
+    "path": "/2/courses",
+    "timestamp": "2025-03-28T17:31:04.744315954"
+  }
 ---
 ## Como executar
 
-- Clonar repositório git
+A Aplicação utiliza o Docker e é disponibilizada dentro de um container com a imagem da api e do banco de dados ao qual se conecta.
 
-```
-git clone https://github.com/GustavoDaMassa/AgendaToDo.git
-```
+### Opção 1
 
-- Construir o projeto:
-```
-$ ./mvnw clean package
-```
-- Executar a aplicação:
-```
-$ java -jar target/Agenda-0.0.1-SNAPSHOT.jar
-```
-### Usando Docker
+#### Dependências:
+  
+  - [Docker](#docker);
+  - [Docker Compose](#docker-compose).
 
-- Clonar repositório git
-- Construir o projeto:
+#### Passos para rodar:
+  
+  - Clone o repositório e entre no diretório:
+```
+git clone https://github.com/GustavoDaMassa/MediasAPI.git
+cd MediasAPI
+```
+- Suba o container com um imagem atualizada:
+```
+docker compose up --build -d 
+```
+- parando a aplicação:
+```
+docker compose down
+```
+### Opção 2
+ caso deseje rodar com mais facilidade sem a necessidade de clonar o repositório 
 
-- Construir a imagem:
+- Baixe o arquivo [docker compose](./Compose%20docker%20/docker-compose.yaml)
+  - esse arquivo sobe uma instância da aplicação de acordo com a versão mais recente presente no [docker hub](https://hub.docker.com/r/gustavodamassa/medias-api/tags);
+  - **mantenha o nome do arquivo.**
+- execute o seguinte comando no repositório em que o arquivo foi baixado
 ```
-./mvnw spring-boot:build-image
+docker compose up
 ```
-- Executar o container:
-```
-docker run --name place-service -p 8080:8080  -d place-service:0.0.1-SNAPSHOT
-```
+### Aplicação no ar 
 
-A API poderá ser acessada em http://localhost:8080/tasks.
+  após executada você pode navegar por ela realizando requisições através do:
+ ##### - [Swagger do projeto](http://localhost:8080/swagger-ui/index.html)
+  - ou por algum API Client de preferência em **localhost:8080**
 
-### [swagger do projeto](http://localhost:8080/swagger-ui.html)
 
 ## Motivação e Solução 
 
@@ -723,3 +750,27 @@ A API poderá ser acessada em http://localhost:8080/tasks.
 - [H2 DataBase](https://www.h2database.com/html/main.html)
 - [Bean Validation](https://beanvalidation.org/)
 
+---
+## Dependências
+
+###  Docker:
+Instalar conforme o sistema operacional:
+
+- Linux (Ubuntu/Debian):
+
+``` 
+  sudo apt update && sudo apt install docker.io -y
+```
+```
+  sudo systemctl enable --now docker
+```
+
+- Windows/Mac: Baixar e instalar o [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+###  Docker Compose:
+
+- Linux 
+```
+  sudo apt install docker-compose -y
+```
+- Windowns/mac: o Docker Compose já vem no Docker Desktop.
