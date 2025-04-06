@@ -41,9 +41,8 @@ public class ProjectionServiceImpl implements ProjectionService {
             throw new DataIntegrityException(projectionName.string());
         }
         var projection = new Projection(course,projectionName.string());
-        projectionRepository.save(projection);
-        assessmentService.createAssessment(projection.getId());
-        return projection;
+        assessmentService.createAssessment(projection);
+        return projectionRepository.save(projection);
     }
 
     public List<Projection> listProjection(Long courseId) {

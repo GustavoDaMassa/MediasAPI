@@ -3,6 +3,7 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
+import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
@@ -36,9 +37,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Transactional
-    public void createAssessment(Long projectionId){
-        validateProjection(projectionId);
-        var projection = projectionRepository.findById(projectionId).orElseThrow();
+    public void createAssessment(Projection projection){
         var course = projection.getCourse();
         identifiersDefinition.defineIdentifiers(course.getAverageMethod(),projection);
         calculateFinalGrade.calculateResult(projection,course.getAverageMethod());
