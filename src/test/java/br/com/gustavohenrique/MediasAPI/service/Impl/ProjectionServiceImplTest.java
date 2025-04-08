@@ -60,7 +60,7 @@ class ProjectionServiceImplTest {
     @DisplayName("createProjection - Should return the projection created successfully")
     void createProjectionSuccessfully() {
         var projectionName = new StringRequestDTO("Projection default");
-        var projection = new Projection(18L,null,null,projectionName.string(),10);
+        var projection = new Projection(null,course,List.of(),projectionName.string(),0);
 
         when(projectionRepository.existsByCourseAndName(course,projectionName.string())).thenReturn(false);
         when(projectionRepository.save(any(Projection.class))).thenReturn(projection);
