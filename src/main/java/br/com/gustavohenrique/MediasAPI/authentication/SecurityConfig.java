@@ -58,7 +58,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/web/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(conf->conf.jwt(Customizer.withDefaults()));
