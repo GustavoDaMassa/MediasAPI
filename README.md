@@ -29,6 +29,14 @@ Entenda um pouco mais sobre o escopo da **[solução](#motivação-e-solução-)
 - Gerencie disciplinas.
 
 ---
+
+## Demonstração
+
+![img_2.png](images/listagemProjeções.png)
+
+Para demonstrar o fluxo principal e exemplificar o potencial da aplicação, ela possui um simples [front-end integrado](#exemplo-1) desenvolvido com o Thymeleaf.
+
+---
 ## Utilizando a API: 
  #### Antes de detalharmos os endpoints e a autenticação, é importante entender o fluxo de uso da API:
 
@@ -754,6 +762,10 @@ Instalar conforme o sistema operacional:
   sudo apt install docker-compose -y
 ```
 - Windowns/mac: o Docker Compose já vem no Docker Desktop.
+
+---
+
+## Exemplo
 
 ---
 ## Motivação e Solução 
