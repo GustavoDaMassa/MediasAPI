@@ -32,7 +32,7 @@ Entenda um pouco mais sobre o escopo da **[solução](#motivação-e-solução-)
 
 ## Demonstração
 
-![img_2.png](images/listagemProjeções.png)
+![img_3.png](images/projeções.png)
 
 Para demonstrar o fluxo principal e exemplificar o potencial da aplicação, ela possui um simples [front-end integrado](#exemplo-1) desenvolvido com o Thymeleaf.
 
@@ -60,7 +60,7 @@ Para demonstrar o fluxo principal e exemplificar o potencial da aplicação, ela
 
  Para obter um token, o usuário deve fazer uma requisição POST para o endpoint `/authenticate` com suas credenciais. O token retornado deve ser incluído no cabeçalho Authorization de todas as requisições subsequentes, exceto para cadastro.
 
-![img.png](img.png)
+![img.png](images/authenticate.png)
 
 - **O usuário é autenticado através do email que é único no sistema, rota pública;**
 - **Auth Type:** `Bearer Token`
@@ -75,7 +75,7 @@ Para demonstrar o fluxo principal e exemplificar o potencial da aplicação, ela
 
 ### user-controller
 
-![img_1.png](img_1.png)
+![img_1.png](images/cadastrarusuarios.png)
 - **Cria um novo perfil de usuário, não é necessário autenticação.** 
 
 - **Request Body:**
