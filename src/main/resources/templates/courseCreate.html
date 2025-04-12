@@ -1,10 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Criar Curso</title>
+    <style>
+        body {
+          background-color: #1273a6;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+        }
+        .container {
+          background-color: black;
+          color: white;
+          border: 1px solid #ccc;
+          padding: 20px;
+          width: 400px;
+          border-radius: 5px;
+          text-align: center;
+        }
+        label, input, button, a {
+          display: block;
+          margin: 10px auto;
+          width: 80%;
+        }
+        a {
+          color: white;
+          text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+<h1>Criar Curso</h1>
+<form th:action="@{'/web/' + ${userId} + '/courses/create'}" method="post" th:object="${requestCourseDto}">
+    <div>
+        <label for="name">Nome:</label>
+        <input type="text" id="name" th:field="*{name}" required>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    </div>
+    <div>
+        <label for="averageMethod">Método de Cálculo:</label>
+        <input type="text" id="averageMethod" th:field="*{averageMethod}" required>
+        <p th:if="${#fields.hasErrors('averageMethod')}" th:errors="*{averageMethod}"></p>
+    </div>
+    <div>
+        <label for="cutOffGrade">Nota de Corte:</label>
+        <input type="text" id="cutOffGrade" th:field="*{cutOffGrade}" required>
+        <p th:if="${#fields.hasErrors('cutOffGrade')}" th:errors="*{cutOffGrade}"></p>
+    </div>
+    <button type="submit">Criar</button>
+    <a th:href="@{'/web/' + ${userId} + '/courses'}">Voltar para Lista de Cursos</a>
+</form>
+</div>
 </body>
 </html>

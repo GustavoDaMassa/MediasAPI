@@ -1,10 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Projeções</title>
+    <style>
+        body {
+            background-color: #1273a6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: black;
+            color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 80%;
+            border-radius: 5px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid black; /* Linhas pretas */
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        td a {
+            color: #5bc0de;
+            text-decoration: none;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <h1>Lista de Projeções</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Avaliações</th>
+            <th>Nota Final</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="projection : ${projections}">
+            <td th:text="${projection.name}"></td>
+            <td>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Identificador</th>
+                        <th>Nota</th>
+                        <th>Nota Necessária</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="assessment : ${projection.assessment}">
+                        <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade'}" th:text="${assessment.identifier}"></a></td>
+                        <td th:text="${assessment.grade}"></td>
+                        <td th:text="${assessment.requiredGrade}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${projection.finalGrade}"></td>
+            <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/delete'}">Deletar</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <a th:href="@{'/web/' + ${courseId} + '/projections/create'}">Criar Projeção</a>
+</div>
 </body>
 </html>

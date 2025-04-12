@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cursos</title>
+    <style>
+        body {
+            background-color: #1273a6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: black;
+            color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 80%;
+            border-radius: 5px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        td a {
+            color: #5bc0de;
+            text-decoration: none;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1>Lista de Cursos</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Método de Cálculo</th>
+        <th>Nota de Corte</th>
+        <th></th> </tr>
+    </thead>
+    <tbody>
+    <tr th:each="course : ${courses}">
+        <td><a th:href="@{'/web/' + ${course.id} + '/projections'}" th:text="${course.name}"></a></td>
+        <td th:text="${course.averageMethod}"></td>
+        <td th:text="${course.cutOffGrade}"></td>
+        <td>
+            <a th:href="@{'/web/' + ${userId} + '/courses/' + ${course.id} + '/delete'}">Deletar</a> </td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{'/web/users/' + ${userId} + '/projections'}">Mostrar todas as projeções</a>
+<a th:href="@{'/web/' + ${userId} + '/courses/create'}">Criar Curso</a>
+</div>
+</body>
+</html>

@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Criar Projeção</title>
+  <style>
+    body {
+      background-color: #1273a6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: black;
+      color: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+      width: 400px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    label, input, button, a {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+    }
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-$END$
+<div class="container">
+<h1>Criar Projeção</h1>
+<form th:action="@{'/web/' + ${courseId} + '/projections/create'}" method="post" th:object="${stringRequestDTO}">
+  <div>
+    <label for="string">Nome:</label>
+    <input type="text" id="string" th:field="*{string}" required>
+    <p th:if="${#fields.hasErrors('string')}" th:errors="*{string}"></p>
+  </div>
+  <button type="submit">Criar</button>
+  <a th:href="@{'/web/' + ${courseId} + '/projections'}">Voltar para Lista de Projeções</a>
+</form>
+</div>
 </body>
 </html>

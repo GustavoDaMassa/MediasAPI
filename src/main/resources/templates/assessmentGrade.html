@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Inserir Nota</title>
+  <style>
+    body {
+      background-color: #1273a6; /* Fundo azul claro para a página */
+      display: flex; /* Usado para centralizar verticalmente */
+      justify-content: center; /* Centraliza horizontalmente */
+      align-items: center; /* Centraliza verticalmente */
+      min-height: 100vh; /* Garante que o body ocupa toda a altura da tela */
+      margin: 0; /* Remove margens padrão do body */
+    }
+    .container {
+      background-color: black; /* Fundo preto para o retângulo */
+      color: white; /* Cor do texto branco */
+      border: 1px solid #ccc;
+      padding: 20px;
+      width: 400px;
+      border-radius: 5px;
+      text-align: center; /* Centraliza o texto dentro do retângulo */
+    }
+    label, input, button, a {
+      display: block; /* Faz cada elemento ocupar uma linha inteira */
+      margin: 10px auto; /* Adiciona margem acima e abaixo de cada elemento */
+      width: 80%; /* Define a largura dos elementos como 80% do retângulo */
+    }
+    a {
+      color: white; /* Cor do link branco */
+      text-decoration: none; /* Remove sublinhado padrão do link */
+    }
+  </style>
 </head>
 <body>
-$END$
+<div class="container">
+  <h1>Inserir Nota</h1>
+  <form th:action="@{'/web/' + ${courseId} + '/projections/' + ${projectionId} + '/assessments/' + ${assessmentId} + '/grade'}" method="post" th:object="${doubleRequestDTO}">
+    <div>
+      <label for="value">Nota:</label>
+      <input type="text" id="value" th:field="*{value}" required>
+      <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}"></p>
+    </div>
+    <button type="submit">Inserir</button>
+    <a th:href="@{'/web/' + ${courseId} + '/projections'}">Voltar para Lista de Projeções</a>
+  </form>
+</div>
 </body>
 </html>
