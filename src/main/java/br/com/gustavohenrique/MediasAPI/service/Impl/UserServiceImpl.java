@@ -64,4 +64,9 @@ public class UserServiceImpl implements UserService {
     public List<Users> listUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public Users findusers(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->new NotFoundArgumentException("User email "+email+" not found"));
+    }
 }

@@ -18,4 +18,6 @@ public interface UserService {
     Users deleteUser(Long id);
 
     List<Users> listUsers();
+
+    Users findusers(String email);
 }

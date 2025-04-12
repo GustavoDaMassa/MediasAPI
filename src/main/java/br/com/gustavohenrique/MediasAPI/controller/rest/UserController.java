@@ -12,6 +12,7 @@ import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.build.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,4 +69,9 @@ public class UserController {
             return ResponseEntity.ok(modelMapper.map(userService.deleteUser(id), UserDTO.class));
     }
 
+    @GetMapping("{email}")
+    @Operation(summary = "resgatar o id de um usuário pelo email")
+    public ResponseEntity<UserDTO> findUser(@PathVariable String email){
+        return  ResponseEntity.ok(modelMapper.map(userService.findusers(email),UserDTO.class));
+    }
 }
