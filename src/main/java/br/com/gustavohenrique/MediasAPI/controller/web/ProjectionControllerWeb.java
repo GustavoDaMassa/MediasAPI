@@ -30,21 +30,22 @@ public class ProjectionControllerWeb {
         this.mapDTO = mapDTO;
     }
 
-    @GetMapping
-    public String showProjections(@PathVariable Long courseId, Model model) {
+    @GetMapping("/{userId}")
+    public String showProjections(@PathVariable Long courseId,@PathVariable Long userId, Model model) {
         List<ProjectionDTO> projections = projectionService.listProjection(courseId).stream()
                 .map(mapDTO::projectionDTO)
                 .collect(Collectors.toList());
 
         model.addAttribute("projections", projections);
+        model.addAttribute("userId", userId);
         model.addAttribute("courseId", courseId);
         return "projections";
     }
 
-    @GetMapping("/{id}/delete")
-    public String deleteProjection(@PathVariable Long courseId, @PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @GetMapping("/{id}/delete/{userId}")
+    public String deleteProjection(@PathVariable Long userId, @PathVariable Long courseId, @PathVariable Long id, RedirectAttributes redirectAttributes) {
         projectionService.deleteProjection(courseId, id);
         redirectAttributes.addFlashAttribute("message", "Projeção deletada com sucesso!");
-        return "redirect:/web/{courseId}/projections";
+        return "redirect:/web/{courseId}/projections/{userId}";
     }
 }

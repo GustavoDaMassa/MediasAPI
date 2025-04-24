@@ -34,14 +34,14 @@
 <body>
 <div class="container">
   <h1>Inserir Nota</h1>
-  <form th:action="@{'/web/' + ${courseId} + '/projections/' + ${projectionId} + '/assessments/' + ${assessmentId} + '/grade'}" method="post" th:object="${doubleRequestDTO}">
+  <form th:action="@{'/web/' + ${courseId} + '/projections/' + ${projectionId} + '/assessments/' + ${assessmentId} + '/grade/' + ${userId}}" method="post" th:object="${doubleRequestDTO}">
     <div>
       <label for="value">Nota:</label>
       <input type="text" id="value" th:field="*{value}" required>
       <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}"></p>
     </div>
     <button type="submit">Inserir</button>
-    <a th:href="@{'/web/' + ${courseId} + '/projections'}">Voltar para Lista de Projeções</a>
+    <a th:href="@{'/web/' + ${courseId} + '/projections/' + ${userId}}">Voltar para Lista de Projeções</a>
   </form>
 </div>
 </body>

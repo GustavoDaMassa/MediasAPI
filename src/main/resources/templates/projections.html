@@ -45,11 +45,15 @@
         a:hover {
             text-decoration: underline;
         }
+        .spaced-link {
+            margin-left: 40px;
+        }
+
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Lista de Projeções</h1>
+    <h1>Projeções</h1>
     <table>
         <thead>
         <tr>
@@ -73,19 +77,23 @@
                     </thead>
                     <tbody>
                     <tr th:each="assessment : ${projection.assessment}">
-                        <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade'}" th:text="${assessment.identifier}"></a></td>
-                        <td th:text="${assessment.grade}"></td>
+                        <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade/' + ${userId}}" th:text="${assessment.identifier}"></a></td>
+                        <td>
+                            <span th:if="${assessment.requiredGrade == 0}" th:text="${assessment.grade}"></span>
+                            <span th:if="${assessment.requiredGrade != 0}">--</span>
+                        </td>
                         <td th:text="${assessment.requiredGrade}"></td>
                     </tr>
                     </tbody>
                 </table>
             </td>
             <td th:text="${projection.finalGrade}"></td>
-            <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/delete'}">Deletar</a></td>
+            <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/delete/' +${userId}}">Deletar</a></td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{'/web/' + ${courseId} + '/projections/create'}">Criar Projeção</a>
+    <a th:href="@{'/web/' + ${courseId} + '/projections/create/' + ${userId}}">Criar Projeção</a>
+    <a th:href="@{'/web/' + ${userId} + '/courses'}" class="spaced-link">Voltar para a Lista de cursos</a>
 </div>
 </body>
 </html>

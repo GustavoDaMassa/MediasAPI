@@ -50,7 +50,7 @@
 </head>
 <body>
 <div class="container">
-<h1>Lista de Cursos</h1>
+<h1>Cursos</h1>
 <table>
     <thead>
     <tr>
@@ -61,7 +61,7 @@
     </thead>
     <tbody>
     <tr th:each="course : ${courses}">
-        <td><a th:href="@{'/web/' + ${course.id} + '/projections'}" th:text="${course.name}"></a></td>
+        <td><a th:href="@{'/web/' + ${course.id} + '/projections/' + ${userId}}" th:text="${course.name}"></a></td>
         <td th:text="${course.averageMethod}"></td>
         <td th:text="${course.cutOffGrade}"></td>
         <td>

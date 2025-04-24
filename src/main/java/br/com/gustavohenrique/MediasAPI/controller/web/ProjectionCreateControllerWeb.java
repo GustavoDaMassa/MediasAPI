@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/web/{courseId}/projections/create")
+@RequestMapping("/web/{courseId}/projections/create/{userId}")
 public class ProjectionCreateControllerWeb {
 
     private final ProjectionService projectionService;
@@ -26,20 +26,21 @@ public class ProjectionCreateControllerWeb {
     }
 
     @GetMapping
-    public String createProjectionForm(@PathVariable Long courseId, Model model) {
+    public String createProjectionForm(@PathVariable Long courseId,@PathVariable Long userId, Model model) {
         model.addAttribute("stringRequestDTO", new StringRequestDTO(""));
-        model.addAttribute("courseId", courseId); // Adiciona o courseId ao modelo
+        model.addAttribute("courseId", courseId);
+        model.addAttribute("userId", userId);
         return "projectionCreate";
     }
 
     @PostMapping
-    public String createProjection(@PathVariable Long courseId, @ModelAttribute @Valid StringRequestDTO stringRequestDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String createProjection(@PathVariable Long userId,@PathVariable Long courseId, @ModelAttribute @Valid StringRequestDTO stringRequestDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "projectionCreate";
         }
-
+        System.out.println(userId);
         projectionService.createProjection(courseId, stringRequestDTO);
         redirectAttributes.addFlashAttribute("message", "Projeção criada com sucesso!");
-        return "redirect:/web/{courseId}/projections";
+        return "redirect:/web/{courseId}/projections/{userId}";
     }
 }

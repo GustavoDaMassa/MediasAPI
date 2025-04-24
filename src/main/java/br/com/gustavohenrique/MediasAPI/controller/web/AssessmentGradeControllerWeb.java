@@ -28,23 +28,24 @@ public class AssessmentGradeControllerWeb {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping
-    public String insertGradeForm(@PathVariable Long courseId, @PathVariable Long projectionId, @PathVariable Long id, Model model) {
+    @GetMapping("/{userId}")
+    public String insertGradeForm(@PathVariable Long userId ,@PathVariable Long courseId, @PathVariable Long projectionId, @PathVariable Long id, Model model) {
         model.addAttribute("doubleRequestDTO", new DoubleRequestDTO(0.0));
         model.addAttribute("projectionId", projectionId);
         model.addAttribute("courseId", courseId);
+        model.addAttribute("userId", userId);
         model.addAttribute("assessmentId", id);
         return "assessmentGrade";
     }
 
-    @PostMapping
-    public String insertGrade(@PathVariable Long projectionId, @PathVariable Long id, @ModelAttribute @Valid DoubleRequestDTO doubleRequestDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    @PostMapping("/{userId}")
+    public String insertGrade(@PathVariable Long userId ,@PathVariable Long projectionId, @PathVariable Long id, @ModelAttribute @Valid DoubleRequestDTO doubleRequestDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "assessmentGrade";
         }
 
         assessmentService.insertGrade(projectionId, id, doubleRequestDTO);
         redirectAttributes.addFlashAttribute("message", "Nota inserida com sucesso!");
-        return "redirect:/web/{courseId}/projections";
+        return "redirect:/web/{courseId}/projections/{userId}";
     }
 }
