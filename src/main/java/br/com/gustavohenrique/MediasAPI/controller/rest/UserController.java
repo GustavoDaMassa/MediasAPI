@@ -9,6 +9,7 @@ import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -28,7 +29,7 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserServiceImpl userService) {
