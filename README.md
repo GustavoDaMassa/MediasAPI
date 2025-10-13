@@ -8,6 +8,10 @@
 
 # 📌 API Rest de Gestão de Notas e Projeções Acadêmicas
 
+Esta solução foi construída originalmente com Java usando o Spring Framework neste repositório
+mas também está implementada com as stacks: 
+- [c#/.Net com ASPNET core](https://github.com/GustavoDaMassa/dotNetMediasAPI)
+- [typeScript/nodeJS com NestJs](https://github.com/GustavoDaMassa/nodeMediasAPI)
 ## Apresentação
 
 Esta API foi desenvolvida para oferecer uma solução completa na gestão de notas acadêmicas. Com ela, os usuários podem armazenar suas avaliações e obter automaticamente a média final de cada disciplina. Ela foi idealizada com o objetivo core de permitir projeções estratégicas para um melhor planejamento do desempenho acadêmico.
