@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.exception;
 
+import org.springframework.security.access.AccessDeniedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,11 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new StandardError(HttpStatus.BAD_REQUEST.value(), errorMessage, request.getRequestURI()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<StandardError> accessDenied(AccessDeniedException e, HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new StandardError(HttpStatus.FORBIDDEN.value(), "Access Denied: You do not have permission to access this resource.", request.getRequestURI()));
     }
 }
