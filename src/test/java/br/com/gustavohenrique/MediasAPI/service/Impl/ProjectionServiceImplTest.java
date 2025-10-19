@@ -5,10 +5,12 @@ import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.h2.command.dml.MergeUsing;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +46,9 @@ class ProjectionServiceImplTest {
 
     @Mock
     private ProjectionRepository projectionRepository;
+
+    @Mock
+    private UserService userService;
 
     private final Long courseId = 1L;
     private final Course course = new Course(courseId,null,"BD",null,
@@ -165,14 +170,14 @@ class ProjectionServiceImplTest {
         var projection = new Projection(1L,null,null,"BD",3);
 
         when(projectionRepository.findByCourseAndId(course,projection.getId())).thenReturn(Optional.of(projection));
-        doNothing().when(projectionRepository).deleteProjection(projection.getId());
+        doNothing().when(projectionRepository).deleteProjection(projection.getId(), courseId);
 
         var response = projectionService.deleteProjection(courseId, projection.getId());
 
         AssertProjection(projection,response);
         verify(courseRepository).findById(courseId);
         verify(projectionRepository).findByCourseAndId(course,projection.getId());
-        verify(projectionRepository).deleteProjection(projection.getId());
+        verify(projectionRepository).deleteProjection(projection.getId(), courseId);
     }
 
     @Test
@@ -186,31 +191,31 @@ class ProjectionServiceImplTest {
 
         verify(courseRepository).findById(courseId);
         verify(projectionRepository).findByCourseAndId(course,projection.getId());
-        verify(projectionRepository,never()).deleteProjection(projection.getId());
+        verify(projectionRepository,never()).deleteProjection(anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("deleteAllProjection - Should delete all projection successfully")
     void deleteAllProjectionsSuccessfully() {
+        var userId = 1L;
+        doNothing().when(projectionRepository).deleteAllByCourse(courseId, userId);
 
-        doNothing().when(projectionRepository).deleteAllByCourse(courseId);
-
-        projectionService.deleteAllProjections(courseId);
+        projectionService.deleteAllProjections(courseId, userId);
 
         verify(courseRepository).existsById(courseId);
-        verify(projectionRepository).deleteAllByCourse(courseId);
+        verify(projectionRepository).deleteAllByCourse(courseId, userId);
     }
 
     @Test
     @DisplayName("deleteAllProjection - Should return exception when the user not exist")
     void deleteAllProjectionUserNotFound(){
-
+        var userId = 1L;
         when(courseRepository.existsById(courseId)).thenThrow(NotFoundArgumentException.class);
 
-        assertThrows(NotFoundArgumentException.class,()-> projectionService.deleteAllProjections(courseId));
+        assertThrows(NotFoundArgumentException.class,()-> projectionService.deleteAllProjections(courseId, userId));
 
         verify(courseRepository).existsById(courseId);
-        verify(projectionRepository,never()).deleteAllByCourse(courseId);
+        verify(projectionRepository,never()).deleteAllByCourse(anyLong(), anyLong());
     }
 
     @Test

@@ -10,11 +10,17 @@ import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import jakarta.validation.Valid;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserServiceImpl(CourseService courseService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(@Lazy CourseService courseService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.courseService = courseService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -33,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Users create(LogOnDto users) {
         if (userRepository.existsByEmail(users.email()))throw new DataIntegrityException(users.email());
-        Users newUser = new Users(null,users.name(), users.email(),null, users.password());
+        Users newUser = new Users(null,users.name(), users.email(),new ArrayList<>(), users.password());
         newUser.setPassword(passwordEncoder.encode(users.password()));
         return userRepository.save(newUser);
     }
@@ -68,5 +74,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users findusers(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->new NotFoundArgumentException("User email "+email+" not found"));
+    }
+
+    @Override
+    public Users getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        Object principal = authentication.getPrincipal();
+        String email;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof org.springframework.security.oauth2.jwt.Jwt) {
+            email = ((org.springframework.security.oauth2.jwt.Jwt) principal).getSubject();
+        } else {
+            throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
+        }
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundArgumentException("User email " + email + " not found"));
     }
 }

@@ -174,7 +174,7 @@ class CourseServiceImplTest {
 
         verify(userRepository).findById(userId);
         verify(courseRepository).findByUserAndId(any(Users.class), eq(course.getId()));
-        verify(projectionService,never()).deleteAllProjections(course.getId());
+        verify(projectionService,never()).deleteAllProjections(anyLong(), anyLong());
         verify(courseRepository,never()).save(any(Course.class));
         verify(projectionService,never()).createProjection(eq(course.getId()), any(StringRequestDTO.class));
 
@@ -187,7 +187,7 @@ class CourseServiceImplTest {
         var course = new Course(null,null,"BD",null,averageMethodDto.string(),6);
 
         when(courseRepository.findByUserAndId(any(Users.class),eq(course.getId()))).thenReturn(Optional.of(course));
-        doNothing().when(projectionService).deleteAllProjections(course.getId());
+        doNothing().when(projectionService).deleteAllProjections(course.getId(), userId);
         when(courseRepository.save(any(Course.class))).thenReturn(course);
         when(projectionService.createProjection(eq(course.getId()), any(StringRequestDTO.class)))
                 .thenReturn(new Projection());
@@ -197,7 +197,7 @@ class CourseServiceImplTest {
         AssertCourse(course,response);
         verify(userRepository).findById(userId);
         verify(courseRepository).findByUserAndId(any(Users.class), eq(course.getId()));
-        verify(projectionService).deleteAllProjections(course.getId());
+        verify(projectionService).deleteAllProjections(course.getId(), userId);
         verify(courseRepository).save(any(Course.class));
         verify(projectionService).createProjection(eq(course.getId()), any(StringRequestDTO.class));
     }
@@ -244,14 +244,14 @@ class CourseServiceImplTest {
         var course = new Course();
 
         when(courseRepository.findByUserAndId(user, course.getId())).thenReturn(Optional.of(course));
-        doNothing().when(courseRepository).deleteCourse(course.getId());
+        doNothing().when(courseRepository).deleteCourse(course.getId(), userId);
 
         var response = courseService.deleteCourse(userId, course.getId());
 
         AssertCourse(course,response);
         verify(userRepository).findById(userId);
         verify(courseRepository).findByUserAndId(user, course.getId());
-        verify(courseRepository).deleteCourse(course.getId());
+        verify(courseRepository).deleteCourse(course.getId(), userId);
     }
 
     @Test
@@ -265,7 +265,7 @@ class CourseServiceImplTest {
 
         verify(userRepository).findById(userId);
         verify(courseRepository).findByUserAndId(user, course.getId());
-        verify(courseRepository,never()).deleteCourse(course.getId());
+        verify(courseRepository,never()).deleteCourse(anyLong(), anyLong());
     }
 
 

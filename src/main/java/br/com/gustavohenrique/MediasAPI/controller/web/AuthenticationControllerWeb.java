@@ -2,7 +2,7 @@ package br.com.gustavohenrique.MediasAPI.controller.web;
 
 import br.com.gustavohenrique.MediasAPI.authentication.AuthenticationService;
 import br.com.gustavohenrique.MediasAPI.dtos.AuthDto;
-import br.com.gustavohenrique.MediasAPI.authentication.AuthenticationService;
+import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;

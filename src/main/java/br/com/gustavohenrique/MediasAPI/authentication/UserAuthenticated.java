@@ -19,7 +19,7 @@ public class UserAuthenticated implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "read");
+        return List.of(() -> "read", () -> "write", () -> "delete");
     }
 
     @Override
@@ -29,6 +29,6 @@ public class UserAuthenticated implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getName();
+        return user.getEmail();
     }
 }

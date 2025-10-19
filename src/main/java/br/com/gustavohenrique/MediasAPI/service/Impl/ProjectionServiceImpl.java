@@ -11,7 +11,9 @@ import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +26,15 @@ public class ProjectionServiceImpl implements ProjectionService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final ProjectionRepository projectionRepository;
+    private final UserService userService;
     @Autowired
     public ProjectionServiceImpl(AssessmentService assessmentService, UserRepository userRepository,
-                                 CourseRepository courseRepository, ProjectionRepository projectionRepository) {
+                                 CourseRepository courseRepository, ProjectionRepository projectionRepository, UserService userService) {
         this.assessmentService = assessmentService;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.projectionRepository = projectionRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -70,14 +74,14 @@ public class ProjectionServiceImpl implements ProjectionService {
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
                 (()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
-        projectionRepository.deleteProjection(id);
+        projectionRepository.deleteProjection(id, courseId);
         return projection;
     }
 
     @Transactional
-    public void deleteAllProjections(Long courseId) {
+    public void deleteAllProjections(Long courseId, Long userId) {
         validateCourse(courseId);
-        projectionRepository.deleteAllByCourse(courseId);
+        projectionRepository.deleteAllByCourse(courseId, userId);
     }
 
     public List<Projection> listAllProjection(Long userId) {
@@ -88,6 +92,16 @@ public class ProjectionServiceImpl implements ProjectionService {
     private void validateCourse(Long courseId){
         if(!courseRepository.existsById(courseId))
             throw new NotFoundArgumentException("Course id "+courseId+" not found");
+    }
+
+    @Override
+    public void getAuthenticatedUserByCourseId(Long courseId) {
+        var user = userService.getAuthenticatedUser();
+        var course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NotFoundArgumentException("Course id " + courseId + " not found"));
+        if (!course.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You are not authorized to access this resource.");
+        }
     }
 }
 

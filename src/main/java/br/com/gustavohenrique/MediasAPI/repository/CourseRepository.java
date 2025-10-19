@@ -22,7 +22,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByUserAndName(Users user, @NotBlank String name);
 
     @Modifying
-    @Query(value = "DELETE FROM course WHERE id = :id",nativeQuery = true)
-    void deleteCourse(@Param("id") Long id);
+    @Query(value = "DELETE FROM course WHERE id = :id AND user_id = :userId",nativeQuery = true)
+    void deleteCourse(@Param("id") Long id, @Param("userId") Long userId);
 
 }

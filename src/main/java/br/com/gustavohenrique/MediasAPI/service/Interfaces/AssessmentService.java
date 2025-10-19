@@ -13,4 +13,6 @@ public interface AssessmentService {
     List<Assessment> listAssessment(Long projectionId);
 
     Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto);
+
+    void getAuthenticatedUserByProjectionId(Long projectionId);
 }

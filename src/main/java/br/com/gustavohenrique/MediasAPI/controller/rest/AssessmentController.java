@@ -31,6 +31,7 @@ public class AssessmentController {
             " para atingir a nota de corte")
     public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long projectionId, @PathVariable Long id,
                                                      @RequestBody DoubleRequestDTO gradeDto){
+            assessmentService.getAuthenticatedUserByProjectionId(projectionId);
             return ResponseEntity.ok(modelMapper.map(assessmentService.insertGrade(projectionId,id,gradeDto),
                     AssessmentDTO.class));
     }
@@ -38,6 +39,7 @@ public class AssessmentController {
     @GetMapping
     @Operation(summary = "Listar avaliações", description = "Lista todas as avaliações de uma projeção")
     public ResponseEntity<List<AssessmentDTO>> showAssessment(@PathVariable Long projectionId){
+            assessmentService.getAuthenticatedUserByProjectionId(projectionId);
             return ResponseEntity.ok(assessmentService.listAssessment(projectionId).stream().map(assessment
                     -> modelMapper.map(assessment, AssessmentDTO.class)).collect(Collectors.toList()));
     }

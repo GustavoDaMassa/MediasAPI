@@ -20,4 +20,6 @@ public interface UserService {
     List<Users> listUsers();
 
     Users findusers(String email);
+
+    Users getAuthenticatedUser();
 }

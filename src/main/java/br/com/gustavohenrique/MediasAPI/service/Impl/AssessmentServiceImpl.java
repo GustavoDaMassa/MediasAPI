@@ -11,7 +11,9 @@ import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +27,17 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final IIdentifiersDefinition identifiersDefinition;
     private final ICalculateFinalGrade calculateFinalGrade;
     private final ICalculateRequiredGrade calculateRequiredGrade;
+    private final UserService userService;
     @Autowired
     public AssessmentServiceImpl(ProjectionRepository projectionRepository, AssessmentRepository assessmentRepository,
                                  IIdentifiersDefinition identifiersDefinition, ICalculateFinalGrade calculateFinalGrade,
-                                 ICalculateRequiredGrade calculateRequiredGrade) {
+                                 ICalculateRequiredGrade calculateRequiredGrade, UserService userService) {
         this.projectionRepository = projectionRepository;
         this.assessmentRepository = assessmentRepository;
         this.identifiersDefinition = identifiersDefinition;
         this.calculateFinalGrade = calculateFinalGrade;
         this.calculateRequiredGrade = calculateRequiredGrade;
+        this.userService = userService;
     }
 
     @Transactional
@@ -70,5 +74,15 @@ public class AssessmentServiceImpl implements AssessmentService {
     public void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
             throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
+    }
+
+    @Override
+    public void getAuthenticatedUserByProjectionId(Long projectionId) {
+        var user = userService.getAuthenticatedUser();
+        var projection = projectionRepository.findById(projectionId)
+                .orElseThrow(() -> new NotFoundArgumentException("Projection id " + projectionId + " not found"));
+        if (!projection.getCourse().getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You are not authorized to access this resource.");
+        }
     }
 }

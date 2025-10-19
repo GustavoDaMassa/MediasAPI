@@ -20,4 +20,6 @@ public interface CourseService {
     Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto);
 
     Course deleteCourse(Long userId, Long id);
+
+    void getAuthenticatedUser(Long userId);
 }

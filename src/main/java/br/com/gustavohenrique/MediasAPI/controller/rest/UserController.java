@@ -54,6 +54,10 @@ public class UserController {
     @PatchMapping("/{id}/name")
     @Operation(summary = "Atualizar nome de usuário")
     public ResponseEntity<UserDTO> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
+           var user = userService.getAuthenticatedUser();
+           if (!user.getId().equals(id)) {
+                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
+           }
            return ResponseEntity.status(HttpStatus.OK).body(modelMapper
                    .map(userService.updateName(id, nameDto), UserDTO.class));
     }
@@ -61,12 +65,20 @@ public class UserController {
     @PatchMapping("/{id}/email")
     @Operation(summary = "Atualizar email de usuário")
     public ResponseEntity<UserDTO> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO){
+            var user = userService.getAuthenticatedUser();
+            if (!user.getId().equals(id)) {
+                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
+            }
             return ResponseEntity.ok(modelMapper.map(userService.updateEmail(id, emailDTO), UserDTO.class));
     }
 
     @DeleteMapping("{id}")
     @Operation(summary = "Deletar o perfil de usuário")
     public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id){
+            var user = userService.getAuthenticatedUser();
+            if (!user.getId().equals(id)) {
+                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to delete this user.");
+            }
             return ResponseEntity.ok(modelMapper.map(userService.deleteUser(id), UserDTO.class));
     }
 

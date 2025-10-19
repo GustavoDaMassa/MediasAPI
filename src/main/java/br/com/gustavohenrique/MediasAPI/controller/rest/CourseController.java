@@ -34,6 +34,7 @@ public class CourseController {
     @Operation(summary = "Criar curso", description = "Cria um novo curso, e através do método de cálculo das médias" +
             " cria automaticamente uma projeção com o mesmo nome, identificando  e instânciando as avaliações definidas.")
     public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid RequestCourseDto course){
+           courseService.getAuthenticatedUser(userId);
            return ResponseEntity.status(HttpStatus.CREATED)
                    .body(modelMapper.map(courseService.createCourse(userId ,course), CourseDTO.class));
     }
@@ -41,6 +42,7 @@ public class CourseController {
     @GetMapping
     @Operation(summary = "Listar cursos", description = "retorna os cursos pertencentes ao usuário autenticado.")
     public  ResponseEntity<List<CourseDTO>> showCourses(@PathVariable Long userId){
+          courseService.getAuthenticatedUser(userId);
           return ResponseEntity.ok(courseService.listCourses(userId).stream()
                   .map(course -> modelMapper.map(course,CourseDTO.class)).collect(Collectors.toList()));
     }
@@ -49,6 +51,7 @@ public class CourseController {
     @Operation(summary = "Alterar nome do curso")
     public ResponseEntity<CourseDTO> updateCourseName(@PathVariable Long userId,@PathVariable Long id,
                                                       @RequestBody @Valid StringRequestDTO nameDto){
+            courseService.getAuthenticatedUser(userId);
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseName(userId, id, nameDto),
                     CourseDTO.class));
     }
@@ -58,6 +61,7 @@ public class CourseController {
             "final é definida. Deleta as projeções equivalentes e criar uma nova atualizada")
     public ResponseEntity<CourseDTO> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id,
                                                         @RequestBody @Valid StringRequestDTO averageMethodDto){
+            courseService.getAuthenticatedUser(userId);
             return ResponseEntity.ok(modelMapper.map(courseService
                     .updateCourseAverageMethod(userId, id, averageMethodDto), CourseDTO.class));
     }
@@ -66,6 +70,7 @@ public class CourseController {
     @Operation(summary = "Alterar nota de corte")
     public ResponseEntity<CourseDTO> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id,
                                                              @RequestBody @Valid DoubleRequestDTO cutOffGradeDto){
+            courseService.getAuthenticatedUser(userId);
             return ResponseEntity.ok(modelMapper.map(courseService.updateCourseCutOffGrade(userId, id, cutOffGradeDto),
                     CourseDTO.class));
     }
@@ -73,12 +78,14 @@ public class CourseController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar curso")
     public ResponseEntity<CourseDTO> deleteCourse(@PathVariable Long userId, @PathVariable Long id){
+            courseService.getAuthenticatedUser(userId);
             return ResponseEntity.ok(modelMapper.map(courseService.deleteCourse(userId, id), CourseDTO.class));
     }
 
     @GetMapping("/projections")
     @Operation(summary = "Listar projeções", description = "Lista todas as projeções de um usuário")
     public ResponseEntity<List<ProjectionDTO>> showAllProjections(@PathVariable Long userId){
+        courseService.getAuthenticatedUser(userId);
         return ResponseEntity.ok(projectionService.listAllProjection(userId).stream().map(projection ->
                 modelMapper.map(projection,ProjectionDTO.class)).collect(Collectors.toList()));
     }

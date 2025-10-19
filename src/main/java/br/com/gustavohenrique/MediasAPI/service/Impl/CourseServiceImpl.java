@@ -11,7 +11,9 @@ import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import jakarta.validation.Valid;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +25,14 @@ public class CourseServiceImpl implements CourseService {
     private final ProjectionService projectionService;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     @Autowired
     public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository, UserService userService) {
         this.projectionService = projectionService;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -64,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         var course = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
-        projectionService.deleteAllProjections(course.getId());
+        projectionService.deleteAllProjections(course.getId(), userId);
         course.setAverageMethod(averageMethodDto.string());
         courseRepository.save(course);
         projectionService.createProjection(course.getId(), new StringRequestDTO(course.getName()));
@@ -86,12 +90,20 @@ public class CourseServiceImpl implements CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         var course  = courseRepository.findByUserAndId(user,id)
                 .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
-        courseRepository.deleteCourse(id);
+        courseRepository.deleteCourse(id, userId);
         return course;
     }
 
 
     private void validateUser(Long userId) {
         if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
+    }
+
+    @Override
+    public void getAuthenticatedUser(Long userId) {
+        var user = userService.getAuthenticatedUser();
+        if (!user.getId().equals(userId)) {
+            throw new AccessDeniedException("You are not authorized to access this resource.");
+        }
     }
 }

@@ -15,7 +15,9 @@ public interface ProjectionService {
 
     Projection deleteProjection(Long courseId, Long id);
 
-    void deleteAllProjections(Long courseId);
+    void deleteAllProjections(Long courseId, Long userId);
 
     List<Projection> listAllProjection(Long userId);
+
+    void getAuthenticatedUserByCourseId(Long courseId);
 }
