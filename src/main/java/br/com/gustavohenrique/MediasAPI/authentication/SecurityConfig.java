@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import jakarta.annotation.PostConstruct; // Adicionar este import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +29,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
+import java.security.KeyFactory; // Adicionar este import
+import java.security.NoSuchAlgorithmException; // Adicionar este import
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException; // Adicionar este import
+import java.security.spec.PKCS8EncodedKeySpec; // Adicionar este import
+import java.security.spec.X509EncodedKeySpec; // Adicionar este import
+import java.util.Base64; // Adicionar este import
 
 @Configuration
 @EnableWebSecurity
@@ -37,15 +44,25 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    @Value("${jwt.public.key}")
-    private RSAPublicKey publicKey;
+    @Value("${JWT_PUBLIC_KEY_CONTENT}")
+    private String publicKeyContent;
 
-    @Value("${jwt.private.key}")
+    @Value("${JWT_PRIVATE_KEY_CONTENT}")
+    private String privateKeyContent;
+
+    private RSAPublicKey publicKey;
     private RSAPrivateKey privateKey;
 
     @Autowired
     public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
+    }
+
+
+    @PostConstruct
+    public void initKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        this.publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent)));
+        this.privateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent)));
     }
 
     @Bean
