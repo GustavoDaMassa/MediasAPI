@@ -6,10 +6,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://medias-mysql:3306/medias
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=custo
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_PUBLIC_KEY_CONTENT: ${JWT_PUBLIC_KEY_CONTENT}
+      JWT_PRIVATE_KEY_CONTENT: ${JWT_PRIVATE_KEY_CONTENT}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
         condition: service_healthy
