@@ -58,11 +58,20 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // Helper method to clean the PEM string
+    private String cleanPemString(String pem) {
+        return pem.replaceAll("-----BEGIN (.*) KEY-----", "")
+                  .replaceAll("-----END (.*) KEY-----", "")
+                  .replaceAll("\\s", ""); // Remove all whitespace, including newlines
+    }
 
     @PostConstruct
     public void initKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        this.publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent)));
-        this.privateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent)));
+        String cleanedPublicKeyContent = cleanPemString(publicKeyContent);
+        String cleanedPrivateKeyContent = cleanPemString(privateKeyContent);
+
+        this.publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(cleanedPublicKeyContent)));
+        this.privateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(cleanedPrivateKeyContent)));
     }
 
     @Bean
