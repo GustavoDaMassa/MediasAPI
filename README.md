@@ -740,8 +740,25 @@ docker compose up
 ### Aplicação no ar 
 
   após executada você pode navegar por ela realizando requisições através do:
- ### - [Swagger do projeto](http://localhost:8080/swagger-ui/index.html)
-  - ou por algum API Client de preferência em **localhost:8080**
+ ### - [Swagger do projeto](https://localhost/swagger-ui/index.html)
+  - ou por algum API Client de preferência em **https://localhost**
+
+---
+
+## Configuração HTTPS com Nginx (Docker)
+
+Para garantir a segurança da comunicação, a API é exposta via HTTPS em ambiente Docker, utilizando o Nginx como um reverse proxy.
+
+### Como funciona:
+1.  **Nginx como Reverse Proxy:** O Nginx intercepta todas as requisições externas na porta 443 (HTTPS).
+2.  **Terminação SSL:** O Nginx é responsável por descriptografar o tráfego HTTPS e encaminhá-lo para a aplicação Spring Boot (que roda internamente em HTTP na porta 8080) dentro da rede Docker.
+3.  **Redirecionamento HTTP para HTTPS:** Qualquer tentativa de acesso via HTTP (porta 80) é automaticamente redirecionada para HTTPS.
+
+### Certificados SSL:
+*   **Desenvolvimento Local:** Para facilitar o desenvolvimento, um certificado SSL autoassinado é gerado e utilizado pelo Nginx. Ao acessar `https://localhost`, seu navegador exibirá um aviso de segurança, que pode ser ignorado com segurança para fins de desenvolvimento.
+*   **Produção:** Em um ambiente de produção, é **essencial** substituir o certificado autoassinado por um certificado emitido por uma Autoridade Certificadora (CA) confiável, como o Let's Encrypt. Isso garante que os usuários não recebam avisos de segurança e que a comunicação seja totalmente segura e verificada.
+
+---
 
 ### Dependências
 

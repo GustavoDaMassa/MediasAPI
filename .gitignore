@@ -35,4 +35,5 @@ build/
 .env
 src/main/resources/app.key
 src/main/resources/app.pub
-*.base64\n# Arquivo de segredos locais\n.env
+*.base64
+

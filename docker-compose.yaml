@@ -1,10 +1,8 @@
 
 services:
-  api:
+  mediasapi:
     build: .
-    container_name: medias-api
-    ports:
-      - "8080:8080"
+    container_name: mediasapi-app
     environment:
       DATABASE_URL: ${DATABASE_URL_DOCKER}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -15,6 +13,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - medias-rede
+
+  nginx:
+    image: nginx:latest
+    container_name: medias-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - mediasapi
     networks:
       - medias-rede
 
