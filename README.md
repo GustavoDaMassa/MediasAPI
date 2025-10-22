@@ -64,6 +64,9 @@ Para demonstrar o fluxo principal e exemplificar o potencial da aplicação, ela
 
  Para obter um token, o usuário deve fazer uma requisição POST para o endpoint `/authenticate` com suas credenciais. O token retornado deve ser incluído no cabeçalho Authorization de todas as requisições subsequentes, exceto para cadastro.
 
+### Gerenciamento de Roles (Perfis de Usuário)
+A API implementa um sistema de roles para controle de acesso baseado em perfis. Cada usuário pode ter uma ou mais roles associadas, que determinam quais recursos e operações ele está autorizado a acessar. As roles são verificadas durante o processo de autorização, garantindo que apenas usuários com as permissões adequadas possam executar determinadas ações.
+
 ![img.png](images/authenticate.png)
 
 - **O usuário é autenticado através do email que é único no sistema, rota pública;**
@@ -786,6 +789,17 @@ Instalar conforme o sistema operacional:
 
 ---
 
+## Configuração CORS
+
+Para garantir a segurança e a interoperabilidade com aplicações frontend, esta API implementa uma política de Cross-Origin Resource Sharing (CORS) global.
+
+### Como funciona:
+1.  **Controle de Origens:** A API define explicitamente quais domínios (origens) têm permissão para fazer requisições HTTP/HTTPS para seus endpoints. Isso impede que sites não autorizados acessem seus recursos.
+2.  **Métodos e Cabeçalhos Permitidos:** São especificados os métodos HTTP (GET, POST, PUT, DELETE, OPTIONS) e cabeçalhos que podem ser utilizados nas requisições cross-origin.
+3.  **Credenciais:** A configuração permite o envio de credenciais (como tokens de autenticação JWT ou cookies) em requisições cross-origin, essencial para fluxos de autenticação.
+
+---
+
 ## Exemplo
 
 ---
@@ -815,6 +829,7 @@ Outro desafio foi a implementação desse cálculo dinâmico. A solução adotad
 - **Validação e Segurança**
   - Validações personalizadas e uso do Bean Validation
   - Implementação de autenticação e autorização via JWT
+  - Configuração de CORS para controle de acesso de origens
 
 - **Tratamento de Erros e Respostas**
   - Captura e tratamento de erros padronizados

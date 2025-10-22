@@ -33,14 +33,14 @@ public class JwtService {
                 .filter(a -> a.getAuthority().startsWith("ROLE_"))
                 .map(a -> a.getAuthority().substring("ROLE_".length()))
                 .findFirst()
-                .orElse("USER"); // Default para USER se nenhuma role for encontrada
+                .orElse("USER");
 
         var claims = JwtClaimsSet.builder().issuer("medias-api")
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(time))
                 .subject(authentication.getName())
                 .claim("Scopes",scopes)
-                .claim("roles", Collections.singletonList(role)) // Adiciona a role como uma claim (lista)
+                .claim("roles", Collections.singletonList(role))
                 .build();
 
         return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

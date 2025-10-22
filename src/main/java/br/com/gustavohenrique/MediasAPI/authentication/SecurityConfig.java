@@ -68,7 +68,7 @@ public class SecurityConfig {
     private String cleanPemString(String pem) {
         return pem.replaceAll("-----BEGIN (.*) KEY-----", "")
                   .replaceAll("-----END (.*) KEY-----", "")
-                  .replaceAll("\\s", ""); // Remove all whitespace, including newlines
+                  .replaceAll("\\s", "");
     }
 
     @PostConstruct
@@ -86,7 +86,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll(); // Allow unauthenticated user creation
+                    auth.requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll();
                     auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui/**", "/swagger-ui.html", "/web/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
@@ -99,12 +99,12 @@ public class SecurityConfig {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtSource -> {
-            Collection<String> roles = jwtSource.getClaimAsStringList("roles"); // Adjust "roles" to your actual claim name
+            Collection<String> roles = jwtSource.getClaimAsStringList("roles");
             if (roles == null) {
                 return Collections.emptyList();
             }
             return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Ensure roles are prefixed with ROLE_
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .collect(Collectors.toList());
         });
         return jwtAuthenticationConverter;
