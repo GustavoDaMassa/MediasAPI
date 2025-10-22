@@ -7,6 +7,7 @@ import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
@@ -20,6 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +46,7 @@ class CourseServiceImplTest {
 
     private final Long userId = 1L;
     private final Users user = new Users(userId,"Gustavo","gustavo.pereira@discente.ufg.br",
-            null,"Senha criptografada");
+            new ArrayList<>(),"Senha criptografada", Role.USER);
 
     @BeforeEach
     void setUp() {

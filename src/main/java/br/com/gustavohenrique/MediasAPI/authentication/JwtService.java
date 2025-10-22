@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,11 +28,19 @@ public class JwtService {
         String scopes = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
+        // Extrai a role do Authentication object
+        String role = authentication.getAuthorities().stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority().substring("ROLE_".length()))
+                .findFirst()
+                .orElse("USER"); // Default para USER se nenhuma role for encontrada
+
         var claims = JwtClaimsSet.builder().issuer("medias-api")
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(time))
                 .subject(authentication.getName())
                 .claim("Scopes",scopes)
+                .claim("roles", Collections.singletonList(role)) // Adiciona a role como uma claim (lista)
                 .build();
 
         return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

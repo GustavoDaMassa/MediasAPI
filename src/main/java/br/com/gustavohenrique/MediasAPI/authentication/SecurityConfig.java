@@ -4,20 +4,21 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import jakarta.annotation.PostConstruct; // Adicionar este import
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,21 +26,26 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
-import java.security.KeyFactory; // Adicionar este import
-import java.security.NoSuchAlgorithmException; // Adicionar este import
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException; // Adicionar este import
-import java.security.spec.PKCS8EncodedKeySpec; // Adicionar este import
-import java.security.spec.X509EncodedKeySpec; // Adicionar este import
-import java.util.Base64; // Adicionar este import
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -75,33 +81,33 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher(new OrRequestMatcher(
-                        new AntPathRequestMatcher("/authenticate", "POST"),
-                        new AntPathRequestMatcher("/users", "POST"),
-                        new AntPathRequestMatcher("/v3/api-docs/**"),
-                        new AntPathRequestMatcher("/v3/api-docs.yaml"),
-                        new AntPathRequestMatcher("/swagger-ui/**"),
-                        new AntPathRequestMatcher("/swagger-ui.html"),
-                        new AntPathRequestMatcher("/web/**")
-                ))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll(); // Allow unauthenticated user creation
+                    auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui/**", "/swagger-ui.html", "/web/**").permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
 
     @Bean
-    @Order(2)
-    public SecurityFilterChain privateSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(conf -> conf.jwt(Customizer.withDefaults()));
-        return http.build();
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtSource -> {
+            Collection<String> roles = jwtSource.getClaimAsStringList("roles"); // Adjust "roles" to your actual claim name
+            if (roles == null) {
+                return Collections.emptyList();
+            }
+            return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Ensure roles are prefixed with ROLE_
+                    .collect(Collectors.toList());
+        });
+        return jwtAuthenticationConverter;
     }
 
     @Bean

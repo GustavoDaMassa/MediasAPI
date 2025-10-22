@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.dtos;
 
+import br.com.gustavohenrique.MediasAPI.model.Role;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,4 +22,6 @@ public class UserDTO {
     @Email
     @Column(unique = true)
     private String email;
+
+    private Role role;
 }

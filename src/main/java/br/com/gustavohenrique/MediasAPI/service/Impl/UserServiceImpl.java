@@ -1,10 +1,12 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
+import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
@@ -37,10 +39,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public Users create(LogOnDto users) {
-        if (userRepository.existsByEmail(users.email()))throw new DataIntegrityException(users.email());
-        Users newUser = new Users(null,users.name(), users.email(),new ArrayList<>(), users.password());
-        newUser.setPassword(passwordEncoder.encode(users.password()));
+    public Users create(LogOnDto logOnDto) {
+        if (userRepository.existsByEmail(logOnDto.email()))throw new DataIntegrityException(logOnDto.email());
+        Users newUser = new Users(null, logOnDto.name(), logOnDto.email(), new ArrayList<>(), logOnDto.password(), Role.USER);
+        newUser.setPassword(passwordEncoder.encode(logOnDto.password()));
+        return userRepository.save(newUser);
+    }
+
+    @Transactional
+    public Users createAdminUser(LogOnDto logOnDto) {
+        if (userRepository.existsByEmail(logOnDto.email()))throw new DataIntegrityException(logOnDto.email());
+        Users newUser = new Users(null, logOnDto.name(), logOnDto.email(), new ArrayList<>(), logOnDto.password(), Role.ADMIN);
+        newUser.setPassword(passwordEncoder.encode(logOnDto.password()));
         return userRepository.save(newUser);
     }
     @Transactional

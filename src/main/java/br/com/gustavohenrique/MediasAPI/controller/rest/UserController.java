@@ -3,20 +3,16 @@ package br.com.gustavohenrique.MediasAPI.controller.rest;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
-import br.com.gustavohenrique.MediasAPI.model.Assessment;
-import br.com.gustavohenrique.MediasAPI.model.Course;
-import br.com.gustavohenrique.MediasAPI.model.Projection;
-import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.bytebuddy.build.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,17 +28,25 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar usuários", description = "Retorna uma lista com todos os usuarios da aplicação e " +
             "seus id's. Perfil Admim necessário.")
     public ResponseEntity<List<UserDTO>> showUsers(){
         return ResponseEntity.ok(userService.listUsers().stream().
                 map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
+    }
+
+    @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Cadastrar usuário administrador", description = "Cria um novo perfil de usuário com role ADMIN. Perfil Admim necessário.")
+    public ResponseEntity<UserDTO> createAdminUser(@RequestBody @Valid LogOnDto users){
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.createAdminUser(users), UserDTO.class));
     }
 
     @PostMapping

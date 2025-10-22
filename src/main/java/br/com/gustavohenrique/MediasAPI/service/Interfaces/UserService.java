@@ -11,6 +11,8 @@ import java.util.List;
 public interface UserService {
     Users create(LogOnDto users);
 
+    Users createAdminUser(LogOnDto logOnDto);
+
     Users updateName(Long id, @Valid StringRequestDTO nameDto);
 
     Users updateEmail(Long id, @Valid EmailUpdateDTO emailDTO);
