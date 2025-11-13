@@ -1,0 +1,17 @@
+spring.datasource.url=jdbc:h2:mem:mediasdbtest;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.h2.console.anabled=true
+spring.h2.console.path=/h2-console
+
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.flyway.enabled=false
+
+# Add the content of your test JWT keys here
+# Example:
+# JWT_PUBLIC_KEY_CONTENT=-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----
+# JWT_PRIVATE_KEY_CONTENT=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----
