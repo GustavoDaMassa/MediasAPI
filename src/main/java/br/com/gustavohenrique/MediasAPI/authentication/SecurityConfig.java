@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final MdcFilter mdcFilter;
 
     @Value("${JWT_PUBLIC_KEY_CONTENT}")
     private String publicKeyContent;
@@ -60,8 +62,9 @@ public class SecurityConfig {
     private RSAPrivateKey privateKey;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter) {
         this.userDetailsService = userDetailsService;
+        this.mdcFilter = mdcFilter;
     }
 
     @PostConstruct
@@ -100,7 +103,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui/**", "/swagger-ui.html", "/web/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
-                .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .addFilterAfter(mdcFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 
@@ -132,6 +136,8 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
+
+
 
     @Bean
     public JwtEncoder jwtEncoder() {

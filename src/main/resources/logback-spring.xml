@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Include Spring Boot's default configurations -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Variable for the application name from application.properties -->
+    <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="medias-api"/>
+
+    <!-- Appender for JSON logs to the console (stdout) -->
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- Add the application name as a custom field in the JSON output -->
+            <customFields>{"app_name":"${springAppName}"}</customFields>
+            <includeMdc>true</includeMdc>
+        </encoder>
+    </appender>
+
+    <!-- Appender for sending JSON logs to Logstash via TCP -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5000</destination> <!-- Default for local development -->
+        <springProfile name="docker">
+            <destination>logstash:5000</destination> <!-- Override for docker environment -->
+        </springProfile>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"app_name":"${springAppName}"}</customFields>
+            <includeMdc>true</includeMdc>
+        </encoder>
+    </appender>
+
+    <!--
+    Appender for plain text logs to the console. Useful for local development if JSON is too verbose.
+    <appender name="STDOUT_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    -->
+
+    <!-- Root logger configuration -->
+    <root level="INFO">
+        <!-- Use STDOUT_JSON to enable structured logging -->
+        <appender-ref ref="STDOUT_JSON"/>
+        <!-- Add LOGSTASH appender to send logs to Logstash -->
+        <appender-ref ref="LOGSTASH"/>
+        <!-- <appender-ref ref="STDOUT_PLAIN"/> -->
+    </root>
+
+</configuration>
