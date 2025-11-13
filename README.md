@@ -863,6 +863,69 @@ Outro desafio foi a implementação desse cálculo dinâmico. A solução adotad
 - [Workbench](https://www.mysql.com/products/workbench/)
 - [Postman](https://postman.com/)
 - [Docker](https://www.docker.com/products/docker-hub/)
-- [Git](https://git-scm.com/)
+---
+
+## Observabilidade e Logging
+
+Para garantir a visibilidade do comportamento da aplicação e facilitar o diagnóstico de problemas, implementamos um sistema de logging estruturado e um ambiente de observabilidade local com o ELK Stack.
+
+### Logging Estruturado
+
+A aplicação agora gera logs em formato JSON, o que os torna facilmente legíveis por máquinas e ideais para processamento por ferramentas de análise de logs.
+
+*   **Formato JSON**: Todos os logs são emitidos em formato JSON, utilizando a biblioteca `logstash-logback-encoder`. Isso permite uma fácil ingestão e análise por sistemas como o Elasticsearch.
+*   **Contexto Enriquecido (MDC)**: Para requisições autenticadas, o e-mail do usuário (`userEmail`) é automaticamente adicionado ao contexto de cada log (Mapped Diagnostic Context - MDC). Isso facilita o rastreamento de ações de usuários específicos.
+*   **Logs de Erro Detalhados**: O `GlobalExceptionHandler` foi instrumentado para registrar todas as exceções capturadas no nível `ERROR`, incluindo o stack trace completo, garantindo que nenhum erro passe despercebido.
+*   **Logs de Requisição**: Os principais endpoints dos controllers REST agora registram mensagens de `INFO` ao serem acessados, fornecendo visibilidade sobre o fluxo das requisições.
+
+### Observabilidade Local com ELK Stack (Elasticsearch, Logstash, Kibana)
+
+Um ambiente ELK Stack foi configurado via `docker-compose` para coletar, processar e visualizar os logs JSON da aplicação localmente.
+
+#### Componentes:
+*   **Elasticsearch**: Armazena e indexa os logs JSON.
+*   **Logstash**: Recebe os logs da aplicação via TCP, processa-os e os envia para o Elasticsearch.
+*   **Kibana**: Interface web para buscar, analisar e visualizar os logs armazenados no Elasticsearch.
+
+#### Como Utilizar:
+
+**1. Iniciar o ELK Stack:**
+
+Para iniciar apenas os serviços do ELK Stack (útil para quando você executa a aplicação pela IDE):
+
+```bash
+docker-compose up -d elasticsearch logstash kibana
+```
+
+Para iniciar o ambiente completo (aplicação, banco de dados, Nginx e ELK):
+
+```bash
+docker-compose up -d
+```
+
+**2. Acessar o Kibana:**
+
+Após os contêineres subirem (pode levar alguns minutos para o Elasticsearch e Kibana estarem totalmente prontos), acesse o Kibana no seu navegador:
+
+```
+http://localhost:5601
+```
+
+**3. Configurar o Padrão de Índice no Kibana:**
+
+Na primeira vez que acessar o Kibana, ou se ainda não o fez:
+*   Vá para **Management** (ícone de engrenagem) -> **Stack Management** -> **Index Patterns**.
+*   Clique em **Create index pattern**.
+*   No campo "Index pattern name", digite `mediasapi-logs-*` e clique em **Next step**.
+*   No campo "Time field", selecione `@timestamp` e clique em **Create index pattern**.
+
+**4. Visualizar os Logs:**
+
+Vá para **Analytics** (ícone de bússola) -> **Discover**. Você deverá ver os logs JSON da sua aplicação.
+
+#### Executando a Aplicação:
+
+*   **Via Docker (com `docker-compose up -d`)**: A aplicação (`mediasapi`) será iniciada com o perfil `docker` ativo, e os logs serão enviados automaticamente para o serviço `logstash` dentro da rede Docker.
+*   **Via IDE (IntelliJ, etc.)**: Inicie a classe `MediasApiApplication` diretamente. A aplicação usará o perfil padrão, que envia os logs para `localhost:5000`. Certifique-se de que o ELK Stack esteja rodando (passo 1) para que o Logstash receba os logs.
 
 ---
