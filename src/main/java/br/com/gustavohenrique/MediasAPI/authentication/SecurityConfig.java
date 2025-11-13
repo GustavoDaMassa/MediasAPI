@@ -64,20 +64,30 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // Helper method to clean the PEM string
-    private String cleanPemString(String pem) {
-        return pem.replaceAll("-----BEGIN (.*) KEY-----", "")
-                  .replaceAll("-----END (.*) KEY-----", "")
-                  .replaceAll("\\s", "");
-    }
-
     @PostConstruct
-    public void initKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String cleanedPublicKeyContent = cleanPemString(publicKeyContent);
-        String cleanedPrivateKeyContent = cleanPemString(privateKeyContent);
+    public void initKeys() {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
-        this.publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(cleanedPublicKeyContent)));
-        this.privateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(cleanedPrivateKeyContent)));
+            String cleanPublicKey = publicKeyContent
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] publicKeyBytes = Base64.getDecoder().decode(cleanPublicKey);
+            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+            this.publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+
+            String cleanPrivateKey = privateKeyContent
+                    .replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] privateKeyBytes = Base64.getDecoder().decode(cleanPrivateKey);
+            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+            this.privateKey = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
+
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IllegalArgumentException e) {
+            throw new RuntimeException("Failed to initialize RSA keys", e);
+        }
     }
 
     @Bean

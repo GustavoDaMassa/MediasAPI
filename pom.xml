@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>br.com.gustavohenrique</groupId>
 	<artifactId>MediasAPI</artifactId>
@@ -96,8 +96,6 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>java-dotenv</artifactId>
