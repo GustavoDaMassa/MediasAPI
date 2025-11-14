@@ -1,0 +1,45 @@
+# Nome do Workflow
+name: Java CI with Maven
+
+# Gatilhos (Triggers): quando o workflow deve rodar
+on:
+  # Roda em pushes para o branch 'main'
+  push:
+    branches: [ "main" ]
+  # Roda em pull requests abertas para o branch 'main'
+  pull_request:
+    branches: [ "main" ]
+
+# Jobs: sequência de tarefas a serem executadas
+jobs:
+  # Nome do job (pode ser qualquer nome)
+  build:
+    # Máquina virtual onde o job vai rodar (runner)
+    # 'ubuntu-latest' é uma escolha comum e econômica
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que compõem o job
+    steps:
+      # 1. Checkout do código
+      # Usa uma "action" pronta da comunidade para baixar o código do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar o ambiente Java
+      # Usa uma "action" pronta para instalar o JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin' # Distribuição do Java (Temurin é uma boa escolha padrão)
+          cache: 'maven' # Habilita o cache de dependências do Maven para acelerar builds futuras
+
+      # 3. Dar permissão de execução para o mvnw
+      # O wrapper do Maven precisa de permissão de execução no ambiente Linux
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      # 4. Construir e testar com Maven
+      # Executa o comando que já usamos para rodar os testes
+      - name: Build and test with Maven
+        run: ./mvnw test
