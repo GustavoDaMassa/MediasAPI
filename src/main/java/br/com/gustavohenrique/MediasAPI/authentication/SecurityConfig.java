@@ -100,7 +100,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll();
-                    auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui/**", "/swagger-ui.html", "/web/**").permitAll();
+                    auth.requestMatchers("/actuator/**").permitAll();
+                    auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/v3.api-docs.yaml", "/swagger-ui/**", "/swagger-ui.html", "/web/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))

@@ -14,6 +14,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      logstash:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       - medias-rede
 
@@ -81,8 +89,15 @@ services:
       - ./logstash/pipeline/:/usr/share/logstash/pipeline/
     ports:
       - "5000:5000" # TCP input from Spring Boot
+      - "9600:9600" # Logstash HTTP API
     environment:
       - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     depends_on:
       - elasticsearch
     networks:
