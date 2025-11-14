@@ -3,7 +3,7 @@ package br.com.gustavohenrique.MediasAPI.controller.web;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
-import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

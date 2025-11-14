@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 import br.com.gustavohenrique.MediasAPI.dtos.*;
 import br.com.gustavohenrique.MediasAPI.model.Course;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("{userId}/courses")
+@RequestMapping("/api/v1/{userId}/courses")
 public class CourseController {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseController.class);

@@ -1,6 +1,6 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
-import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/{courseId}/projections")
+@RequestMapping("/api/v1/{courseId}/projections")
 public class ProjectionController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectionController.class);

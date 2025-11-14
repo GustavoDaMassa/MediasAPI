@@ -1,6 +1,7 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
-import br.com.gustavohenrique.MediasAPI.controller.rest.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.ProjectionController;
 import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
@@ -81,7 +82,7 @@ class ProjectionControllerTest {
         when(projectionService.createProjection(any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
-        mockMvc.perform(post("/1/projections").with(csrf())
+        mockMvc.perform(post("/api/v1/1/projections").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(stringRequestDTO)))
                 .andExpect(status().isCreated())
@@ -96,7 +97,7 @@ class ProjectionControllerTest {
         when(projectionService.listProjection(1L)).thenReturn(List.of(projection));
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
-        mockMvc.perform(get("/1/projections"))
+        mockMvc.perform(get("/api/v1/1/projections"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Projection 1"));
     }
@@ -108,7 +109,7 @@ class ProjectionControllerTest {
         doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
         when(projectionService.updateProjectionName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
 
-        mockMvc.perform(patch("/1/projections/1").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/projections/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("New Name"))))
                 .andExpect(status().isOk());
@@ -121,7 +122,7 @@ class ProjectionControllerTest {
         doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
         when(projectionService.deleteProjection(any(Long.class), any(Long.class))).thenReturn(projection);
 
-        mockMvc.perform(delete("/1/projections/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/projections/1").with(csrf()))
                 .andExpect(status().isOk());
     }
 
@@ -133,7 +134,7 @@ class ProjectionControllerTest {
         when(userService.getAuthenticatedUser()).thenReturn(new Users());
         doNothing().when(projectionService).deleteAllProjections(any(Long.class), any(Long.class));
 
-        mockMvc.perform(delete("/1/projections/all").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/projections/all").with(csrf()))
                 .andExpect(status().isOk());
     }
 }

@@ -1,5 +1,6 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.AssessmentController;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
@@ -63,7 +64,7 @@ class AssessmentControllerTest {
         doNothing().when(assessmentService).getAuthenticatedUserByProjectionId(1L);
         when(assessmentService.insertGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(assessment);
 
-        mockMvc.perform(patch("/1/assessment/1").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/assessments/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(doubleRequestDTO)))
                 .andExpect(status().isOk());
@@ -76,7 +77,7 @@ class AssessmentControllerTest {
         doNothing().when(assessmentService).getAuthenticatedUserByProjectionId(1L);
         when(assessmentService.listAssessment(1L)).thenReturn(List.of(assessment));
 
-        mockMvc.perform(get("/1/assessment"))
+        mockMvc.perform(get("/api/v1/1/assessments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].identifier").value("P1"));
     }

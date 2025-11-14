@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 
 import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/{projectionId}/assessment")
+@RequestMapping("/api/v1/{projectionId}/assessments")
 public class AssessmentController {
 
     private static final Logger logger = LoggerFactory.getLogger(AssessmentController.class);

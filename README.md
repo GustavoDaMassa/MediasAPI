@@ -3,6 +3,12 @@
 </h1>
 
 <p align="center">
+  <a href="https://github.com/GustavoDaMassa/MediasAPI/actions/workflows/ci.yml">
+    <img src="https://github.com/GustavoDaMassa/MediasAPI/actions/workflows/ci.yml/badge.svg" alt="Java CI with Maven">
+  </a>
+</p>
+
+<p align="center">
   <img src="images/img_19.png" alt="Descrição da Imagem">
 </p>
 
@@ -78,13 +84,28 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
         "password":"aula321"
    }
 ---
+
+## Versionamento de API
+
+A API utiliza versionamento via URI (Uniform Resource Identifier) para gerenciar a evolução da sua interface de forma controlada e evitar quebras em clientes existentes. A versão da API é incluída diretamente no caminho da URL.
+
+*   **Versão Atual:** `v1`
+*   **Prefixo:** Todos os endpoints da API REST são prefixados com `/api/v1`.
+
+**Exemplo:**
+*   Para acessar recursos de usuário na versão 1: `/api/v1/users`
+*   Para acessar recursos de cursos na versão 1: `/api/v1/{userId}/courses`
+
+Esta estratégia garante que novas versões da API possam ser introduzidas no futuro (ex: `/api/v2/users`) sem impactar os clientes que ainda utilizam a versão anterior.
+
+---
 ## API Endpoints
 
 ### user-controller
 
 ![img_1.png](images/cadastrarusuarios.png)
 - **Cria um novo perfil de usuário, não é necessário autenticação.** 
-
+- **Endpoint:** `POST /api/v1/users`
 - **Request Body:**
    ```json
    {
@@ -104,6 +125,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_2.png](images/img_2.png)
 - **Retorna uma lista com todos os usuários e seus respectivos id's que serão usados como parâmetros em demais requisições;**
+- **Endpoint:** `GET /api/v1/users`
 - **Response**
   ```json
     [
@@ -117,6 +139,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_1.png](images/img_1.png)
 - **Parâmetro**: `id` - id do usuário;
+- **Endpoint:** `PATCH /api/v1/users/{id}/name`
 - **Request Body:**
    ```json
     {
@@ -135,6 +158,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_3.png](images/img_3.png)
 
 - **Parâmetro**: `id` - id do usuário;
+- **Endpoint:** `PATCH /api/v1/users/{id}/email`
 - **Request Body:**
    ```json
     {
@@ -153,12 +177,24 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_4.png](images/img_4.png)
 
 - **Parâmetro**: `id` - id do usuário;
+- **Endpoint:** `DELETE /api/v1/users/{id}`
 - **Response**
   ```json
     {
         "id": 2,
         "name": "Gustavo",
         "email": "gustavohenrique3gb@gmail.com"
+    }
+
+---
+- **Parâmetro**: `email` - email do usuário;
+- **Endpoint:** `GET /api/v1/users/{email}`
+- **Response**
+  ```json
+    {
+        "id": 2,
+        "name": "Gustavo",
+        "email": "gustavo.pereira@discente.ufg.br"
     }
 
 ### course-controller
@@ -168,6 +204,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 
 - **Cria um novo curso, e através do método de cálculo das médias cria automaticamente uma projeção com o mesmo nome, identificando e instânciando as avaliações definidas.**
 - **Parâmetro**: `userId` - id do usuário;
+- **Endpoint:** `POST /api/v1/{userId}/courses`
 - **Request Body:**
    ```json
     {
@@ -205,6 +242,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 
 - **Lista todos os cursos do usuário.**
 - **Parâmetro**: `userId` - id do usuário;
+- **Endpoint:** `GET /api/v1/{userId}/courses`
 - **Response**
   ```json
     [
@@ -227,6 +265,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_7.png](images/img_7.png)
 
+- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/name`
 - **Parâmetros**: 
   - `userId` - id do usuário;
     - `id` - id da disciplina.
@@ -249,6 +288,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_8.png](images/img_8.png)
 
 - **Altera a forma como o método de cálculo da média final é definida. Deleta as projeções equivalentes e criar uma nova atualizada com um novo id pra essa projeção.**
+- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/method`
 - **Parâmetros**:
     - `userId` - id do usuário;
     - `id` - id da disciplina.
@@ -269,6 +309,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_9.png](images/img_9.png)
 
+- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/cutoffgrade`
 - **Parâmetros**:
     - `userId` - id do usuário;
     - `id` - id da disciplina.
@@ -290,6 +331,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_10.png](images/img_10.png)
 
 - **Parâmetro**: `userId` - id do usuário;
+- **Endpoint:** `GET /api/v1/{userId}/courses/projections`
 - **Lista todos os cursos juntamente com suas projeções e as atividades.**
 - **Response**
   ```json
@@ -357,6 +399,8 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_11.png](images/img_11.png)
 
+- **Deletar curso**
+- **Endpoint:** `DELETE /api/v1/{userId}/courses/{id}`
 - **Parâmetro**: `userId` - id do usuário;
 - **Response**
     ```json
@@ -373,6 +417,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_12.png](images/img_12.png)
 
 -**Cria uma nova projeção e automaticamente suas avaliações de acordo com a definição do curso.**
+- **Endpoint:** `POST /api/v1/{courseId}/projections`
 - **Parâmetro**: `courseId` - id da disciplina;
 - **Request Body**
     ```json
@@ -394,6 +439,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_13.png](images/img_13.png)
 
 - **retorna todas as projeções de um determinido curso com uma lista de avaliações equivalentes.**
+- **Endpoint:** `GET /api/v1/{courseId}/projections`
 - **Parâmetro**: `courseId` - id da disciplina;
   - **Response**
       ```json
@@ -469,6 +515,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 ![img_14.png](images/img_14.png)
 
+- **Endpoint:** `PATCH /api/v1/{courseId}/projections/{id}`
 - **Parâmetro**: `courseId` - id da disciplina;
 - **Parâmetro**: `id` - id da projeção;
 - **Request Body**
@@ -490,6 +537,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_15.png](images/img_15.png)
 
 - **Deleta apenas a projeção especificada.**
+- **Endpoint:** `DELETE /api/v1/{courseId}/projections/{id}`
 - **Parâmetro**: `courseId` - id da disciplina;
 - **Parâmetro**: `id` - id da projeção;
 - **Response**
@@ -507,14 +555,14 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_16.png](images/img_16.png)
 
 - **Deleta todas as projeções do curso, incluindo a projeção default.**
+- **Endpoint:** `DELETE /api/v1/{courseId}/projections/all`
 - **Parâmetro**: `courseId` - id da disciplina;
 
 ---
-### assessment-controller
-
 ![img_18.png](images/img_18.png)
 
 - **Lista todas as avaliações de uma projeção.**
+- **Endpoint:** `GET /api/v1/{projectionId}/assessments`
 - **Parâmetro**: `projectionId` - id da projeção;
 - **Response**
     ```json
@@ -549,6 +597,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ![img_17.png](images/img_17.png)
 
 - **Posta a nota adquirida. Automaticamente a média final é calculada juntamente com o quanto de pontuação ainda falta em cada avaliação ainda não realizada, para atingir a nota de corte.**
+- **Endpoint:** `PATCH /api/v1/{projectionId}/assessments/{id}`
 - **Parâmetro**: `projectionId` - id da projeção;
 - **Parâmetro**: `id` - id da avaliação;
 - **Request Body**
@@ -569,7 +618,7 @@ A API implementa um sistema de roles para controle de acesso baseado em perfis. 
 ---
 
 ### 📌 Observando os resultados
-Após esse fluxo podemos realizar uma requisição para o end-point `/{courseId}/projections` com o método HTTP `GET` e observa:
+Após esse fluxo podemos realizar uma requisição para o end-point `/api/v1/{courseId}/projections` com o método HTTP `GET` e observa:
 
 - **o cálculo automático para a média final;**
 - **O cálculo para as notas requeridas.**
@@ -796,7 +845,7 @@ Para garantir a segurança e a interoperabilidade com aplicações frontend, est
 ### Como funciona:
 1.  **Controle de Origens:** A API define explicitamente quais domínios (origens) têm permissão para fazer requisições HTTP/HTTPS para seus endpoints. Isso impede que sites não autorizados acessem seus recursos.
 2.  **Métodos e Cabeçalhos Permitidos:** São especificados os métodos HTTP (GET, POST, PUT, DELETE, OPTIONS) e cabeçalhos que podem ser utilizados nas requisições cross-origin.
-3.  **Credenciais:** A configuração permite o envio de credenciais (como tokens de autenticação JWT ou cookies) em requisições cross-origin, essencial para fluxos de autenticação.
+3.  **Credenciais:** A configuração permite o envio de credenciais (como tokens de autenticação JWT ou cookies) em fluxos de autenticação.
 
 ---
 
@@ -849,6 +898,11 @@ Outro desafio foi a implementação desse cálculo dinâmico. A solução adotad
   - Uso de API Client e Database Client durante o desenvolvimento
   - Encapsulamento da aplicação com Docker, criando imagens e containers personalizados
   - Versionamento de código com Git
+
+- **CI/CD com GitHub Actions**
+  - O projeto utiliza um pipeline de Integração Contínua (CI) com GitHub Actions.
+  - A cada `push` ou `pull request` para o branch `main`, o workflow em `.github/workflows/ci.yml` é acionado.
+  - O pipeline realiza o checkout do código, configura o ambiente Java 17 e executa o comando `./mvnw test` para compilar e testar a aplicação, garantindo que novas alterações não quebrem o código existente.
   
 ### Tecnologias
 
@@ -929,3 +983,18 @@ Vá para **Analytics** (ícone de bússola) -> **Discover**. Você deverá ver o
 *   **Via IDE (IntelliJ, etc.)**: Inicie a classe `MediasApiApplication` diretamente. A aplicação usará o perfil padrão, que envia os logs para `localhost:5000`. Certifique-se de que o ELK Stack esteja rodando (passo 1) para que o Logstash receba os logs.
 
 ---
+
+## Monitoramento e Saúde da Aplicação (Health Check)
+
+Este projeto utiliza o **Spring Boot Actuator** para expor endpoints que permitem o monitoramento da saúde e do estado da aplicação. Isso é fundamental para garantir a resiliência e a observabilidade em um ambiente de produção.
+
+### Endpoints Disponíveis
+
+*   **Health Check Geral:** `GET /actuator/health`
+    *   Retorna um status detalhado da aplicação, incluindo a conectividade com o banco de dados e o espaço em disco.
+
+*   **Liveness Probe:** `GET /actuator/health/liveness`
+    *   Indica se a aplicação está em execução (viva). Usado por orquestradores de contêineres (como Docker e Kubernetes) para decidir se um contêiner precisa ser reiniciado.
+
+*   **Readiness Probe:** `GET /actuator/health/readiness`
+    *   Indica se a aplicação está pronta para aceitar novas requisições. Usado por balanceadores de carga para decidir se devem ou não enviar tráfego para uma instância da aplicação.

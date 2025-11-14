@@ -1,5 +1,6 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
+import br.com.gustavohenrique.MediasAPI.controller.rest.v1.CourseController;
 import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
@@ -74,7 +75,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.createCourse(any(Long.class), any(RequestCourseDto.class))).thenReturn(course);
 
-        mockMvc.perform(post("/1/courses").with(csrf())
+        mockMvc.perform(post("/api/v1/1/courses").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestCourseDto)))
                 .andExpect(status().isCreated())
@@ -88,7 +89,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.listCourses(1L)).thenReturn(List.of(course));
 
-        mockMvc.perform(get("/1/courses"))
+        mockMvc.perform(get("/api/v1/1/courses"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Math"));
     }
@@ -100,7 +101,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.updateCourseName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/1/courses/1/name").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/name").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("New Math"))))
                 .andExpect(status().isOk());
@@ -113,7 +114,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.updateCourseAverageMethod(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/1/courses/1/method").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/method").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("P1+P2+P3"))))
                 .andExpect(status().isOk());
@@ -126,7 +127,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.updateCourseCutOffGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/1/courses/1/cutoffgrade").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/cutoffgrade").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new DoubleRequestDTO(7.0))))
                 .andExpect(status().isOk());
@@ -139,7 +140,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(courseService.deleteCourse(any(Long.class), any(Long.class))).thenReturn(course);
 
-        mockMvc.perform(delete("/1/courses/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/courses/1").with(csrf()))
                 .andExpect(status().isOk());
     }
 
@@ -150,7 +151,7 @@ class CourseControllerTest {
         doNothing().when(courseService).getAuthenticatedUser(1L);
         when(projectionService.listAllProjection(1L)).thenReturn(List.of(new Projection()));
 
-        mockMvc.perform(get("/1/courses/projections"))
+        mockMvc.perform(get("/api/v1/1/courses/projections"))
                 .andExpect(status().isOk());
     }
 }

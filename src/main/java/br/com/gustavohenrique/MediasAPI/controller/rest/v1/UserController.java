@@ -1,4 +1,4 @@
-package br.com.gustavohenrique.MediasAPI.controller.rest;
+package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
