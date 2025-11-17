@@ -37,3 +37,4 @@ src/main/resources/app.key
 src/main/resources/app.pub
 *.base64
 src/test/resources/application-local.properties
+*.pem
