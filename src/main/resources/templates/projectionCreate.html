@@ -34,14 +34,15 @@
 <body>
 <div class="container">
 <h1>Criar Projeção</h1>
-<form th:action="@{'/web/' + ${courseId} + '/projections/create/' + ${userId}}" method="post" th:object="${stringRequestDTO}">
+<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+<form th:action="@{'/web/courses/' + ${courseId} + '/projections/create'}" method="post" th:object="${stringRequestDTO}">
   <div>
     <label for="string">Nome:</label>
     <input type="text" id="string" th:field="*{string}" required>
     <p th:if="${#fields.hasErrors('string')}" th:errors="*{string}"></p>
   </div>
   <button type="submit">Criar</button>
-  <a th:href="@{'/web/' + ${courseId} + '/projections/' + ${userId}}">Voltar para Lista de Projeções</a>
+  <a th:href="@{'/web/courses/' + ${courseId} + '/projections'}">Voltar para Lista de Projeções</a>
 </form>
 </div>
 </body>

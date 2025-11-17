@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Cursos</title>
     <style>
@@ -46,31 +46,50 @@
         a:hover {
             text-decoration: underline;
         }
+        .logout-form {
+            display: inline;
+        }
+        .logout-button {
+            background: none;
+            border: none;
+            color: white;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: inherit;
+            font-family: inherit;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-<h1>Cursos</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Nome</th>
-        <th>Método de Cálculo</th>
-        <th>Nota de Corte</th>
-        <th></th> </tr>
-    </thead>
-    <tbody>
-    <tr th:each="course : ${courses}">
-        <td><a th:href="@{'/web/' + ${course.id} + '/projections/' + ${userId}}" th:text="${course.name}"></a></td>
-        <td th:text="${course.averageMethod}"></td>
-        <td th:text="${course.cutOffGrade}"></td>
-        <td>
-            <a th:href="@{'/web/' + ${userId} + '/courses/' + ${course.id} + '/delete'}">Deletar</a> </td>
-    </tr>
-    </tbody>
-</table>
-<a th:href="@{'/web/users/' + ${userId} + '/projections'}">Mostrar todas as projeções</a>
-<a th:href="@{'/web/' + ${userId} + '/courses/create'}">Criar Curso</a>
+    <h1>Cursos</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Método de Cálculo</th>
+            <th>Nota de Corte</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <!-- Assumindo que a rota de projeções será refatorada -->
+            <td><a th:href="@{'/web/courses/' + ${course.id} + '/projections'}" th:text="${course.name}"></a></td>
+            <td th:text="${course.averageMethod}"></td>
+            <td th:text="${course.cutOffGrade}"></td>
+            <td>
+                <a th:href="@{'/web/courses/' + ${course.id} + '/delete'}">Deletar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- Assumindo que as rotas serão refatoradas -->
+    <a th:href="@{/web/projections}">Mostrar todas as projeções</a>
+    <a th:href="@{/web/courses/create}">Criar Curso</a>
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
 </div>
 </body>
 </html>

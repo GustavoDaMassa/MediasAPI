@@ -34,6 +34,7 @@
 <body>
 <div class="container">
 <h1>Cadastro</h1>
+<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
 <form th:action="@{/web/register}" method="post" th:object="${logOnDto}">
     <div>
         <label for="name">Nome:</label>

@@ -60,7 +60,7 @@
             <th>Nome</th>
             <th>Avaliações</th>
             <th>Nota Final</th>
-            <th></th>
+            <th>Ações</th>
         </tr>
         </thead>
         <tbody>
@@ -77,7 +77,8 @@
                     </thead>
                     <tbody>
                     <tr th:each="assessment : ${projection.assessment}">
-                        <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade/' + ${userId}}" th:text="${assessment.identifier}"></a></td>
+                        <!-- Assumindo que a rota de avaliações será refatorada -->
+                        <td><a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade'}" th:text="${assessment.identifier}"></a></td>
                         <td>
                             <span th:if="${assessment.requiredGrade == 0}" th:text="${assessment.grade}"></span>
                             <span th:if="${assessment.requiredGrade != 0}">--</span>
@@ -88,12 +89,13 @@
                 </table>
             </td>
             <td th:text="${projection.finalGrade}"></td>
-            <td><a th:href="@{'/web/' + ${courseId} + '/projections/' + ${projection.id} + '/delete/' +${userId}}">Deletar</a></td>
+            <td><a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/delete'}">Deletar</a></td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{'/web/' + ${courseId} + '/projections/create/' + ${userId}}">Criar Projeção</a>
-    <a th:href="@{'/web/' + ${userId} + '/courses'}" class="spaced-link">Voltar para a Lista de cursos</a>
+    <!-- Assumindo que a rota de criação será refatorada -->
+    <a th:href="@{'/web/courses/' + ${courseId} + '/projections/create'}">Criar Projeção</a>
+    <a th:href="@{/web/courses}" class="spaced-link">Voltar para a Lista de cursos</a>
 </div>
 </body>
 </html>

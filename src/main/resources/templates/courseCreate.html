@@ -34,7 +34,8 @@
 <body>
 <div class="container">
 <h1>Criar Curso</h1>
-<form th:action="@{'/web/' + ${userId} + '/courses/create'}" method="post" th:object="${requestCourseDto}">
+<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+<form th:action="@{/web/courses/create}" method="post" th:object="${requestCourseDto}">
     <div>
         <label for="name">Nome:</label>
         <input type="text" id="name" th:field="*{name}" required>
@@ -51,7 +52,7 @@
         <p th:if="${#fields.hasErrors('cutOffGrade')}" th:errors="*{cutOffGrade}"></p>
     </div>
     <button type="submit">Criar</button>
-    <a th:href="@{'/web/' + ${userId} + '/courses'}">Voltar para Lista de Cursos</a>
+    <a th:href="@{/web/courses}">Voltar para Lista de Cursos</a>
 </form>
 </div>
 </body>

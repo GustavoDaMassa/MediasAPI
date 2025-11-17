@@ -1,15 +1,10 @@
 package br.com.gustavohenrique.MediasAPI.controller.web;
 
-import br.com.gustavohenrique.MediasAPI.dtos.AuthDto;
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
-import br.com.gustavohenrique.MediasAPI.authentication.AuthenticationService;
 import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,13 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/web/register")
 public class RegisterControllerWeb {
 
-    private final AuthenticationService authenticationService;
     private final UserServiceImpl userService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public RegisterControllerWeb(AuthenticationService authenticationService, UserServiceImpl userService, ModelMapper modelMapper) {
-        this.authenticationService = authenticationService;
+    public RegisterControllerWeb(UserServiceImpl userService, ModelMapper modelMapper) {
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
@@ -40,15 +33,16 @@ public class RegisterControllerWeb {
     }
 
     @PostMapping
-    public String registerUser(@ModelAttribute @Valid LogOnDto logOnDto, BindingResult bindingResult, HttpSession session) {
+    public String registerUser(@ModelAttribute @Valid LogOnDto logOnDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "register";
         }
         try {
-            var user = userService.create(logOnDto);
-            ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(user, LogOnDto.class));
-            return "login";
+            userService.create(logOnDto);
+            return "redirect:/web/login?registration_success";
         } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erro ao registrar: " + e.getMessage());
+            model.addAttribute("logOnDto", logOnDto);
             return "register";
         }
     }
