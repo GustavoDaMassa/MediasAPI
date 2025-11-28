@@ -10,7 +10,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       JWT_PUBLIC_KEY_CONTENT: ${JWT_PUBLIC_KEY_CONTENT}
       JWT_PRIVATE_KEY_CONTENT: ${JWT_PRIVATE_KEY_CONTENT}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
     depends_on:
       db:
         condition: service_healthy
