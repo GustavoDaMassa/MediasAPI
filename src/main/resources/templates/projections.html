@@ -1,137 +1,101 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeções - MediasAPI</title>
-    <link rel="stylesheet" th:href="@{/css/spotify-style.css}">
+    <title>Projeções</title>
+    <style>
+        body {
+            background-color: #1273a6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: black;
+            color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 80%;
+            border-radius: 5px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid black; /* Linhas pretas */
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        td a {
+            color: #5bc0de;
+            text-decoration: none;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .spaced-link {
+            margin-left: 40px;
+        }
+
+    </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">
-            Medias<span>API</span>
-        </div>
-        <nav>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a th:href="@{/web/courses}">
-                        <span class="nav-icon">📚</span>
-                        Meus Cursos
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a th:href="@{/web/projections}">
-                        <span class="nav-icon">📊</span>
-                        Todas as Projeções
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/web/courses/create}">
-                        <span class="nav-icon">➕</span>
-                        Criar Curso
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <div class="logout-section">
-            <form th:action="@{/logout}" method="post" class="logout-form">
-                <button type="submit" class="logout-button">
-                    🚪 Sair
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    <!-- Conteúdo principal -->
-    <main class="main-content fade-in">
-        <div class="page-header">
-            <h1 class="page-title">Projeções do Curso</h1>
-            <p class="page-subtitle">Visualize e gerencie diferentes cenários de notas</p>
-        </div>
-
-        <div style="margin-bottom: 24px;">
-            <a th:href="@{'/web/courses/' + ${courseId} + '/projections/create'}" class="btn btn-primary">
-                ➕ Nova Projeção
-            </a>
-            <a th:href="@{/web/courses}" class="btn btn-secondary" style="margin-left: 12px;">
-                ← Voltar para Cursos
-            </a>
-        </div>
-
-        <div class="table-container" th:if="${projections != null and !projections.isEmpty()}">
-            <table>
-                <thead>
+<div class="container">
+    <h1>Projeções</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Avaliações</th>
+            <th>Nota Final</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="projection : ${projections}">
+            <td th:text="${projection.name}"></td>
+            <td>
+                <table>
+                    <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th style="width: 60%;">Avaliações</th>
-                        <th>Nota Final</th>
-                        <th>Ações</th>
+                        <th>Identificador</th>
+                        <th>Nota</th>
+                        <th>Nota Necessária</th>
                     </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="projection : ${projections}">
+                    </thead>
+                    <tbody>
+                    <tr th:each="assessment : ${projection.assessment}">
+                        <!-- Assumindo que a rota de avaliações será refatorada -->
+                        <td><a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade'}" th:text="${assessment.identifier}"></a></td>
                         <td>
-                            <strong th:text="${projection.name}"></strong>
+                            <span th:if="${assessment.requiredGrade == 0}" th:text="${assessment.grade}"></span>
+                            <span th:if="${assessment.requiredGrade != 0}">--</span>
                         </td>
-                        <td>
-                            <div class="nested-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Identificador</th>
-                                            <th>Nota</th>
-                                            <th>Nota Necessária</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="assessment : ${projection.assessment}">
-                                            <td>
-                                                <a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/assessments/' + ${assessment.id} + '/grade'}"
-                                                   th:text="${assessment.identifier}"></a>
-                                            </td>
-                                            <td>
-                                                <span th:if="${assessment.requiredGrade == 0}"
-                                                      class="badge badge-success"
-                                                      th:text="${assessment.grade}"></span>
-                                                <span th:if="${assessment.requiredGrade != 0}"
-                                                      style="color: var(--text-secondary);">--</span>
-                                            </td>
-                                            <td>
-                                                <span th:if="${assessment.requiredGrade > 0}"
-                                                      class="badge badge-warning"
-                                                      th:text="${assessment.requiredGrade}"></span>
-                                                <span th:if="${assessment.requiredGrade == 0}"
-                                                      style="color: var(--text-secondary);">--</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge badge-info" th:text="${projection.finalGrade}"></span>
-                        </td>
-                        <td>
-                            <a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/delete'}"
-                               class="action-link danger">
-                                Deletar
-                            </a>
-                        </td>
+                        <td th:text="${assessment.requiredGrade}"></td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div th:if="${projections == null or projections.isEmpty()}" style="text-align: center; padding: 60px 20px;">
-            <h2 style="color: var(--text-secondary); font-size: 18px;">Nenhuma projeção encontrada</h2>
-            <p style="color: var(--text-secondary); margin: 20px 0;">Crie uma nova projeção para começar</p>
-            <a th:href="@{'/web/courses/' + ${courseId} + '/projections/create'}" class="btn btn-primary">
-                Criar Primeira Projeção
-            </a>
-        </div>
-    </main>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${projection.finalGrade}"></td>
+            <td><a th:href="@{'/web/courses/' + ${courseId} + '/projections/' + ${projection.id} + '/delete'}">Deletar</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- Assumindo que a rota de criação será refatorada -->
+    <a th:href="@{'/web/courses/' + ${courseId} + '/projections/create'}">Criar Projeção</a>
+    <a th:href="@{/web/courses}" class="spaced-link">Voltar para a Lista de cursos</a>
 </div>
 </body>
 </html>

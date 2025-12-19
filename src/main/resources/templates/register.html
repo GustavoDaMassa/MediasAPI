@@ -1,41 +1,59 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - MediasAPI</title>
-    <link rel="stylesheet" th:href="@{/css/spotify-style.css}">
+    <title>Cadastro</title>
+    <style>
+        body {
+          background-color: #1273a6;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+        }
+        .container {
+          background-color: black;
+          color: white;
+          border: 1px solid #ccc;
+          padding: 20px;
+          width: 400px;
+          border-radius: 5px;
+          text-align: center;
+        }
+        label, input, button, a {
+          display: block;
+          margin: 10px auto;
+          width: 80%;
+        }
+        a {
+          color: white;
+          text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-<div class="auth-container fade-in">
-    <div class="auth-card">
-        <div class="auth-logo">
-            Medias<span>API</span>
-        </div>
-        <h1 class="auth-title">Criar sua conta</h1>
-        <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
-        <form th:action="@{/web/register}" method="post" th:object="${logOnDto}">
-            <div class="form-group">
-                <label for="name">Nome</label>
-                <input type="text" id="name" th:field="*{name}" placeholder="Seu nome completo" required>
-                <p th:if="${#fields.hasErrors('name')}" class="error-message" th:errors="*{name}"></p>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" th:field="*{email}" placeholder="seu@email.com" required>
-                <p th:if="${#fields.hasErrors('email')}" class="error-message" th:errors="*{email}"></p>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" th:field="*{password}" placeholder="••••••••" required>
-                <p th:if="${#fields.hasErrors('password')}" class="error-message" th:errors="*{password}"></p>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Cadastrar</button>
-            <div class="auth-link">
-                Já tem uma conta? <a th:href="@{/web/login}">Faça login</a>
-            </div>
-        </form>
+<div class="container">
+<h1>Cadastro</h1>
+<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+<form th:action="@{/web/register}" method="post" th:object="${logOnDto}">
+    <div>
+        <label for="name">Nome:</label>
+        <input type="text" id="name" th:field="*{name}" required>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
     </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}" required>
+        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+    </div>
+    <div>
+        <label for="password">Senha:</label>
+        <input type="password" id="password" th:field="*{password}" required>
+        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+    </div>
+    <button type="submit">Cadastrar</button>
+    <a th:href="@{/web/login}">Voltar para Login</a>
+</form>
 </div>
 </body>
 </html>

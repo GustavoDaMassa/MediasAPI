@@ -1,71 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Projeção - MediasAPI</title>
-    <link rel="stylesheet" th:href="@{/css/spotify-style.css}">
+  <title>Criar Projeção</title>
+  <style>
+    body {
+      background-color: #1273a6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: black;
+      color: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+      width: 400px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    label, input, button, a {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+    }
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">
-            Medias<span>API</span>
-        </div>
-        <nav>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a th:href="@{/web/courses}">
-                        <span class="nav-icon">📚</span>
-                        Meus Cursos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/web/projections}">
-                        <span class="nav-icon">📊</span>
-                        Todas as Projeções
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/web/courses/create}">
-                        <span class="nav-icon">➕</span>
-                        Criar Curso
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <div class="logout-section">
-            <form th:action="@{/logout}" method="post" class="logout-form">
-                <button type="submit" class="logout-button">
-                    🚪 Sair
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    <!-- Conteúdo principal -->
-    <main class="main-content fade-in">
-        <div class="page-header">
-            <h1 class="page-title">Criar Nova Projeção</h1>
-            <p class="page-subtitle">Adicione um novo cenário de planejamento de notas</p>
-        </div>
-
-        <div class="form-container">
-            <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
-            <form th:action="@{'/web/courses/' + ${courseId} + '/projections/create'}" method="post" th:object="${stringRequestDTO}">
-                <div class="form-group">
-                    <label for="string">Nome da Projeção</label>
-                    <input type="text" id="string" th:field="*{string}" placeholder="Ex: Cenário Otimista" required>
-                    <p th:if="${#fields.hasErrors('string')}" class="error-message" th:errors="*{string}"></p>
-                </div>
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">Criar Projeção</button>
-                    <a th:href="@{'/web/courses/' + ${courseId} + '/projections'}" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
-        </div>
-    </main>
+<div class="container">
+<h1>Criar Projeção</h1>
+<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+<form th:action="@{'/web/courses/' + ${courseId} + '/projections/create'}" method="post" th:object="${stringRequestDTO}">
+  <div>
+    <label for="string">Nome:</label>
+    <input type="text" id="string" th:field="*{string}" required>
+    <p th:if="${#fields.hasErrors('string')}" th:errors="*{string}"></p>
+  </div>
+  <button type="submit">Criar</button>
+  <a th:href="@{'/web/courses/' + ${courseId} + '/projections'}">Voltar para Lista de Projeções</a>
+</form>
 </div>
 </body>
 </html>

@@ -17,10 +17,10 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/web/**", "/login", "/logout", "/css/**", "/js/**", "/images/**")
+                .securityMatcher("/web/**", "/login", "/logout")
                 .csrf(AbstractHttpConfigurer::disable) // Simplificando para o exemplo, considere habilitar em produção
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/web/login", "/web/register", "/css/**", "/js/**", "/images/**", "/web/").permitAll();
+                    auth.requestMatchers("/web/login", "/web/register", "/css/**", "/web/").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> {
