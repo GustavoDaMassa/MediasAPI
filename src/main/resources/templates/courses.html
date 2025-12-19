@@ -1,95 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Cursos</title>
-    <style>
-        body {
-            background-color: #1273a6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: black;
-            color: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            width: 80%;
-            border-radius: 5px;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #333;
-            color: white;
-        }
-        td a {
-            color: #5bc0de;
-            text-decoration: none;
-        }
-        a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .logout-form {
-            display: inline;
-        }
-        .logout-button {
-            background: none;
-            border: none;
-            color: white;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: inherit;
-            font-family: inherit;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos - MediasAPI</title>
+    <link rel="stylesheet" th:href="@{/css/spotify-style.css}">
 </head>
 <body>
-<div class="container">
-    <h1>Cursos</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Método de Cálculo</th>
-            <th>Nota de Corte</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="course : ${courses}">
-            <!-- Assumindo que a rota de projeções será refatorada -->
-            <td><a th:href="@{'/web/courses/' + ${course.id} + '/projections'}" th:text="${course.name}"></a></td>
-            <td th:text="${course.averageMethod}"></td>
-            <td th:text="${course.cutOffGrade}"></td>
-            <td>
-                <a th:href="@{'/web/courses/' + ${course.id} + '/delete'}">Deletar</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <!-- Assumindo que as rotas serão refatoradas -->
-    <a th:href="@{/web/projections}">Mostrar todas as projeções</a>
-    <a th:href="@{/web/courses/create}">Criar Curso</a>
-    <form th:action="@{/logout}" method="post" class="logout-form">
-        <button type="submit" class="logout-button">Logout</button>
-    </form>
+<div class="app-container">
+    <!-- Sidebar estilo Spotify -->
+    <aside class="sidebar">
+        <div class="logo">
+            Medias<span>API</span>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a th:href="@{/web/courses}">
+                        <span class="nav-icon">📚</span>
+                        Meus Cursos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/web/projections}">
+                        <span class="nav-icon">📊</span>
+                        Todas as Projeções
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/web/courses/create}">
+                        <span class="nav-icon">➕</span>
+                        Criar Curso
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="logout-section">
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="logout-button">
+                    🚪 Sair
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content fade-in">
+        <div class="page-header">
+            <h1 class="page-title">Meus Cursos</h1>
+            <p class="page-subtitle">Gerencie suas disciplinas e acompanhe seu desempenho acadêmico</p>
+        </div>
+
+        <div class="table-container" th:if="${courses != null and !courses.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Método de Cálculo</th>
+                        <th>Nota de Corte</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="course : ${courses}">
+                        <td>
+                            <a th:href="@{'/web/courses/' + ${course.id} + '/projections'}" th:text="${course.name}"></a>
+                        </td>
+                        <td th:text="${course.averageMethod}"></td>
+                        <td>
+                            <span class="badge badge-info" th:text="${course.cutOffGrade}"></span>
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a th:href="@{'/web/courses/' + ${course.id} + '/delete'}" class="action-link danger">
+                                    Deletar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${courses == null or courses.isEmpty()}" style="text-align: center; padding: 60px 20px;">
+            <h2 style="color: var(--text-secondary); font-size: 18px;">Nenhum curso cadastrado ainda</h2>
+            <p style="color: var(--text-secondary); margin: 20px 0;">Comece criando seu primeiro curso para acompanhar suas notas</p>
+            <a th:href="@{/web/courses/create}" class="btn btn-primary">Criar Primeiro Curso</a>
+        </div>
+    </main>
 </div>
 </body>
 </html>
