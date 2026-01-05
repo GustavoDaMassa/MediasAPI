@@ -1,5 +1,7 @@
+> **Read this in other languages:** [English](README_EN.md)
+
 <h1 align="center">
-  Médias API 
+  Médias API
 </h1>
 
 <p align="center">
