@@ -1,7 +1,7 @@
 > **Leia em outros idiomas:** [Português](README.md)
 
 <h1 align="center">
-  Grades API
+  Academic Grades Management API
 </h1>
 
 <p align="center">
@@ -11,1026 +11,1819 @@
 </p>
 
 <p align="center">
-  <img src="images/img_19.png" alt="Image Description">
+  <img src="images/img_19.png" alt="Application Preview">
 </p>
 
-# 📌 REST API for Academic Grades and Projections Management
+## 🚀 Quick Start
 
-This solution was originally built with Java using the Spring Framework in this repository
-but is also implemented with the following stacks:
-- [c#/.Net with ASPNET core](https://github.com/GustavoDaMassa/dotNetMediasAPI)
-- [typeScript/nodeJS with NestJs](https://github.com/GustavoDaMassa/nodeMediasAPI)
+```bash
+# Clone and run with Docker
+git clone https://github.com/GustavoDaMassa/MediasAPI.git
+cd MediasAPI
+docker compose up -d
 
-## Overview
-
-This API was developed to offer a complete solution for academic grades management. With it, users can store their assessments and automatically get the final grade for each course. It was designed with the core objective of enabling strategic projections for better academic performance planning.
-
-The unique characteristic of this API is the customization of the calculation method for each course. It's possible to define custom rules for calculating the average, making the system adaptable to different approaches. Additionally, the API automatically calculates the score needed to reach the cut-off grade.
-
-Both students and teachers can use it to manage grades, create projections for each student or scenario, and post grades.
-
-Learn more about the scope of the **[applied solution](#motivation-and-solution-)**.
-
----
-
-## Main Features:
-
-- Store grades in a structured and efficient way.
-- Define custom methods for calculating averages.
-- Automatically get the score needed to achieve academic goals.
-- Simulate different scenarios for strategic planning.
-- Manage courses.
-
----
-
-## Demo
-
-![img_3.png](images/projeções.png)
-
-To demonstrate the main flow and exemplify the application's potential, it has a simple [integrated front-end](#example-1) developed with Thymeleaf.
-
----
-## Using the API:
- #### Before detailing the endpoints and authentication, it's important to understand the API usage flow:
-
-### **Login**:
-  - The user creates their profile by registering in the system.
-
-### **Authentication**:
-  - The API validates the credentials and, if successful, returns a JWT token.
-### **Courses**:
-  - The user can create and edit their custom courses.
-### **Projections**:
-  - A projection is automatically created when defining the calculation method in the previous step. Users can create, edit and view other projections.
-### **Assessments**:
-  - Also automatically created for each projection. Users can post grades.
-
- ### If you wish to compile and navigate the system on your own, proceed to [how to run](#how-to-run)
-
----
-
-## Authentication (JSON Web Token)
-
- To obtain a token, the user must make a POST request to the `/authenticate` endpoint with their credentials. The returned token must be included in the Authorization header of all subsequent requests, except for registration.
-
-### Role Management (User Profiles)
-The API implements a role system for profile-based access control. Each user can have one or more associated roles, which determine which resources and operations they are authorized to access. Roles are verified during the authorization process, ensuring that only users with appropriate permissions can perform certain actions.
-
-![img.png](images/authenticate.png)
-
-- **The user is authenticated through the email which is unique in the system, public route;**
-- **Auth Type:** `Bearer Token`
-- **Request Body:**
-  ```json
-   {
-        "email":"gustavo.pereira@discente.ufg.br",
-        "password":"aula321"
-   }
+# Access the application
+open https://localhost/swagger-ui/index.html
 ```
+
+**Alternative implementations:**
+- [C#/.NET with ASP.NET Core](https://github.com/GustavoDaMassa/dotNetMediasAPI)
+- [TypeScript/Node.js with NestJS](https://github.com/GustavoDaMassa/nodeMediasAPI)
+
 ---
 
-## API Versioning
+## 📋 Table of Contents
 
-The API uses URI (Uniform Resource Identifier) versioning to manage the evolution of its interface in a controlled manner and avoid breaking existing clients. The API version is included directly in the URL path.
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Technical Stack](#technical-stack)
+- [Core Features](#core-features)
+- [Dynamic Calculation Engine](#dynamic-calculation-engine)
+- [Security Architecture](#security-architecture)
+- [API Reference](#api-reference)
+- [Database Schema](#database-schema)
+- [Deployment](#deployment)
+- [Development Guide](#development-guide)
+- [Monitoring & Observability](#monitoring--observability)
+- [Troubleshooting](#troubleshooting)
 
-*   **Current Version:** `v1`
-*   **Prefix:** All REST API endpoints are prefixed with `/api/v1`.
+---
+
+## 🎯 Overview
+
+A production-ready REST API for academic performance management with dynamic grade calculation capabilities. Built with Spring Boot 3.4.2 and Java 17, featuring a sophisticated expression evaluation engine based on Reverse Polish Notation (RPN) and the Shunting Yard algorithm.
+
+### Key Capabilities
+
+- **Dynamic Formula Processing**: Define custom grading formulas using mathematical expressions with regex-based parsing
+- **Strategic Projections**: Create multiple scenarios to simulate academic outcomes
+- **Automatic Calculations**: Real-time computation of final grades and required scores
+- **Production-Ready**: Includes health checks, structured logging, ELK stack integration, and automated migrations
+
+### Use Cases
+
+- **Students**: Track grades across courses with personalized calculation methods
+- **Educators**: Manage class grades with flexible grading schemes
+- **Institutions**: Standardize grade management with customizable evaluation criteria
+
+---
+
+## 🏗️ Architecture
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         Nginx (443/80)                       │
+│              SSL Termination + Reverse Proxy                │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│                  Spring Boot Application (8080)              │
+│  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │ REST API   │  │  Web MVC     │  │   Actuator       │   │
+│  │ (JWT Auth) │  │ (Form Login) │  │ (Health Checks)  │   │
+│  └────────────┘  └──────────────┘  └──────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │          Business Logic Layer                       │   │
+│  │  • Dynamic Expression Parser (Regex + RPN)         │   │
+│  │  • Grade Calculation Service                       │   │
+│  │  • Projection Management                           │   │
+│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │          Data Access Layer (Spring Data JPA)        │   │
+│  └─────────────────────────────────────────────────────┘   │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         │                 │                 │
+┌────────▼────────┐ ┌──────▼──────┐ ┌───────▼────────┐
+│  MySQL 8.0      │ │ Logstash    │ │ Elasticsearch  │
+│  (Persistent    │ │ (Log        │ │ (Log Storage & │
+│   Storage)      │ │  Aggregation)│ │  Indexing)    │
+└─────────────────┘ └─────────────┘ └────────┬───────┘
+                                              │
+                                     ┌────────▼───────┐
+                                     │    Kibana      │
+                                     │ (Log Analytics)│
+                                     └────────────────┘
+```
+
+### Layered Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                 Presentation Layer                    │
+│  • UserController, CourseController, etc.            │
+│  • REST API v1 (/api/v1/*)                          │
+│  • Web Controllers (Thymeleaf)                       │
+└───────────────────────┬──────────────────────────────┘
+                        │
+┌───────────────────────▼──────────────────────────────┐
+│                  Service Layer                        │
+│  • UserService, CourseService                        │
+│  • RegularExpressionProcessor                        │
+│  • CalculateFinalGrade, CalculateRequiredGrade      │
+│  • ConvertToPolishNotationReverse                   │
+└───────────────────────┬──────────────────────────────┘
+                        │
+┌───────────────────────▼──────────────────────────────┐
+│               Repository Layer                        │
+│  • UserRepository, CourseRepository                  │
+│  • Spring Data JPA + JPQL queries                   │
+└───────────────────────┬──────────────────────────────┘
+                        │
+┌───────────────────────▼──────────────────────────────┐
+│                  Domain Layer                         │
+│  • User, Course, Projection, Assessment              │
+│  • JPA Entities with validation                      │
+└──────────────────────────────────────────────────────┘
+```
+
+### Design Patterns
+
+- **Dependency Injection**: Constructor-based injection via Spring
+- **DTO Pattern**: Decoupling domain models from API contracts
+- **Repository Pattern**: Data access abstraction with Spring Data JPA
+- **Strategy Pattern**: Multiple calculation strategies via service interfaces
+- **Chain of Responsibility**: Expression parsing pipeline
+
+---
+
+## 🛠️ Technical Stack
+
+### Core Framework
+- **Spring Boot 3.4.2** - Application framework
+- **Java 17** - Programming language
+- **Maven** - Build automation and dependency management
+
+### Data Layer
+- **Spring Data JPA** - ORM and data access
+- **MySQL 8.0** - Production database
+- **Flyway** - Database migration management
+- **H2 Database** - In-memory database for testing
+
+### Security
+- **Spring Security** - Authentication and authorization framework
+- **OAuth2 Resource Server** - JWT token validation
+- **RSA Key Pair** - Asymmetric key cryptography for JWT signing
+
+### API Documentation
+- **SpringDoc OpenAPI 3** - API specification (Swagger UI)
+- **Bean Validation** - Request/Response validation
+
+### Infrastructure
+- **Docker & Docker Compose** - Containerization
+- **Nginx** - Reverse proxy and SSL termination
+- **ELK Stack** - Centralized logging (Elasticsearch, Logstash, Kibana)
+
+### Observability
+- **Spring Boot Actuator** - Health checks and metrics
+- **Logstash Logback Encoder** - Structured JSON logging
+- **MDC (Mapped Diagnostic Context)** - Request tracing
+
+### Testing
+- **JUnit 5** - Unit testing framework
+- **Mockito** - Mocking framework
+- **Spring Boot Test** - Integration testing
+
+### DevOps
+- **GitHub Actions** - CI/CD pipeline
+- **Docker Hub** - Container registry
+
+---
+
+## ⚡ Core Features
+
+### 1. Dynamic Grade Calculation Engine
+
+The heart of the system is a custom mathematical expression parser and evaluator.
+
+**Expression Syntax:**
+```java
+// Simple weighted average
+"(P1*0.4 + P2*0.6)"
+
+// Complex formula with special function
+"(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0.6*(AV1+AV2[10]/2))"
+```
+
+**Features:**
+- **Custom Identifiers**: `AT1`, `PROVA_FINAL`, `exam_1` (must contain at least one letter)
+- **Max Grade Specification**: `AV2[10]` defines max grade of 10
+- **Special Function `@M[n](...)`**: Sums the top N grades from provided assessments
+- **Standard Operators**: `+`, `-`, `*`, `/`, `(`, `)`
+- **Decimal Support**: Both `.` and `,` as decimal separators
+
+### 2. Multi-Scenario Projections
+
+Create unlimited projection scenarios per course to explore "what-if" situations.
+
+**Workflow:**
+1. Course created → Default projection auto-generated
+2. User posts actual grades → Automatic recalculation of final grade
+3. System calculates required grades for remaining assessments
+4. User creates additional projections for different scenarios
+
+### 3. Automated Grade Requirements
+
+After posting any grade, the system automatically calculates:
+- **Final Grade**: Using the custom formula
+- **Required Grade**: Evenly distributed among remaining assessments to meet cutoff
 
 **Example:**
-*   To access user resources in version 1: `/api/v1/users`
-*   To access course resources in version 1: `/api/v1/{userId}/courses`
+```
+Course: Database Management
+Formula: (0.4*(@M[6](AT1;...;AT9)/6)) + (0.6*(AV1+AV2)/2)
+Cutoff: 6.0
 
-This strategy ensures that new API versions can be introduced in the future (e.g.: `/api/v2/users`) without impacting clients still using the previous version.
+Posted Grades: AT1=6.0, AT2=5.0, AV1=7.0
+Remaining: AT3-AT9, AV2
+
+Result:
+- Current Final Grade: 4.93
+- Required Grade (per remaining assessment): 1.9
+```
+
+### 4. Dual Authentication System
+
+**REST API (Stateless):**
+- JWT Bearer tokens with RSA signature
+- Public endpoints: `/api/v1/users` (POST), `/authenticate`
+- Token-based authorization
+
+**Web Interface (Stateful):**
+- Form-based login with session management
+- Thymeleaf templates for UI
+- CSRF protection enabled
+
+### 5. Production-Grade Operations
+
+- **Health Checks**: Liveness and readiness probes for K8s/Docker
+- **Structured Logging**: JSON logs with MDC context (user email)
+- **Database Migrations**: Automated with Flyway
+- **API Versioning**: URI-based (`/api/v1/*`)
+- **CORS Configuration**: Global cross-origin policy
 
 ---
-## API Endpoints
 
-### user-controller
+## 🧮 Dynamic Calculation Engine
 
-![img_1.png](images/cadastrarusuarios.png)
-- **Creates a new user profile, authentication is not required.**
-- **Endpoint:** `POST /api/v1/users`
-- **Request Body:**
-   ```json
-   {
-      "name":"Gustavo Henrique",
-      "email":"gustavo.pereira@discente.ufg.br",
-      "password":"aula321"
-   }
+### Architecture Overview
+
+The calculation engine processes custom formulas through a 5-stage pipeline:
+
 ```
-- **Response**
-  ```json
-   {
-       "id": 2,
-       "name": "Gustavo Henrique",
-       "email": "gustavo.pereira@discente.ufg.br"
-   }
+Input Formula
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│  1. RegularExpressionProcessor          │
+│     Tokenizes using complex regex       │
+│     Output: List<String> tokens         │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│  2. IdentifiersDefinition               │
+│     Maps identifiers to max grades      │
+│     Output: Map<String, Double>         │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│  3. ConvertToPolishNotationReverse      │
+│     Shunting Yard Algorithm             │
+│     Output: RPN token list              │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│  4. CalculateFinalGrade                 │
+│     Stack-based RPN evaluation          │
+│     Output: Double (final grade)        │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│  5. CalculateRequiredGrade              │
+│     Inverse calculation for target      │
+│     Output: Required grade per assess.  │
+└─────────────────────────────────────────┘
 ```
 
+### Regex Pattern Breakdown
+
+```regex
+^(\d+(([.,])?\d+)?)(?=[\+\-\*\/])
+|(?<=[\+\-\*\/\(;])(\d+(([.,])?\d+)?)(?=[\+\-\*\/\);])
+|(?<=[\+\-\*\/])(\d+(([.,])?\d+)?)$
+|[\+\-\*\/\(\)\;]
+|(?<=[\+\-\*\/\)\(;])@M(\[\d+\]\()?
+|^@M(\[\d+\]\()?
+|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
+```
+
+**Components:**
+1. **Constants**: Decimal numbers with `.` or `,`
+2. **Operators**: `+`, `-`, `*`, `/`, `(`, `)`, `;`
+3. **Special Function**: `@M[n](...)` with optional opening
+4. **Identifiers**: Alphanumeric with `_`, requires at least one letter
+5. **Max Grade Suffix**: `[N]` where N is a double
+
+**Test Your Regex:** [regexr.com](https://regexr.com/)
+
+### RPN Conversion (Shunting Yard)
+
+**Input:** `(0.4 * (AV1 + AV2) / 2)`
+
+**Output (RPN):** `0.4 AV1 AV2 + * 2 /`
+
+**Evaluation:**
+```
+Stack: []
+Token: 0.4    → Stack: [0.4]
+Token: AV1    → Stack: [0.4, 7.0]  // Assume AV1 = 7.0
+Token: AV2    → Stack: [0.4, 7.0, 8.0]  // Assume AV2 = 8.0
+Token: +      → Stack: [0.4, 15.0]
+Token: *      → Stack: [6.0]
+Token: 2      → Stack: [6.0, 2.0]
+Token: /      → Stack: [3.0]
+Result: 3.0
+```
+
+### Special Function: @M[n](...)
+
+**Purpose:** Select top N grades from a larger set
+
+**Example:**
+```
+Formula: @M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)
+Grades:  5, 8, 3, 9, 7, 4, 6, 10, 2
+
+Top 6: 10, 9, 8, 7, 6, 5
+Sum: 45
+```
+
+**Constraints:**
+- `n` must be an integer
+- Number of provided assessments ≥ n
+- Semicolon-separated list
 
 ---
-![img_2.png](images/img_2.png)
-- **Returns a list with all users and their respective IDs which will be used as parameters in other requests;**
-- **Endpoint:** `GET /api/v1/users`
-- **Response**
-  ```json
-    [
-        {
-            "id": 2,
-            "name": "Gustavo Henrique",
-            "email": "gustavo.pereira@discente.ufg.br"
-        }
-    ]
+
+## 🔒 Security Architecture
+
+### Dual Security Configuration
+
+```java
+// REST API Security (Order 1)
+@Configuration
+@Order(1)
+public class SecurityConfig {
+    // JWT Bearer token validation
+    // RSA public/private key pair
+    // Stateless session management
+}
+
+// Web Security (Order 2)
+@Configuration
+@Order(2)
+public class WebSecurityConfig {
+    // Form-based login
+    // Stateful sessions
+    // CSRF protection
+}
+```
+
+### JWT Token Flow
+
+```
+1. User → POST /authenticate
+         {email, password}
+
+2. API → Validates credentials
+      → Generates JWT with RSA private key
+      → Returns token
+
+3. User → Subsequent requests with header:
+          Authorization: Bearer <token>
+
+4. API → Validates JWT with RSA public key
+      → Extracts user info
+      → Processes request
+```
+
+### Token Structure
+
+```
+Header:
+{
+  "alg": "RS256",
+  "typ": "JWT"
+}
+
+Payload:
+{
+  "sub": "user@example.com",
+  "roles": ["USER", "ADMIN"],
+  "iat": 1234567890,
+  "exp": 1234571490
+}
+
+Signature:
+RSA_SHA256(
+  base64(header) + "." + base64(payload),
+  privateKey
+)
+```
+
+### Role-Based Access Control
+
+- **Roles**: Defined in User entity, verified at runtime
+- **Authorization**: Method-level security with `@PreAuthorize`
+- **Resource Ownership**: Users can only access their own resources
+
+### Environment Variables (Required)
+
+```bash
+JWT_PUBLIC_KEY_CONTENT=<RSA public key PEM>
+JWT_PRIVATE_KEY_CONTENT=<RSA private key PEM>
+DATABASE_URL=jdbc:mysql://host:3306/dbname
+DATABASE_USERNAME=user
+DATABASE_PASSWORD=pass
 ```
 
 ---
-![img_1.png](images/img_1.png)
-- **Parameter**: `id` - user ID;
-- **Endpoint:** `PATCH /api/v1/users/{id}/name`
-- **Request Body:**
-   ```json
-    {
-        "string": "Gustavo"
-    }
+
+## 📡 API Reference
+
+### Base URL
+```
+Production: https://localhost
+Development: http://localhost:8080
+Swagger UI: https://localhost/swagger-ui/index.html
 ```
 
-- **Response**
-  ```json
-    {
+### API Versioning
+All endpoints are prefixed with `/api/v1/`
+
+### Authentication
+
+#### Register User (Public)
+```http
+POST /api/v1/users
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secure123"
+}
+
+Response: 201 Created
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+#### Login (Public)
+```http
+POST /authenticate
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "secure123"
+}
+
+Response: 200 OK
+{
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": 3600
+}
+```
+
+### User Management
+
+#### List All Users
+```http
+GET /api/v1/users
+Authorization: Bearer <token>
+
+Response: 200 OK
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+]
+```
+
+#### Get User by Email
+```http
+GET /api/v1/users/{email}
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+#### Update User Name
+```http
+PATCH /api/v1/users/{id}/name
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "string": "Jane Doe"
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Jane Doe",
+  "email": "john@example.com"
+}
+```
+
+#### Update User Email
+```http
+PATCH /api/v1/users/{id}/email
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "email": "jane@example.com"
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Jane Doe",
+  "email": "jane@example.com"
+}
+```
+
+#### Delete User
+```http
+DELETE /api/v1/users/{id}
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Jane Doe",
+  "email": "jane@example.com"
+}
+```
+
+### Course Management
+
+#### Create Course
+```http
+POST /api/v1/{userId}/courses
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Database Management",
+  "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0.6*(AV1+AV2[10])/2)",
+  "cutOffGrade": 6.0
+}
+
+Response: 201 Created
+{
+  "id": 1,
+  "name": "Database Management",
+  "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0.6*(AV1+AV2[10])/2)",
+  "cutOffGrade": 6.0
+}
+
+Notes:
+- Auto-creates default projection
+- Auto-instantiates assessments from formula
+- cutOffGrade defaults to 6.0 if omitted
+```
+
+#### List User Courses
+```http
+GET /api/v1/{userId}/courses
+Authorization: Bearer <token>
+
+Response: 200 OK
+[
+  {
+    "id": 1,
+    "name": "Database Management",
+    "averageMethod": "(P1+P2)/2",
+    "cutOffGrade": 6.0
+  }
+]
+```
+
+#### Update Course Name
+```http
+PATCH /api/v1/{userId}/courses/{id}/name
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "string": "Advanced Databases"
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Advanced Databases",
+  "averageMethod": "(P1+P2)/2",
+  "cutOffGrade": 6.0
+}
+```
+
+#### Update Average Method
+```http
+PATCH /api/v1/{userId}/courses/{id}/method
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "string": "(P1*0.3 + P2*0.7)"
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Advanced Databases",
+  "averageMethod": "(P1*0.3 + P2*0.7)",
+  "cutOffGrade": 6.0
+}
+
+Note: Deletes all projections and creates new default
+```
+
+#### Update Cut-Off Grade
+```http
+PATCH /api/v1/{userId}/courses/{id}/cutoffgrade
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "value": 7.0
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Advanced Databases",
+  "averageMethod": "(P1*0.3 + P2*0.7)",
+  "cutOffGrade": 7.0
+}
+```
+
+#### Get Courses with Projections
+```http
+GET /api/v1/{userId}/courses/projections
+Authorization: Bearer <token>
+
+Response: 200 OK
+[
+  {
+    "id": 1,
+    "name": "Advanced Databases",
+    "assessment": [
+      {
+        "id": 1,
+        "identifier": "P1",
+        "grade": 0.0,
+        "requiredGrade": 7.0
+      },
+      {
         "id": 2,
-        "name": "Gustavo",
-        "email": "gustavo.pereira@discente.ufg.br"
-    }
+        "identifier": "P2",
+        "grade": 0.0,
+        "requiredGrade": 7.0
+      }
+    ],
+    "finalGrade": 0.0,
+    "courseName": "Advanced Databases"
+  }
+]
 ```
 
----
-![img_3.png](images/img_3.png)
+#### Delete Course
+```http
+DELETE /api/v1/{userId}/courses/{id}
+Authorization: Bearer <token>
 
-- **Parameter**: `id` - user ID;
-- **Endpoint:** `PATCH /api/v1/users/{id}/email`
-- **Request Body:**
-   ```json
-    {
-        "email":"gustavohenrique3gb@gmail.com"
-    }
+Response: 200 OK
+{
+  "id": 1,
+  "name": "Advanced Databases",
+  "averageMethod": "(P1*0.3 + P2*0.7)",
+  "cutOffGrade": 7.0
+}
 ```
 
-- **Response**
-  ```json
-    {
+### Projection Management
+
+#### Create Projection
+```http
+POST /api/v1/{courseId}/projections
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "string": "Optimistic Scenario"
+}
+
+Response: 201 Created
+{
+  "id": 2,
+  "name": "Optimistic Scenario",
+  "assessment": [...],
+  "finalGrade": 0.0,
+  "courseName": "Advanced Databases"
+}
+```
+
+#### List Course Projections
+```http
+GET /api/v1/{courseId}/projections
+Authorization: Bearer <token>
+
+Response: 200 OK
+[
+  {
+    "id": 1,
+    "name": "Advanced Databases",
+    "assessment": [
+      {
+        "id": 1,
+        "identifier": "P1",
+        "grade": 7.5,
+        "requiredGrade": 0.0
+      },
+      {
         "id": 2,
-        "name": "Gustavo",
-        "email": "gustavohenrique3gb@gmail.com"
-    }
+        "identifier": "P2",
+        "grade": 0.0,
+        "requiredGrade": 6.14
+      }
+    ],
+    "finalGrade": 2.25,
+    "courseName": "Advanced Databases"
+  },
+  {
+    "id": 2,
+    "name": "Optimistic Scenario",
+    "assessment": [...],
+    "finalGrade": 0.0,
+    "courseName": "Advanced Databases"
+  }
+]
 ```
 
----
-![img_4.png](images/img_4.png)
+#### Update Projection Name
+```http
+PATCH /api/v1/{courseId}/projections/{id}
+Authorization: Bearer <token>
+Content-Type: application/json
 
-- **Parameter**: `id` - user ID;
-- **Endpoint:** `DELETE /api/v1/users/{id}`
-- **Response**
-  ```json
-    {
-        "id": 2,
-        "name": "Gustavo",
-        "email": "gustavohenrique3gb@gmail.com"
-    }
+{
+  "string": "Pessimistic Scenario"
+}
+
+Response: 200 OK
+{
+  "id": 2,
+  "name": "Pessimistic Scenario",
+  "assessment": [...],
+  "finalGrade": 0.0,
+  "courseName": "Advanced Databases"
+}
 ```
 
----
-- **Parameter**: `email` - user email;
-- **Endpoint:** `GET /api/v1/users/{email}`
-- **Response**
-  ```json
-    {
-        "id": 2,
-        "name": "Gustavo",
-        "email": "gustavo.pereira@discente.ufg.br"
-    }
+#### Delete Projection
+```http
+DELETE /api/v1/{courseId}/projections/{id}
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "id": 2,
+  "name": "Pessimistic Scenario",
+  ...
+}
 ```
 
-### course-controller
+#### Delete All Projections
+```http
+DELETE /api/v1/{courseId}/projections/all
+Authorization: Bearer <token>
 
----
-![img_5.png](images/img_5.png)
-
-- **Creates a new course, and through the average calculation method automatically creates a projection with the same name, identifying and instantiating the defined assessments.**
-- **Parameter**: `userId` - user ID;
-- **Endpoint:** `POST /api/v1/{userId}/courses`
-- **Request Body:**
-   ```json
-    {
-        "name":"SGBD",
-        "averageMethod":"(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
-        "cutOffGrade": 6.0
-    }
+Response: 204 No Content
 ```
 
-- **`AverageMethod:`**
-  - Constants are represented by `double` values;
-  - Identifiers can contain numbers, the special character `_` and at least one letter;
+### Assessment Management
 
-  - Identifiers can have the suffix `[N]` indicating the maximum grade for the assessment;
-    - **N** is a `double`;
-    - if not informed, assumes the default value `10`.
-  - `@M[n](i1;i2;...;im)` is an extra functionality beyond arithmetic operations;
-    - It sums the n highest grades provided within the parentheses;
-    - `m>=n` ;
-    - n is an `int`.
-  - `cutOffGrade` is also optional;
-    - default value `6.0`.
-  - Syntactic and semantic analysis of the formula is performed.
+#### List Assessments
+```http
+GET /api/v1/{projectionId}/assessments
+Authorization: Bearer <token>
 
-- **Response**
-  ```json
-    {
-        "id": 2,
-        "name": "SGBD",
-        "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
-        "cutOffGrade": 6
+Response: 200 OK
+[
+  {
+    "id": 1,
+    "identifier": "P1",
+    "grade": 7.5,
+    "requiredGrade": 0.0
+  },
+  {
+    "id": 2,
+    "identifier": "P2",
+    "grade": 0.0,
+    "requiredGrade": 6.14
+  }
+]
+```
+
+#### Update Assessment Grade
+```http
+PATCH /api/v1/{projectionId}/assessments/{id}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "value": 8.5
+}
+
+Response: 200 OK
+{
+  "id": 2,
+  "identifier": "P2",
+  "grade": 8.5,
+  "requiredGrade": 0.0
+}
+
+Note: Automatically recalculates finalGrade and requiredGrade for all assessments
+```
+
+### Error Responses
+
+All errors follow this format:
+
+```json
+{
+  "statusCode": 400,
+  "error": "Detailed error message",
+  "path": "/api/v1/2/courses",
+  "timestamp": "2025-01-05T10:30:45.123Z"
+}
+```
+
+**Common Error Codes:**
+
+| Status | Exception | Description |
+|--------|-----------|-------------|
+| 400 | `IllegalArgumentException` | Invalid formula syntax or parameters |
+| 400 | `NoSuchElementException` | Missing operands in expression |
+| 400 | `DataIntegrityException` | Duplicate entity (name/email) |
+| 404 | `NotFoundArgumentException` | Resource not found |
+| 500 | `InternalServerError` | Division by zero or unexpected error |
+
+**Example Error:**
+```http
+POST /api/v1/1/courses
+{
+  "name": "Math",
+  "averageMethod": "2.5(P_1)+3 / 2.5*(P2#)3"
+}
+
+Response: 400 Bad Request
+{
+  "statusCode": 400,
+  "error": "Method for calculating averages not accepted, formula terms are invalid: 2,5----------#-3",
+  "path": "/1/courses",
+  "timestamp": "2025-01-05T10:30:45.123Z"
 }
 ```
 
 ---
-![img_6.png](images/img_6.png)
 
-- **Lists all user courses.**
-- **Parameter**: `userId` - user ID;
-- **Endpoint:** `GET /api/v1/{userId}/courses`
-- **Response**
-  ```json
-    [
-       {
-          "id": 1,
-          "name": "BD 1",
-          "averageMethod": "(P2+P3*2)/3",
-          "cutOffGrade": 6
-       },
-       {
-          "id": 2,
-          "name": "SGBD",
-          "averageMethod": "(0.4*(@M[6](AT1;AT2;AT3;AT4;AT5;AT6;AT7;AT8;AT9)/6))+(0,6*(AV1+AV2[10]/2))",
-          "cutOffGrade": 6
-       }
-    ]
+## 🗄️ Database Schema
+
+### Entity Relationship Diagram
+
+![Database Schema](images/img.png)
+
+### Schema Overview
+
+```
+User (1) ──────< (N) Course (1) ──────< (N) Projection (1) ──────< (N) Assessment
 ```
 
+### Entities
 
-
----
-![img_7.png](images/img_7.png)
-
-- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/name`
-- **Parameters**:
-  - `userId` - user ID;
-    - `id` - course ID.
-- **Request Body**
-    ```json
-  {
-      "string":"BD"
-  }
-```
-- **Response**
-    ```json
-    {
-        "id": 1,
-        "name": "BD",
-        "averageMethod": "(P2+P3*2)/3",
-        "cutOffGrade": 6.0
-    }
+#### User
+```sql
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uk_user_email UNIQUE (email)
+);
 ```
 
-
----
-![img_8.png](images/img_8.png)
-
-- **Changes how the final average calculation method is defined. Deletes the equivalent projections and creates a new updated one with a new ID for this projection.**
-- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/method`
-- **Parameters**:
-    - `userId` - user ID;
-    - `id` - course ID.
-- **Request Body**
-    ```json
-  {
-      "string":"(P2+P3)/2"
-  }
-```
-- **Response**
-    ```json
-    {
-        "id": 1,
-        "name": "BD",
-        "averageMethod": "(P2+P3)/2",
-        "cutOffGrade": 6.0
-    }
+#### Course
+```sql
+CREATE TABLE courses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    average_method TEXT NOT NULL,
+    cut_off_grade DOUBLE DEFAULT 6.0,
+    user_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT uk_course_name_user UNIQUE (name, user_id)
+);
 ```
 
----
-![img_9.png](images/img_9.png)
-
-- **Endpoint:** `PATCH /api/v1/{userId}/courses/{id}/cutoffgrade`
-- **Parameters**:
-    - `userId` - user ID;
-    - `id` - course ID.
-- **Request Body**
-    ```json
-  {
-      "value": 7
-  }
-```
-- **Response**
-    ```json
-    {
-        "id": 1,
-        "name": "BD",
-        "averageMethod": "(P2+P3)/2",
-        "cutOffGrade": 7.0
-    }
+#### Projection
+```sql
+CREATE TABLE projections (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    final_grade DOUBLE DEFAULT 0.0,
+    course_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    CONSTRAINT uk_projection_name_course UNIQUE (name, course_id)
+);
 ```
 
----
-![img_10.png](images/img_10.png)
-
-- **Parameter**: `userId` - user ID;
-- **Endpoint:** `GET /api/v1/{userId}/courses/projections`
-- **Lists all courses along with their projections and activities.**
-- **Response**
-  ```json
-  [
-     {
-          "id": 2,
-          "name": "SGBD",
-          "assessment":[
-              {
-                 "id": 3,
-                 "identifier": "AT1",
-                 "grade": 0,
-                 "requiredGrade": 4.7
-              },
-              {
-                 "id": 4,
-                 "identifier": "AT2",
-                 "grade": 0,
-                 "requiredGrade": 4.7
-              },
-                    .
-                    .
-                    .
-                    .
-                    .
-              {
-                 "id": 12,
-                 "identifier": "AV1",
-                 "grade": 0,
-                 "requiredGrade": 4.7
-              },
-              {
-                 "id": 13,
-                 "identifier": "AV2",
-                 "grade": 0,
-                 "requiredGrade": 4.7
-              }
-          ],
-          "finalGrade": 0,
-          "courseName": "SGBD"
-     },
-     {
-          "id": 4,
-          "name": "BD",
-          "assessment": [
-              {
-                 "id": 16,
-                 "identifier": "P2",
-                 "grade": 0,
-                 "requiredGrade": 7
-              },
-              {
-                 "id": 17,
-                 "identifier": "P3",
-                 "grade": 0,
-                 "requiredGrade": 7
-              }
-          ],
-          "finalGrade": 0,
-          "courseName": "BD"
-     }
-  ]
+#### Assessment
+```sql
+CREATE TABLE assessments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    identifier VARCHAR(100) NOT NULL,
+    grade DOUBLE DEFAULT 0.0,
+    max_grade DOUBLE DEFAULT 10.0,
+    required_grade DOUBLE DEFAULT 0.0,
+    projection_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (projection_id) REFERENCES projections(id) ON DELETE CASCADE,
+    CONSTRAINT uk_assessment_identifier_projection UNIQUE (identifier, projection_id)
+);
 ```
 
+### Constraints
 
----
-![img_11.png](images/img_11.png)
+- **Uniqueness**: Name/ID pairs are unique within their parent context
+- **Cascade Deletes**: Deleting parent entity removes all children
+- **NOT NULL**: Critical fields enforce data integrity
+- **Defaults**: Sensible defaults for grades (0.0) and cutoffs (6.0)
 
-- **Delete course**
-- **Endpoint:** `DELETE /api/v1/{userId}/courses/{id}`
-- **Parameter**: `userId` - user ID;
-- **Response**
-    ```json
-    {
-        "id": 1,
-        "name": "BD",
-        "averageMethod": "(P2+P3)/2",
-        "cutOffGrade": 7.0
-    }
+### Indexes
+
+```sql
+-- Automatically created by JPA/Hibernate
+CREATE INDEX idx_course_user ON courses(user_id);
+CREATE INDEX idx_projection_course ON projections(course_id);
+CREATE INDEX idx_assessment_projection ON assessments(projection_id);
 ```
 
-### projection-controller
+### Migration Strategy
 
----
-![img_12.png](images/img_12.png)
+**Flyway** manages all schema changes:
 
--**Creates a new projection and automatically its assessments according to the course definition.**
-- **Endpoint:** `POST /api/v1/{courseId}/projections`
-- **Parameter**: `courseId` - course ID;
-- **Request Body**
-    ```json
-      {
-          "string": "projection 2"
-      }
 ```
-- **Response**
-    ```json
-    {
-        "id": 5,
-        "name": "projection 2",
-            .
-            .
-            .
-        "finalGrade": 0.0,
-        "courseName": "SGBD"
-    }
-```
----
-![img_13.png](images/img_13.png)
-
-- **Returns all projections of a specific course with a list of equivalent assessments.**
-- **Endpoint:** `GET /api/v1/{courseId}/projections`
-- **Parameter**: `courseId` - course ID;
-  - **Response**
-      ```json
-    [
-        {
-          "id": 2,
-          "name": "SGBD",
-          "assessment": [
-              {
-                  "id": 3,
-                  "identifier": "AT1",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              },
-              {
-                  .
-                  .
-                  .
-                  .
-              {
-                  "id": 10,
-                  "identifier": "AT8",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              },
-              {
-                  "id": 11,
-                  "identifier": "AT9",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              },
-              {
-                  "id": 12,
-                  "identifier": "AV1",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              },
-              {
-                  "id": 13,
-                  "identifier": "AV2",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              }
-          ],
-          "finalGrade": 0.0,
-          "courseName": "SGBD"
-        },
-        {
-          "id": 5,
-          "name": "projection 2",
-          "assessment": [
-              {
-                  "id": 18,
-                  "identifier": "AT1",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              },
-                  .
-                  .
-                  .
-                  .
-              {
-                  "id": 28,
-                  "identifier": "AV2",
-                  "grade": 0.0,
-                  "requiredGrade": 4.7
-              }
-          ],
-          "finalGrade": 0.0,
-          "courseName": "SGBD"
-        }
-    ]
-```
----
-![img_14.png](images/img_14.png)
-
-- **Endpoint:** `PATCH /api/v1/{courseId}/projections/{id}`
-- **Parameter**: `courseId` - course ID;
-- **Parameter**: `id` - projection ID;
-- **Request Body**
-    ```json
-      {
-          "string":"Optimistic Projection"
-      }
-```
-- **Response**
-    ```json
-    {
-       "id": 5,
-      "name": "Optimistic Projection",
-         .
-         .
-         .
-      "courseName": "SGBD"
-    }
-```
----
-![img_15.png](images/img_15.png)
-
-- **Deletes only the specified projection.**
-- **Endpoint:** `DELETE /api/v1/{courseId}/projections/{id}`
-- **Parameter**: `courseId` - course ID;
-- **Parameter**: `id` - projection ID;
-- **Response**
-    ```json
-    {
-      "id": 5,
-      "name": "Optimistic Projection",
-         .
-         .
-         .
-      "courseName": "SGBD"
-    }
+src/main/resources/db/migration/
+├── V1__initial_schema.sql
+├── V2__add_timestamps.sql
+└── V3__add_indexes.sql
 ```
 
----
-![img_16.png](images/img_16.png)
+**Migration Commands:**
+```bash
+# Migrations run automatically on application start
 
-- **Deletes all course projections, including the default projection.**
-- **Endpoint:** `DELETE /api/v1/{courseId}/projections/all`
-- **Parameter**: `courseId` - course ID;
+# Manual migration info
+./mvnw flyway:info
 
----
-![img_18.png](images/img_18.png)
+# Validate migrations
+./mvnw flyway:validate
 
-- **Lists all assessments of a projection.**
-- **Endpoint:** `GET /api/v1/{projectionId}/assessments`
-- **Parameter**: `projectionId` - projection ID;
-- **Response**
-    ```json
-  [
-       {
-          "id": 3,
-          "identifier": "AT1",
-          "grade": 0.0,
-          "requiredGrade": 4.7
-       },
-       {
-          "id": 4,
-          "identifier": "AT2",
-          "grade": 0.0,
-          "requiredGrade": 4.7
-       },
-       {
-          .
-          .
-          .
-          .
-       {
-          "id": 13,
-          "identifier": "AV2",
-          "grade": 0.0,
-          "requiredGrade": 4.7
-        }
-  ]
+# Clean database (DEV ONLY)
+./mvnw flyway:clean
 ```
 
-
----
-![img_17.png](images/img_17.png)
-
-- **Posts the acquired grade. The final average is automatically calculated along with how much score is still needed in each assessment not yet taken, to reach the cut-off grade.**
-- **Endpoint:** `PATCH /api/v1/{projectionId}/assessments/{id}`
-- **Parameter**: `projectionId` - projection ID;
-- **Parameter**: `id` - assessment ID;
-- **Request Body**
-    ```json
-  {
-      "value": 7
-  }
-```
-
-- **Response**
-    ```json
-    {
-       "id": 12,
-       "identifier": "AV1",
-       "grade": 7.0,
-       "requiredGrade": 0.0
-  }
-```
+**Best Practices:**
+- Never modify applied migrations in production
+- Test migrations locally first
+- Use descriptive names: `V{version}__{description}.sql`
+- Keep migrations idempotent when possible
 
 ---
 
-### 📌 Observing the Results
-After this flow we can make a request to the endpoint `/api/v1/{courseId}/projections` with the HTTP method `GET` and observe:
+## 🚀 Deployment
 
-- **Automatic calculation for the final average;**
-- **Calculation for the required grades.**
-  - Those where the grade is defined receive the value zero;
-  - They are calculated uniformly.
+### Docker Deployment (Recommended)
 
-- **Response**
-    ```json
-      [
-    {
-        "id": 2,
-        "name": "SGBD",
-        "assessment": [
-            {
-                "id": 3,
-                "identifier": "AT1",
-                "grade": 6.0,
-                "requiredGrade": 0.0
-            },
-            {
-                "id": 4,
-                "identifier": "AT2",
-                "grade": 5.0,
-                "requiredGrade": 0.0
-            },
-            {
-                "id": 5,
-                "identifier": "AT3",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 6,
-                "identifier": "AT4",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 7,
-                "identifier": "AT5",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 8,
-                "identifier": "AT6",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 9,
-                "identifier": "AT7",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 10,
-                "identifier": "AT8",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 11,
-                "identifier": "AT9",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            },
-            {
-                "id": 12,
-                "identifier": "AV1",
-                "grade": 7.0,
-                "requiredGrade": 0.0
-            },
-            {
-                "id": 13,
-                "identifier": "AV2",
-                "grade": 0.0,
-                "requiredGrade": 1.9
-            }
-        ],
-        "finalGrade": 4.933333333333334,
-        "courseName": "SGBD"
-    }
-  ]
-```
+#### Prerequisites
+- Docker 20.10+
+- Docker Compose 2.0+
 
-- Calculation : 0.4*((**6**+**5**+0+0+0+0)/6)+0,6*(**7**+(0/2))
+#### Option 1: Clone and Build
 
----
-## Data Model
-
-![img.png](images/img.png)
-
-- User has N --> Courses;
-- Course has N --> Projections;
-- Projection has N --> Assessments;
-
-All IDs are primary keys. Entities have a uniqueness constraint between their respective `name` and `id`, in the case of Assessment this uniqueness is between the `identifier` and its `id`.
-
----
-
-##  Exception Handling
-
-The API returns standardized responses for errors and exceptions. Below are the error codes and their descriptions:
-
-###  Custom Exceptions
-
-| StatusCode | Exception            | Error example                                             |
-|------------|--------------------|-----------------------------------------------------------|
-| 404        | `NotFoundArgumentException`  | Course id 30 not found for UserId 2                       |
-| 400        | `IllegalArgumentException` | It is not possible to select more values than those provided |
-| 400        | `NoSuchElementException`    | The equation has operators without arguments              |
-| 400        | `DataIntegrityException`     | The attribute SGBD already exist for this context         |
-| 500        | `InternalServerError` | possible division by zero detected                                     |
-
-### Example:
-- **Method**: POST;
-- **URI** {userId}/courses
-  - **Request:**
-  ```json
-  {
-      "name":"Greek",
-      "averageMethod":" 2,5(P_1)+3 / 2,5*(P2#)3 ",
-      "cutOffGrade": 6.0
-  }
-```
-- **Response:**
-  ```json
-  {
-    "statusCode": 400,
-    "error": "Method for calculating averages not accepted, formula terms are invalid: 2,5----------#-3",
-    "path": "/2/courses",
-    "timestamp": "2025-03-28T17:31:04.744315954"
-  }
-```
----
-## How to Run
-
-The Application uses Docker and is made available inside a container with the API image and the database it connects to.
-
-#### Dependencies:
-
-- [Docker](#docker);
-- [Docker Compose](#docker-compose).
-
-### Option 1
-
-
-#### Steps to run:
-
-  - Clone the repository and enter the directory:
-```
+```bash
+# Clone repository
 git clone https://github.com/GustavoDaMassa/MediasAPI.git
 cd MediasAPI
-```
-- Start the container with an updated image:
-```
+
+# Start all services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+
+# Clean restart (removes volumes)
+docker compose down -v
 docker compose up --build -d
 ```
-- Stopping the application:
-```
-docker compose down
-```
-### Option 2
- **If you want to run it more easily without the need to clone the repository**
 
-- Download the file [docker compose](./Compose%20docker%20/docker-compose.yaml)
-  - This file creates an instance of the application according to the most recent version in the repository [docker hub](https://hub.docker.com/r/gustavodamassa/medias-api/tags);
-  - **Keep the file name.**
-- Run the following command in the directory where the file was downloaded
-```
-docker compose up
-```
-### Application Running
+#### Option 2: Pre-built Image
 
-  After running you can navigate through it by making requests through:
- ### - [Project Swagger](https://localhost/swagger-ui/index.html)
-  - Or through any API Client of your choice at **https://localhost**
+```bash
+# Download docker-compose.yaml
+curl -O https://raw.githubusercontent.com/GustavoDaMassa/MediasAPI/main/docker-compose.yaml
+
+# Start services
+docker compose up -d
+```
+
+#### Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Nginx | 443 (HTTPS), 80 (HTTP) | Reverse proxy + SSL |
+| MediasAPI | 8080 (internal) | Spring Boot application |
+| MySQL | 3306 (internal) | Database |
+| Elasticsearch | 9200 (internal) | Log storage |
+| Logstash | 5000 (internal) | Log aggregation |
+| Kibana | 5601 | Log visualization UI |
+
+#### Environment Configuration
+
+Create `.env` file:
+
+```bash
+# Database
+MYSQL_ROOT_PASSWORD=rootpassword
+MYSQL_DATABASE=mediasdb
+MYSQL_USER=mediasuser
+MYSQL_PASSWORD=mediaspassword
+DATABASE_URL=jdbc:mysql://mysql:3306/mediasdb?useSSL=false
+
+# JWT Keys (replace with your own)
+JWT_PUBLIC_KEY_CONTENT=-----BEGIN PUBLIC KEY-----\nMIIBIjANBgk...\n-----END PUBLIC KEY-----
+JWT_PRIVATE_KEY_CONTENT=-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgk...\n-----END PRIVATE KEY-----
+
+# Application
+SPRING_PROFILES_ACTIVE=docker
+```
+
+#### Generate RSA Keys
+
+```bash
+# Generate private key
+openssl genrsa -out private_key.pem 2048
+
+# Extract public key
+openssl rsa -in private_key.pem -pubout -out public_key.pem
+
+# Convert to single line for env var
+cat public_key.pem | tr '\n' '\\n'
+cat private_key.pem | tr '\n' '\\n'
+```
+
+#### Health Checks
+
+```bash
+# Application health
+curl https://localhost/actuator/health
+
+# Liveness probe
+curl https://localhost/actuator/health/liveness
+
+# Readiness probe
+curl https://localhost/actuator/health/readiness
+
+# Docker health status
+docker compose ps
+```
+
+### SSL/TLS Configuration
+
+#### Development (Self-Signed Certificate)
+
+Generated automatically in `nginx/certs/`:
+```bash
+nginx/certs/
+├── nginx-selfsigned.crt
+└── nginx-selfsigned.key
+```
+
+Browser will show security warning - safe to ignore locally.
+
+#### Production (Let's Encrypt)
+
+```bash
+# Install certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Obtain certificate
+sudo certbot --nginx -d yourdomain.com
+
+# Auto-renewal (cron)
+0 0 * * * certbot renew --quiet
+```
+
+Update `nginx/nginx.conf`:
+```nginx
+ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+```
+
+### CORS Configuration
+
+Edit `src/main/java/br/com/gustavohenrique/MediasAPI/config/CorsConfig.java`:
+
+```java
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Arrays.asList(
+        "https://yourdomain.com",
+        "http://localhost:3000"
+    ));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
+```
+
+### Scaling Considerations
+
+#### Horizontal Scaling
+```yaml
+# docker-compose.yml
+services:
+  mediasapi:
+    deploy:
+      replicas: 3
+    ...
+```
+
+#### Database Connection Pool
+```properties
+# application.properties
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000
+```
+
+#### Caching (Future Enhancement)
+- Add Redis for session storage
+- Implement Spring Cache for frequent queries
+- CDN for static assets
 
 ---
 
-## HTTPS Configuration with Nginx (Docker)
+## 💻 Development Guide
 
-To ensure communication security, the API is exposed via HTTPS in Docker environment, using Nginx as a reverse proxy.
+### Local Development Setup
 
-### How it works:
-1.  **Nginx as Reverse Proxy:** Nginx intercepts all external requests on port 443 (HTTPS).
-2.  **SSL Termination:** Nginx is responsible for decrypting HTTPS traffic and forwarding it to the Spring Boot application (which runs internally on HTTP on port 8080) within the Docker network.
-3.  **HTTP to HTTPS Redirect:** Any access attempt via HTTP (port 80) is automatically redirected to HTTPS.
+#### Prerequisites
+- Java 17 (JDK)
+- Maven 3.8+
+- Docker Desktop (for local ELK stack)
+- IDE: IntelliJ IDEA / VS Code / Eclipse
 
-### SSL Certificates:
-*   **Local Development:** To facilitate development, a self-signed SSL certificate is generated and used by Nginx. When accessing `https://localhost`, your browser will display a security warning, which can be safely ignored for development purposes.
-*   **Production:** In a production environment, it is **essential** to replace the self-signed certificate with a certificate issued by a trusted Certificate Authority (CA), such as Let's Encrypt. This ensures that users do not receive security warnings and that communication is fully secure and verified.
+#### Setup Steps
+
+```bash
+# 1. Clone repository
+git clone https://github.com/GustavoDaMassa/MediasAPI.git
+cd MediasAPI
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# 3. Start dependencies (MySQL + ELK)
+docker compose up -d mysql elasticsearch logstash kibana
+
+# 4. Run application
+./mvnw spring-boot:run
+
+# Alternative: Run from IDE
+# Open MediasApiApplication.java and run main method
+```
+
+#### Build Commands
+
+```bash
+# Compile
+./mvnw clean compile
+
+# Run tests
+./mvnw test
+
+# Run specific test
+./mvnw test -Dtest=CourseServiceTest
+
+# Package (creates JAR)
+./mvnw clean package
+
+# Skip tests
+./mvnw clean package -DskipTests
+
+# Install to local Maven repo
+./mvnw clean install
+
+# Build Docker image
+docker build -t mediasapi:latest .
+```
+
+#### Project Structure
+
+```
+MediasAPI/
+├── src/
+│   ├── main/
+│   │   ├── java/br/com/gustavohenrique/MediasAPI/
+│   │   │   ├── authentication/       # JWT services
+│   │   │   ├── config/              # Spring configurations
+│   │   │   ├── controller/
+│   │   │   │   ├── rest/v1/         # REST API controllers
+│   │   │   │   │   └── mapper/      # DTO mappers
+│   │   │   │   └── web/             # Thymeleaf controllers
+│   │   │   ├── dtos/                # Data Transfer Objects
+│   │   │   ├── exception/           # Global exception handler
+│   │   │   ├── model/               # JPA entities
+│   │   │   ├── repository/          # Spring Data repositories
+│   │   │   └── service/
+│   │   │       ├── Impl/            # Service implementations
+│   │   │       └── Interfaces/      # Service contracts
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-docker.properties
+│   │       ├── db/migration/        # Flyway migrations
+│   │       ├── static/              # CSS, JS
+│   │       └── templates/           # Thymeleaf templates
+│   └── test/
+│       └── java/                    # Test classes
+├── docker-compose.yml
+├── Dockerfile
+├── pom.xml
+└── README.md
+```
+
+#### Running Tests
+
+```bash
+# All tests
+./mvnw test
+
+# With coverage
+./mvnw test jacoco:report
+# View: target/site/jacoco/index.html
+
+# Integration tests only
+./mvnw verify -DskipUnitTests
+
+# Unit tests only
+./mvnw test -DskipIntegrationTests
+```
+
+#### Code Style
+
+Project uses default Java conventions:
+- 4 spaces indentation
+- Max line length: 120 characters
+- Javadoc for public APIs
+
+#### Adding New Endpoints
+
+1. **Create DTO:**
+```java
+// src/main/java/.../ dtos/NewFeatureDTO.java
+public record NewFeatureDTO(String name, Double value) {}
+```
+
+2. **Add Service Method:**
+```java
+// src/main/java/.../service/Interfaces/INewFeatureService.java
+public interface INewFeatureService {
+    NewFeatureDTO create(NewFeatureDTO dto);
+}
+```
+
+3. **Implement Service:**
+```java
+// src/main/java/.../service/Impl/NewFeatureServiceImpl.java
+@Service
+public class NewFeatureServiceImpl implements INewFeatureService {
+    @Override
+    public NewFeatureDTO create(NewFeatureDTO dto) {
+        // Implementation
+    }
+}
+```
+
+4. **Create Controller:**
+```java
+// src/main/java/.../controller/rest/v1/NewFeatureController.java
+@RestController
+@RequestMapping("/api/v1/features")
+public class NewFeatureController {
+
+    @PostMapping
+    public ResponseEntity<NewFeatureDTO> create(@RequestBody NewFeatureDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+    }
+}
+```
+
+5. **Write Tests:**
+```java
+// src/test/java/.../NewFeatureControllerTest.java
+@SpringBootTest
+@AutoConfigureMockMvc
+class NewFeatureControllerTest {
+
+    @Test
+    void shouldCreateNewFeature() {
+        // Test implementation
+    }
+}
+```
+
+#### Database Migrations
+
+```bash
+# Create new migration
+# File: src/main/resources/db/migration/V4__add_new_table.sql
+
+CREATE TABLE new_table (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+# Migration runs automatically on next startup
+./mvnw spring-boot:run
+```
 
 ---
 
-### Dependencies
-
-####  Docker:
-Install according to your operating system:
-
-- Linux (Ubuntu/Debian):
-
-```
-  sudo apt update && sudo apt install docker.io -y
-```
-```
-  sudo systemctl enable --now docker
-```
-
-- Windows/Mac: Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
-####  Docker Compose:
-
-- Linux
-```
-  sudo apt install docker-compose -y
-```
-- Windows/Mac: Docker Compose is already included in Docker Desktop.
-
----
-
-## CORS Configuration
-
-To ensure security and interoperability with frontend applications, this API implements a global Cross-Origin Resource Sharing (CORS) policy.
-
-### How it works:
-1.  **Origin Control:** The API explicitly defines which domains (origins) are allowed to make HTTP/HTTPS requests to its endpoints. This prevents unauthorized sites from accessing your resources.
-2.  **Allowed Methods and Headers:** HTTP methods (GET, POST, PUT, DELETE, OPTIONS) and headers that can be used in cross-origin requests are specified.
-3.  **Credentials:** The configuration allows sending credentials (such as JWT authentication tokens or cookies) in authentication flows.
-
----
-
-## Example
-
----
-## Motivation and Solution
-
-During the academic journey at university, managing grades or even just storing them is a process that can be automated efficiently. However, as each professor and course define their own evaluation methods and performance criteria according to their preferences and approaches, there is great variability and flexibility in this process.
-
-For the application to support these custom definitions, a solution based on regular expression processing was implemented, allowing dynamic identification and manipulation of variables, constants and operators. This way, final grade calculation is automated in a flexible and adaptable manner to different evaluation rules.
-
-Another challenge was implementing this dynamic calculation. The adopted solution uses Reverse Polish Notation (RPN), which eliminates the need for parentheses by defining the correct order of precedence directly in its structure. Additionally, an adaptation of the Shunting Yard algorithm was employed, using stacks and lists as data structures to ensure correct expression evaluation.
-
-```
-^(\d+(([.,])?\d+)?)(?=[\+\-\*\/])|(?<=[\+\-\*\/\(;])(\d+(([.,])?\d+)?)(?=[\+\-\*\/\);])|(?<=[\+\-\*\/])(\d+(([.,])?\d+)?)$|[\+\-\*\/\(\)\;]|(?<=[\+\-\*\/\)\(;])@M(\[\d+\]\()?|^@M(\[\d+\]\()?|(?<!@)\w*[A-Za-z]\w*(\[(\d+(([.,])?\d+)?)\])?
-```
-- Regex engineering tool: [regexr](https://regexr.com/)
-
----
-
-## Adopted Practices
-
-- **Architecture and Design**
-  - REST API with layered architecture
-  - Application of SOLID principles
-  - Dependency Injection
-  - Use of the Data Transfer Object (DTO) pattern
-
-- **Validation and Security**
-  - Custom validations and use of Bean Validation
-  - Implementation of authentication and authorization via JWT
-  - CORS configuration for origin access control
-
-- **Error Handling and Responses**
-  - Standardized error capture and handling
-
-- **Documentation**
-  - API documentation with diagrams and examples
-  - Technical endpoint documentation with OpenAPI 3
-
-- **Testing and Code Quality**
-  - Automated tests with mock creation and separate environment
-
-- **Database**
-  - Relational database modeling with constraint definitions
-  - JPQL and native SQL queries with Spring Data JPA
-
-- **Tools and Deployment**
-  - Use of API Client and Database Client during development
-  - Application encapsulation with Docker, creating custom images and containers
-  - Code versioning with Git
-
-- **CI/CD with GitHub Actions**
-  - The project uses a Continuous Integration (CI) pipeline with GitHub Actions.
-  - With each `push` or `pull request` to the `main` branch, the workflow in `.github/workflows/ci.yml` is triggered.
-  - The pipeline performs code checkout, configures the Java 17 environment and executes the `./mvnw test` command to compile and test the application, ensuring that new changes don't break existing code.
-
-### Technologies
-
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
-- [Maven](https://maven.apache.org/)
-- [H2 DataBase](https://www.h2database.com/html/main.html)
-- [Bean Validation](https://beanvalidation.org/)
-- [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
-- [JUnit](https://junit.org/junit5/)
-- [Mysql](https://dev.mysql.com/downloads/)
-- [Workbench](https://www.mysql.com/products/workbench/)
-- [Postman](https://postman.com/)
-- [Docker](https://www.docker.com/products/docker-hub/)
----
-
-## Observability and Logging
-
-To ensure visibility into application behavior and facilitate problem diagnosis, we implemented a structured logging system and a local observability environment with the ELK Stack.
+## 📊 Monitoring & Observability
 
 ### Structured Logging
 
-The application now generates logs in JSON format, making them easily machine-readable and ideal for processing by log analysis tools.
+#### JSON Log Format
 
-*   **JSON Format**: All logs are emitted in JSON format, using the `logstash-logback-encoder` library. This allows easy ingestion and analysis by systems like Elasticsearch.
-*   **Enriched Context (MDC)**: For authenticated requests, the user's email (`userEmail`) is automatically added to the context of each log (Mapped Diagnostic Context - MDC). This facilitates tracking actions of specific users.
-*   **Detailed Error Logs**: The `GlobalExceptionHandler` has been instrumented to log all captured exceptions at the `ERROR` level, including the complete stack trace, ensuring no error goes unnoticed.
-*   **Request Logs**: The main REST controller endpoints now log `INFO` messages when accessed, providing visibility into the request flow.
+```json
+{
+  "@timestamp": "2025-01-05T10:30:45.123Z",
+  "level": "INFO",
+  "logger_name": "br.com.gustavohenrique.MediasAPI.controller.rest.v1.CourseController",
+  "message": "Creating new course for user 1",
+  "thread_name": "http-nio-8080-exec-1",
+  "userEmail": "john@example.com"
+}
+```
 
-### Local Observability with ELK Stack (Elasticsearch, Logstash, Kibana)
+#### MDC Context
 
-An ELK Stack environment has been configured via `docker-compose` to collect, process and visualize the application's JSON logs locally.
+Automatically adds user email to all logs:
 
-#### Components:
-*   **Elasticsearch**: Stores and indexes JSON logs.
-*   **Logstash**: Receives logs from the application via TCP, processes them and sends them to Elasticsearch.
-*   **Kibana**: Web interface to search, analyze and visualize logs stored in Elasticsearch.
+```java
+// MdcFilter.java
+Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+    String email = auth.getName();
+    MDC.put("userEmail", email);
+}
+```
 
-#### How to Use:
+### ELK Stack Setup
 
-**1. Start the ELK Stack:**
-
-To start only the ELK Stack services (useful when you run the application through the IDE):
+#### Start ELK Services
 
 ```bash
-docker-compose up -d elasticsearch logstash kibana
+# Start full stack
+docker compose up -d
+
+# Start ELK only (run app from IDE)
+docker compose up -d elasticsearch logstash kibana
 ```
 
-To start the complete environment (application, database, Nginx and ELK):
+#### Configure Kibana
+
+1. **Access Kibana**: http://localhost:5601
+
+2. **Create Index Pattern**:
+   - Go to Management → Stack Management → Index Patterns
+   - Click "Create index pattern"
+   - Pattern: `mediasapi-logs-*`
+   - Time field: `@timestamp`
+   - Click "Create"
+
+3. **View Logs**:
+   - Go to Analytics → Discover
+   - Select `mediasapi-logs-*` index
+
+#### Log Queries
+
+**Search by user:**
+```
+userEmail: "john@example.com"
+```
+
+**Filter by level:**
+```
+level: "ERROR"
+```
+
+**Filter by time range:**
+```
+@timestamp: [now-1h TO now]
+```
+
+**Complex query:**
+```
+level: "ERROR" AND userEmail: "john@example.com" AND message: *"calculation"*
+```
+
+### Health Checks
+
+#### Endpoints
 
 ```bash
-docker-compose up -d
+# Overall health
+curl http://localhost:8080/actuator/health
+{
+  "status": "UP",
+  "components": {
+    "db": {
+      "status": "UP",
+      "details": {
+        "database": "MySQL",
+        "validationQuery": "isValid()"
+      }
+    },
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 499963174912,
+        "free": 123456789012,
+        "threshold": 10485760
+      }
+    }
+  }
+}
+
+# Liveness (for K8s)
+curl http://localhost:8080/actuator/health/liveness
+{
+  "status": "UP"
+}
+
+# Readiness (for load balancers)
+curl http://localhost:8080/actuator/health/readiness
+{
+  "status": "UP"
+}
 ```
 
-**2. Access Kibana:**
+#### Docker Health Check
 
-After the containers are up (it may take a few minutes for Elasticsearch and Kibana to be fully ready), access Kibana in your browser:
+Configured in `docker-compose.yml`:
 
+```yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
 ```
-http://localhost:5601
+
+### Metrics (Future Enhancement)
+
+Enable additional actuator endpoints:
+
+```properties
+# application.properties
+management.endpoints.web.exposure.include=health,info,metrics,prometheus
+management.metrics.export.prometheus.enabled=true
 ```
 
-**3. Configure the Index Pattern in Kibana:**
-
-The first time you access Kibana, or if you haven't already:
-*   Go to **Management** (gear icon) -> **Stack Management** -> **Index Patterns**.
-*   Click **Create index pattern**.
-*   In the "Index pattern name" field, type `mediasapi-logs-*` and click **Next step**.
-*   In the "Time field" field, select `@timestamp` and click **Create index pattern**.
-
-**4. View Logs:**
-
-Go to **Analytics** (compass icon) -> **Discover**. You should see the JSON logs from your application.
-
-#### Running the Application:
-
-*   **Via Docker (with `docker-compose up -d`)**: The application (`mediasapi`) will be started with the `docker` profile active, and logs will be automatically sent to the `logstash` service within the Docker network.
-*   **Via IDE (IntelliJ, etc.)**: Start the `MediasApiApplication` class directly. The application will use the default profile, which sends logs to `localhost:5000`. Make sure the ELK Stack is running (step 1) so that Logstash receives the logs.
+Access metrics:
+```bash
+curl http://localhost:8080/actuator/metrics
+curl http://localhost:8080/actuator/prometheus
+```
 
 ---
 
-## Application Monitoring and Health (Health Check)
+## 🔧 Troubleshooting
 
-This project uses **Spring Boot Actuator** to expose endpoints that allow monitoring the application's health and status. This is fundamental for ensuring resilience and observability in a production environment.
+### Common Issues
 
-### Available Endpoints
+#### 1. Application Won't Start
 
-*   **General Health Check:** `GET /actuator/health`
-    *   Returns a detailed status of the application, including database connectivity and disk space.
+**Symptom:** Error on startup about database connection
 
-*   **Liveness Probe:** `GET /actuator/health/liveness`
-    *   Indicates if the application is running (alive). Used by container orchestrators (like Docker and Kubernetes) to decide if a container needs to be restarted.
+```
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+```
 
-*   **Readiness Probe:** `GET /actuator/health/readiness`
-    *   Indicates if the application is ready to accept new requests. Used by load balancers to decide whether or not to send traffic to an application instance.
+**Solution:**
+```bash
+# Check MySQL is running
+docker compose ps
+
+# Check MySQL logs
+docker compose logs mysql
+
+# Wait for MySQL health check
+docker compose up -d mysql
+sleep 30
+docker compose up mediasapi
+```
+
+#### 2. JWT Token Invalid
+
+**Symptom:** 401 Unauthorized on authenticated endpoints
+
+```json
+{
+  "statusCode": 401,
+  "error": "Invalid JWT token"
+}
+```
+
+**Solution:**
+- Verify JWT keys are correctly set in environment
+- Check token hasn't expired
+- Ensure `Authorization: Bearer <token>` header format
+
+```bash
+# Test authentication
+curl -X POST https://localhost/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"pass123"}'
+
+# Use returned token
+curl -X GET https://localhost/api/v1/users \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+#### 3. Flyway Migration Fails
+
+**Symptom:** Error about migration checksum mismatch
+
+```
+FlywayException: Validate failed: Migration checksum mismatch
+```
+
+**Solution (Development Only):**
+```bash
+# Stop application
+docker compose down
+
+# Remove database volume
+docker volume rm mediasapi_mysql-data
+
+# Restart
+docker compose up -d
+```
+
+**Production:** Never modify applied migrations. Create new migration to fix.
+
+#### 4. CORS Errors
+
+**Symptom:** Browser console shows CORS policy error
+
+```
+Access to XMLHttpRequest blocked by CORS policy
+```
+
+**Solution:**
+
+Edit `src/main/java/.../config/CorsConfig.java`:
+```java
+configuration.setAllowedOrigins(Arrays.asList(
+    "http://localhost:3000",
+    "https://yourfrontend.com"
+));
+```
+
+Rebuild and restart application.
+
+#### 5. SSL Certificate Warning
+
+**Symptom:** Browser shows "Your connection is not private"
+
+**Solution (Development):**
+- This is expected with self-signed certificates
+- Click "Advanced" → "Proceed to localhost (unsafe)"
+
+**Solution (Production):**
+- Replace with Let's Encrypt certificate
+- See [SSL/TLS Configuration](#ssltls-configuration)
+
+#### 6. Formula Parsing Error
+
+**Symptom:** 400 Bad Request when creating course
+
+```json
+{
+  "error": "Method for calculating averages not accepted, formula terms are invalid"
+}
+```
+
+**Solution:**
+- Check formula syntax: [regexr.com](https://regexr.com/)
+- Ensure identifiers contain at least one letter
+- Verify parentheses are balanced
+- Use semicolons `;` in `@M[n](...)` function
+
+**Valid:**
+```
+(P1 + P2) / 2
+@M[3](A1;A2;A3;A4)
+(0.4 * EXAM1[20]) + (0.6 * EXAM2)
+```
+
+**Invalid:**
+```
+P1 + P2 / 2            # Missing parentheses for precedence
+@M[3](A1,A2,A3)        # Commas instead of semicolons
+0.4 * 123              # Identifier "123" has no letters
+```
+
+#### 7. Logs Not Appearing in Kibana
+
+**Symptom:** No logs visible in Kibana Discover
+
+**Solution:**
+```bash
+# Check Logstash is receiving logs
+docker compose logs logstash | grep "Pipeline started"
+
+# Check Elasticsearch
+curl http://localhost:9200/_cat/indices
+# Should see mediasapi-logs-* indices
+
+# Verify index pattern in Kibana
+# Management → Index Patterns → mediasapi-logs-*
+
+# Check application is sending logs
+docker compose logs mediasapi | tail -20
+```
+
+#### 8. Out of Memory Error
+
+**Symptom:** Application crashes with OOM
+
+```
+java.lang.OutOfMemoryError: Java heap space
+```
+
+**Solution:**
+
+Edit `docker-compose.yml`:
+```yaml
+services:
+  mediasapi:
+    environment:
+      JAVA_OPTS: "-Xms512m -Xmx2g"
+```
+
+Or run locally:
+```bash
+export MAVEN_OPTS="-Xmx2g"
+./mvnw spring-boot:run
+```
+
+### Debug Mode
+
+Enable debug logging:
+
+```properties
+# application.properties
+logging.level.br.com.gustavohenrique.MediasAPI=DEBUG
+logging.level.org.springframework.security=DEBUG
+logging.level.org.hibernate.SQL=DEBUG
+```
+
+### Getting Help
+
+1. **Check Logs**: Always check application and Docker logs first
+2. **GitHub Issues**: [Report bugs](https://github.com/GustavoDaMassa/MediasAPI/issues)
+3. **Documentation**: Review this README and CLAUDE.md
+4. **Swagger UI**: Test endpoints at https://localhost/swagger-ui/index.html
+
+---
+
+## 📚 Additional Resources
+
+### Official Documentation
+
+- [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
+- [Spring Security Reference](https://docs.spring.io/spring-security/reference/)
+- [Spring Data JPA Guide](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+- [Flyway Documentation](https://flywaydb.org/documentation/)
+- [Docker Compose Reference](https://docs.docker.com/compose/)
+
+### Related Projects
+
+- **.NET Implementation**: [dotNetMediasAPI](https://github.com/GustavoDaMassa/dotNetMediasAPI)
+- **Node.js Implementation**: [nodeMediasAPI](https://github.com/GustavoDaMassa/nodeMediasAPI)
+
+### Tools
+
+- **API Testing**: [Postman](https://www.postman.com/)
+- **Database Client**: [MySQL Workbench](https://www.mysql.com/products/workbench/)
+- **Regex Testing**: [RegExr](https://regexr.com/)
+- **JWT Decoder**: [jwt.io](https://jwt.io/)
+
+### CI/CD
+
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+```yaml
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+      - name: Build and Test
+        run: ./mvnw clean test
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👤 Author
+
+**Gustavo Henrique**
+- GitHub: [@GustavoDaMassa](https://github.com/GustavoDaMassa)
+- Email: gustavo.pereira@discente.ufg.br
+
+---
+
+## 🙏 Acknowledgments
+
+- Federal University of Goiás (UFG)
+- Spring Boot Community
+- Open Source Contributors
