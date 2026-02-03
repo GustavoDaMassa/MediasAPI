@@ -1,0 +1,33 @@
+# =============================================================================
+# MediasAPI Terraform Variables Example
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in the values
+# NEVER commit terraform.tfvars to version control!
+# =============================================================================
+
+# AWS region
+aws_region = "us-east-1"
+
+# Your IP address for SSH access (get from: curl ifconfig.me)
+# Format: "YOUR_IP/32"
+admin_ip_cidr = "0.0.0.0/32"
+
+# Name of the EC2 key pair (must be created in AWS first)
+ec2_key_pair_name = "mediasapi-key"
+
+# Database password (use a strong password)
+db_password = "your-secure-database-password"
+
+# JWT Keys (get from your existing keys or generate new ones)
+# Note: For multi-line keys, use heredoc syntax or escape newlines
+#
+# Example with heredoc:
+# jwt_public_key_content = <<-EOT
+# -----BEGIN PUBLIC KEY-----
+# MIIBIjANBgkqhki...
+# -----END PUBLIC KEY-----
+# EOT
+
+jwt_public_key_content = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhki...\n-----END PUBLIC KEY-----"
+
+jwt_private_key_content = "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgk...\n-----END PRIVATE KEY-----"
