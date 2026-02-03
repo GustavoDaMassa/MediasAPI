@@ -42,3 +42,10 @@ src/test/resources/application-local.properties
 ### AI-generated documentation ###
 CLAUDE.md
 GEMINI.md
+
+### Terraform ###
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.terraform/
+infra/.terraform.lock.hcl
+terraform.tfvars
