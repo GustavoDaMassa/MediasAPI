@@ -10,40 +10,49 @@
     <!-- Appender for JSON logs to the console (stdout) -->
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <!-- Add the application name as a custom field in the JSON output -->
             <customFields>{"app_name":"${springAppName}"}</customFields>
             <includeMdc>true</includeMdc>
         </encoder>
     </appender>
 
-    <!-- Appender for sending JSON logs to Logstash via TCP -->
+    <!-- Appender for sending JSON logs to Logstash via TCP (only for docker profile) -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5000</destination> <!-- Default for local development -->
-        <springProfile name="docker">
-            <destination>logstash:5000</destination> <!-- Override for docker environment -->
-        </springProfile>
+        <destination>logstash:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"app_name":"${springAppName}"}</customFields>
             <includeMdc>true</includeMdc>
         </encoder>
     </appender>
 
-    <!--
-    Appender for plain text logs to the console. Useful for local development if JSON is too verbose.
-    <appender name="STDOUT_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
-    -->
+    <!-- Production profile: only STDOUT_JSON (CloudWatch captures via awslogs driver) -->
+    <springProfile name="prod">
+        <root level="WARN">
+            <appender-ref ref="STDOUT_JSON"/>
+        </root>
+        <logger name="br.com.gustavohenrique.MediasAPI" level="INFO"/>
+        <logger name="org.flywaydb" level="INFO"/>
+    </springProfile>
 
-    <!-- Root logger configuration -->
-    <root level="INFO">
-        <!-- Use STDOUT_JSON to enable structured logging -->
-        <appender-ref ref="STDOUT_JSON"/>
-        <!-- Add LOGSTASH appender to send logs to Logstash -->
-        <appender-ref ref="LOGSTASH"/>
-        <!-- <appender-ref ref="STDOUT_PLAIN"/> -->
-    </root>
+    <!-- Docker profile: STDOUT_JSON + Logstash TCP (for ELK Stack) -->
+    <springProfile name="docker">
+        <root level="INFO">
+            <appender-ref ref="STDOUT_JSON"/>
+            <appender-ref ref="LOGSTASH"/>
+        </root>
+    </springProfile>
+
+    <!-- Default profile (local development): only STDOUT_JSON -->
+    <springProfile name="default">
+        <root level="INFO">
+            <appender-ref ref="STDOUT_JSON"/>
+        </root>
+    </springProfile>
+
+    <!-- Fallback for any other profiles -->
+    <springProfile name="!prod,!docker,!default">
+        <root level="INFO">
+            <appender-ref ref="STDOUT_JSON"/>
+        </root>
+    </springProfile>
 
 </configuration>
