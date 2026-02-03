@@ -1,0 +1,52 @@
+# Production Profile Configuration
+# This profile is optimized for AWS deployment with RDS MySQL and CloudWatch logging
+
+spring:
+  # Database - Uses RDS MySQL (configured via environment variables)
+  datasource:
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+      pool-name: MediasAPI-HikariPool
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # Flyway migrations
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+# Swagger/OpenAPI - Disabled in production
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Logging - Reduced verbosity for production
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate: WARN
+    br.com.gustavohenrique.MediasAPI: INFO
+    org.flywaydb: INFO
+
+# Actuator - Health endpoints for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
