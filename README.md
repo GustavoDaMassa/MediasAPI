@@ -783,9 +783,10 @@ docker compose down
 ```
 ### Aplicação no ar
 
-  Após executada você pode navegar por ela realizando requisições através do:
- ### - [Swagger do projeto](https://localhost/swagger-ui/index.html)
-  - ou por algum API Client de preferência em **https://localhost**
+  **Produção:** `https://mediasapi.duckdns.org`
+
+  **Local:** `https://localhost`
+  - [Swagger UI (local)](https://localhost/swagger-ui/index.html)
 
 ---
 
