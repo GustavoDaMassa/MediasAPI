@@ -172,10 +172,13 @@ A production-ready REST API for academic performance management with dynamic gra
 - **SpringDoc OpenAPI 3** - API specification (Swagger UI)
 - **Bean Validation** - Request/Response validation
 
-### Infrastructure
-- **Docker & Docker Compose** - Containerization
-- **Nginx** - Reverse proxy and SSL termination
-- **ELK Stack** - Centralized logging (Elasticsearch, Logstash, Kibana)
+### Infrastructure & Cloud
+- **Docker & Docker Compose** - Containerization with multi-stage builds
+- **Nginx** - Reverse proxy and SSL termination (separate configs for dev/prod)
+- **Terraform** - Infrastructure as Code for AWS provisioning
+- **AWS** - EC2, RDS MySQL, SSM Parameter Store, IAM, CloudWatch
+- **Let's Encrypt** - Valid SSL certificate with auto-renewal via Certbot
+- **ELK Stack** - Centralized logging for local development (Elasticsearch, Logstash, Kibana)
 
 ### Observability
 - **Spring Boot Actuator** - Health checks and metrics
@@ -188,8 +191,9 @@ A production-ready REST API for academic performance management with dynamic gra
 - **Spring Boot Test** - Integration testing
 
 ### DevOps
-- **GitHub Actions** - CI/CD pipeline
-- **Docker Hub** - Container registry
+- **GitHub Actions** - Full CI/CD pipeline (test, build, push, deploy)
+- **Docker Hub** - Container registry with commit SHA tagging
+- **Terraform** - Infrastructure provisioning and management
 
 ---
 
@@ -460,9 +464,9 @@ DATABASE_PASSWORD=pass
 
 ### Base URL
 ```
-Production: https://localhost
-Development: http://localhost:8080
-Swagger UI: https://localhost/swagger-ui/index.html
+Production:  https://mediasapi.duckdns.org
+Local:       https://localhost
+Swagger UI:  https://localhost/swagger-ui/index.html (local only)
 ```
 
 ### API Versioning
@@ -1067,16 +1071,6 @@ docker compose down
 # Clean restart (removes volumes)
 docker compose down -v
 docker compose up --build -d
-```
-
-#### Option 2: Pre-built Image
-
-```bash
-# Download docker-compose.yaml
-curl -O https://raw.githubusercontent.com/GustavoDaMassa/MediasAPI/main/docker-compose.yaml
-
-# Start services
-docker compose up -d
 ```
 
 #### Services
@@ -1782,29 +1776,61 @@ logging.level.org.hibernate.SQL=DEBUG
 - **Regex Testing**: [RegExr](https://regexr.com/)
 - **JWT Decoder**: [jwt.io](https://jwt.io/)
 
-### CI/CD
+### AWS Production Infrastructure (Terraform)
 
-GitHub Actions workflow: `.github/workflows/ci.yml`
+The production environment is fully provisioned with **Terraform** (Infrastructure as Code):
 
-```yaml
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-      - name: Build and Test
-        run: ./mvnw clean test
 ```
+┌─────────────────────────────────────────────────────────────┐
+│                        AWS Cloud                              │
+│                                                               │
+│   ┌─────────────────┐         ┌──────────────────────────┐  │
+│   │  EC2 t3.micro   │         │  RDS db.t3.micro         │  │
+│   │  ┌───────────┐  │         │  MySQL 8.0               │  │
+│   │  │   Nginx   │  │  :3306  │  Encrypted, managed      │  │
+│   │  │ :80/:443  │──┼────────▶│  Auto backup             │  │
+│   │  └───────────┘  │         └──────────────────────────┘  │
+│   │  ┌───────────┐  │                                        │
+│   │  │ MediasAPI │  │◀────────┐ SSM Parameter Store         │
+│   │  │  :8080    │  │         │ (Secrets management)        │
+│   │  └───────────┘  │         └─────────────────────────────│
+│   │  Docker Compose  │                                        │
+│   └─────────────────┘                                        │
+│   Elastic IP (static)                                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Resources provisioned:**
+- **EC2 t3.micro** - Application server running Docker + Nginx
+- **RDS db.t3.micro** - Managed MySQL 8.0 (encrypted, private, auto backup)
+- **SSM Parameter Store** - Secure storage for database credentials and JWT keys
+- **IAM Role** - Least-privilege access for EC2 to read SSM and write CloudWatch
+- **Security Groups** - Network-level access control (EC2 and RDS)
+- **Elastic IP** - Stable public IP address
+- **CloudWatch Log Group** - Centralized log storage
+
+All resources fit within the **AWS Free Tier** (12 months).
+
+See [`infra/README.md`](infra/README.md) for Terraform configuration details.
+
+### CI/CD Pipeline (GitHub Actions)
+
+Full automated pipeline triggered on every push to `main`:
+
+```
+git push → Test → Build Docker Image → Push to Docker Hub → Deploy to EC2
+```
+
+| Stage | Trigger | What it does |
+|-------|---------|--------------|
+| **Test** | Push or PR to `main` | Runs `./mvnw test` with JDK 17 |
+| **Build & Push** | Push to `main` only | Builds Docker image, pushes to Docker Hub with commit SHA tag |
+| **Deploy** | Push to `main` only | Copies configs to EC2 via SSH, fetches secrets from SSM, pulls new image, restarts containers |
+| **Health Check** | After deploy | Verifies application responds on HTTPS |
+
+Each deploy creates a tagged image (e.g., `gustavodamassa/medias-api:3df6f15`), enabling instant rollback by changing the tag.
+
+Pull requests only run tests — no deployment occurs.
 
 ---
 

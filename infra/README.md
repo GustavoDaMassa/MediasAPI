@@ -87,17 +87,15 @@ terraform apply
 # SSH into EC2
 ssh -i mediasapi-key.pem ec2-user@$(terraform output -raw ec2_public_ip)
 
-# On EC2: Fetch secrets from SSM
-/opt/mediasapi/fetch-secrets.sh
+# Copy deployment files to EC2
+scp docker-compose.prod.yml start.sh ec2-user@<EC2_IP>:/opt/mediasapi/
+scp nginx/nginx.prod.conf ec2-user@<EC2_IP>:/opt/mediasapi/nginx/
 
-# Clone docker-compose.prod.yml and nginx config
-# (Or use CI/CD to deploy)
-cd /opt/mediasapi
-# ... copy docker-compose.prod.yml and nginx/nginx.conf
-
-# Start application
-docker compose -f docker-compose.prod.yml up -d
+# On EC2: Start application (fetches secrets from SSM and starts containers)
+/opt/mediasapi/start.sh
 ```
+
+Or let the **CI/CD pipeline** handle deployments automatically on every push to `main`.
 
 ## Outputs
 
@@ -122,7 +120,7 @@ After `terraform apply`, you'll see:
 
 ## Security Considerations
 
-1. **SSH Access**: Limited to your IP only (`admin_ip_cidr`)
+1. **SSH Access**: Key-pair authentication only (password auth disabled)
 2. **RDS**: Private, not publicly accessible
 3. **Secrets**: Stored in SSM Parameter Store (SecureString)
 4. **Encryption**: EBS and RDS storage encrypted
@@ -143,7 +141,7 @@ terraform destroy
 | `main.tf` | Main infrastructure configuration |
 | `variables.tf` | Input variables |
 | `outputs.tf` | Output values |
-| `user-data.sh` | EC2 initialization script |
+| `user-data.sh` | EC2 initialization script (installs Docker, creates start.sh) |
 | `terraform.tfvars.example` | Example variables file |
 
 ## Troubleshooting

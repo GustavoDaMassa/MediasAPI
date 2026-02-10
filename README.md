@@ -781,36 +781,26 @@ docker compose up --build -d
 ```
 docker compose down
 ```
-### Opção 2
- **caso deseje rodar com mais facilidade sem a necessidade de clonar o repositório**
+### Aplicação no ar
 
-- Baixe o arquivo  [docker compose](./Compose%20docker%20/docker-compose.yaml)
-  - esse arquivo cria uma instância da aplicação de acordo com a versão mais recente presente no repositório [docker hub](https://hub.docker.com/r/gustavodamassa/medias-api/tags);
-  - **mantenha o nome do arquivo.**
-- execute o seguinte comando no repositório em que o arquivo foi baixado
-```
-docker compose up
-```
-### Aplicação no ar 
-
-  após executada você pode navegar por ela realizando requisições através do:
+  Após executada você pode navegar por ela realizando requisições através do:
  ### - [Swagger do projeto](https://localhost/swagger-ui/index.html)
   - ou por algum API Client de preferência em **https://localhost**
 
 ---
 
-## Configuração HTTPS com Nginx (Docker)
+## Configuração HTTPS com Nginx
 
-Para garantir a segurança da comunicação, a API é exposta via HTTPS em ambiente Docker, utilizando o Nginx como um reverse proxy.
+A API é exposta via HTTPS utilizando o Nginx como reverse proxy, com configurações separadas para cada ambiente.
 
 ### Como funciona:
 1.  **Nginx como Reverse Proxy:** O Nginx intercepta todas as requisições externas na porta 443 (HTTPS).
-2.  **Terminação SSL:** O Nginx é responsável por descriptografar o tráfego HTTPS e encaminhá-lo para a aplicação Spring Boot (que roda internamente em HTTP na porta 8080) dentro da rede Docker.
+2.  **Terminação SSL:** O Nginx descriptografa o tráfego HTTPS e encaminha para a aplicação Spring Boot (HTTP na porta 8080).
 3.  **Redirecionamento HTTP para HTTPS:** Qualquer tentativa de acesso via HTTP (porta 80) é automaticamente redirecionada para HTTPS.
 
 ### Certificados SSL:
-*   **Desenvolvimento Local:** Para facilitar o desenvolvimento, um certificado SSL autoassinado é gerado e utilizado pelo Nginx. Ao acessar `https://localhost`, seu navegador exibirá um aviso de segurança, que pode ser ignorado com segurança para fins de desenvolvimento.
-*   **Produção:** Em um ambiente de produção, é **essencial** substituir o certificado autoassinado por um certificado emitido por uma Autoridade Certificadora (CA) confiável, como o Let's Encrypt. Isso garante que os usuários não recebam avisos de segurança e que a comunicação seja totalmente segura e verificada.
+*   **Desenvolvimento Local:** Certificado SSL autoassinado utilizado pelo Nginx (`nginx/nginx.conf`). Ao acessar `https://localhost`, o navegador exibirá um aviso de segurança que pode ser ignorado para fins de desenvolvimento.
+*   **Produção:** Certificado válido emitido pelo **Let's Encrypt** com renovação automática via Certbot (`nginx/nginx.prod.conf`). Acesse a aplicação em produção sem nenhum aviso de segurança.
 
 ---
 
@@ -896,29 +886,51 @@ Outro desafio foi a implementação desse cálculo dinâmico. A solução adotad
   - Modelagem do banco de dados relacional com definições de constraints
   - Consultas JPQL e SQL nativo com Spring Data JPA
 
-- **Ferramentas e Deploy**
-  - Uso de API Client e Database Client durante o desenvolvimento
-  - Encapsulamento da aplicação com Docker, criando imagens e containers personalizados
+- **Infraestrutura como Código (IaC)**
+  - Provisionamento completo da infraestrutura AWS com Terraform
+  - EC2, RDS, Security Groups, IAM Roles, SSM Parameter Store, CloudWatch
+  - Reprodutível e versionado
+
+- **Cloud (AWS Free Tier)**
+  - EC2 t3.micro como servidor de aplicação com Docker
+  - RDS MySQL 8.0 gerenciado (backup automático, patching, storage criptografado)
+  - SSM Parameter Store para gestão segura de secrets
+  - Elastic IP para endereço público estável
+  - CloudWatch para centralização de logs
+
+- **CI/CD Completo com GitHub Actions**
+  - Pipeline automatizado a cada push na branch `main`
+  - Etapas: testes automatizados, build da imagem Docker, push ao Docker Hub e deploy na EC2 via SSH
+  - Cada deploy gera uma imagem com tag do commit SHA para rastreabilidade e rollback
+  - Pull requests executam apenas os testes, sem deploy
+
+- **Certificado SSL (Let's Encrypt)**
+  - Certificado válido em produção com renovação automática via Certbot
+  - Certificado autoassinado para desenvolvimento local
+
+- **Containerização e Deploy**
+  - Multi-stage Dockerfile (build com Maven + runtime com JRE)
+  - Docker Compose separado para desenvolvimento local e produção
+  - Nginx como reverse proxy com configurações por ambiente
   - Versionamento de código com Git
 
-- **CI/CD com GitHub Actions**
-  - O projeto utiliza um pipeline de Integração Contínua (CI) com GitHub Actions.
-  - A cada `push` ou `pull request` para o branch `main`, o workflow em `.github/workflows/ci.yml` é acionado.
-  - O pipeline realiza o checkout do código, configura o ambiente Java 17 e executa o comando `./mvnw test` para compilar e testar a aplicação, garantindo que novas alterações não quebrem o código existente.
-  
 ### Tecnologias
 
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [SpringDoc OpenAPI 3](https://springdoc.org/v2/#spring-webflux-support)
 - [Maven](https://maven.apache.org/)
+- [Flyway](https://flywaydb.org/)
 - [H2 DataBase](https://www.h2database.com/html/main.html)
 - [Bean Validation](https://beanvalidation.org/)
 - [Spring Security](https://docs.spring.io/spring-security/reference/index.html)
 - [JUnit](https://junit.org/junit5/)
-- [Mysql](https://dev.mysql.com/downloads/)
-- [Workbench](https://www.mysql.com/products/workbench/)
-- [Postman](https://postman.com/)
+- [MySQL](https://dev.mysql.com/downloads/)
 - [Docker](https://www.docker.com/products/docker-hub/)
+- [Nginx](https://nginx.org/)
+- [Terraform](https://www.terraform.io/)
+- [AWS](https://aws.amazon.com/) (EC2, RDS, SSM, IAM, CloudWatch)
+- [GitHub Actions](https://github.com/features/actions)
+- [Let's Encrypt](https://letsencrypt.org/)
 ---
 
 ## Observabilidade e Logging
