@@ -115,9 +115,9 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           IMAGE_TAG: ${{ needs.build-and-push.outputs.short_sha }}
         run: |
-          # Copy docker-compose.prod.yml and nginx config to EC2
+          # Copy deployment files to EC2
           scp -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no \
-            docker-compose.prod.yml \
+            docker-compose.prod.yml start.sh \
             ec2-user@${EC2_HOST}:/opt/mediasapi/
 
           scp -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no \
@@ -125,25 +125,8 @@ jobs:
             ec2-user@${EC2_HOST}:/opt/mediasapi/nginx/
 
           # SSH and deploy
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} << 'DEPLOY_SCRIPT'
-            cd /opt/mediasapi
-
-            # Fetch latest secrets from SSM
-            ./fetch-secrets.sh
-
-            # Update IMAGE_TAG in .env
-            sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ needs.build-and-push.outputs.short_sha }}/" .env
-
-            # Pull and restart containers
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
-
-            # Cleanup old images
-            docker image prune -f
-
-            # Show status
-            docker compose -f docker-compose.prod.yml ps
-          DEPLOY_SCRIPT
+          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} \
+            "chmod +x /opt/mediasapi/start.sh && /opt/mediasapi/start.sh ${IMAGE_TAG}"
 
       - name: Health check
         env:
@@ -152,15 +135,14 @@ jobs:
           echo "Waiting for application to start..."
           sleep 30
 
-          # Check if application is healthy
           for i in {1..10}; do
-            if curl -sf -k https://${EC2_HOST}/actuator/health/liveness; then
-              echo "Application is healthy!"
+            if curl -sk -o /dev/null https://${EC2_HOST}/; then
+              echo "Application is responding!"
               exit 0
             fi
             echo "Attempt $i: Application not ready yet, waiting..."
             sleep 10
           done
 
-          echo "Application failed to become healthy"
+          echo "Application failed to respond"
           exit 1

@@ -1,40 +1,10 @@
 #!/bin/bash
 # =============================================================================
-# MediasAPI EC2 User Data Script
-# Amazon Linux 2023
+# MediasAPI Deploy Script
+# Fetches secrets from AWS SSM Parameter Store and starts containers
+# Usage: ./start.sh [IMAGE_TAG]
 # =============================================================================
 
-set -e
-
-# Update system packages
-dnf update -y
-
-# Install Docker
-dnf install -y docker
-systemctl enable docker
-systemctl start docker
-
-# Add ec2-user to docker group
-usermod -aG docker ec2-user
-
-# Install Docker Compose v2 (as Docker plugin)
-mkdir -p /usr/local/lib/docker/cli-plugins
-curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
-# Create application directory
-mkdir -p /opt/mediasapi/nginx/certs
-chown -R ec2-user:ec2-user /opt/mediasapi
-
-# Install AWS CLI (for SSM parameter retrieval)
-dnf install -y awscli
-
-# Install jq for JSON parsing
-dnf install -y jq
-
-# Create deploy script (fetches secrets from SSM and starts containers)
-cat > /opt/mediasapi/start.sh << 'SCRIPT'
-#!/bin/bash
 set -e
 
 REGION="us-east-1"
@@ -42,9 +12,12 @@ cd /opt/mediasapi
 
 echo "Fetching secrets from SSM Parameter Store..."
 
+# Database connection (Spring Boot relaxed binding format)
 export SPRING_DATASOURCE_URL="$(aws ssm get-parameter --name '/mediasapi/DATABASE_URL' --with-decryption --region $REGION --query 'Parameter.Value' --output text)?useSSL=false&allowPublicKeyRetrieval=true"
 export SPRING_DATASOURCE_USERNAME="$(aws ssm get-parameter --name '/mediasapi/DATABASE_USERNAME' --with-decryption --region $REGION --query 'Parameter.Value' --output text)"
 export SPRING_DATASOURCE_PASSWORD="$(aws ssm get-parameter --name '/mediasapi/DATABASE_PASSWORD' --with-decryption --region $REGION --query 'Parameter.Value' --output text)"
+
+# JWT keys: remove newlines for Docker Compose YAML compatibility
 export JWT_PUBLIC_KEY_CONTENT=$(aws ssm get-parameter --name '/mediasapi/JWT_PUBLIC_KEY_CONTENT' --with-decryption --region $REGION --query 'Parameter.Value' --output text | tr -d '\n')
 export JWT_PRIVATE_KEY_CONTENT=$(aws ssm get-parameter --name '/mediasapi/JWT_PRIVATE_KEY_CONTENT' --with-decryption --region $REGION --query 'Parameter.Value' --output text | tr -d '\n')
 
@@ -55,22 +28,8 @@ echo "Secrets loaded. Starting containers with IMAGE_TAG=$IMAGE_TAG..."
 docker compose -f docker-compose.prod.yml pull
 docker compose -f docker-compose.prod.yml up -d
 
+# Cleanup old images
 docker image prune -f
 
 echo "Deploy complete. Container status:"
 docker compose -f docker-compose.prod.yml ps
-SCRIPT
-
-chmod +x /opt/mediasapi/start.sh
-chown ec2-user:ec2-user /opt/mediasapi/start.sh
-
-# Generate self-signed SSL certificate for Nginx
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout /opt/mediasapi/nginx/certs/nginx.key \
-  -out /opt/mediasapi/nginx/certs/nginx.crt \
-  -subj "/C=BR/ST=SP/L=SaoPaulo/O=MediasAPI/CN=localhost"
-
-chown -R ec2-user:ec2-user /opt/mediasapi/nginx/certs
-
-# Log completion
-echo "EC2 user-data script completed at $(date)" >> /var/log/user-data.log

@@ -72,13 +72,13 @@ resource "aws_security_group" "ec2_sg" {
   description = "Security group for MediasAPI EC2 instance"
   vpc_id      = data.aws_vpc.default.id
 
-  # SSH from admin IP only
+  # SSH (open for CI/CD GitHub Actions and admin access)
   ingress {
-    description = "SSH from admin IP"
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.admin_ip_cidr]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # HTTP
@@ -310,7 +310,7 @@ resource "aws_db_instance" "mysql" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   publicly_accessible    = false
 
-  backup_retention_period = 7
+  backup_retention_period = 1
   backup_window           = "03:00-04:00"
   maintenance_window      = "Mon:04:00-Mon:05:00"
 

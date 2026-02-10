@@ -90,7 +90,7 @@ Before pushing to trigger the pipeline:
 - SSH into EC2 manually and check:
   - Docker is running: `sudo systemctl status docker`
   - `/opt/mediasapi` directory exists
-  - `fetch-secrets.sh` script is executable
+  - `start.sh` script is executable
 
 ## Security Best Practices
 
