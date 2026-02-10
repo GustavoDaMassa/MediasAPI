@@ -121,7 +121,7 @@ jobs:
             ec2-user@${EC2_HOST}:/opt/mediasapi/
 
           scp -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no \
-            nginx/nginx.conf \
+            nginx/nginx.prod.conf \
             ec2-user@${EC2_HOST}:/opt/mediasapi/nginx/
 
           # SSH and deploy
