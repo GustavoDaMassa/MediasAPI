@@ -13,10 +13,11 @@ services:
     networks:
       - medias-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "mediasapi", "-p${DATABASE_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DATABASE_ROOT_PASSWORD}"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
   mediasapi:
     image: gustavodamassa/medias-api:${IMAGE_TAG:-latest}
