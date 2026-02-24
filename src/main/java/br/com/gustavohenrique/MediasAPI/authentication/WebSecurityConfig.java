@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -18,6 +19,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/web/**", "/login", "/logout")
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable) // Simplificando para o exemplo, considere habilitar em produção
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/web/login", "/web/register", "/css/**", "/web/").permitAll();
