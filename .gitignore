@@ -33,7 +33,7 @@ build/
 ### VS Code ###
 .vscode/
 .env
-!.env.example
+.env.example
 src/main/resources/app.key
 src/main/resources/app.pub
 *.base64
