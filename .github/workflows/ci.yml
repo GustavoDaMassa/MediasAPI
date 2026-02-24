@@ -2,8 +2,9 @@
 # MediasAPI CI/CD Pipeline
 # =============================================================================
 # Triggers:
-#   - Push to main: Build, Test, Push to Docker Hub, Deploy to EC2
+#   - Push to main: Build, Test, Push to Docker Hub
 #   - Pull Request to main: Build and Test only
+# Deploy: handled automatically by Watchtower on home server
 # =============================================================================
 
 name: CI/CD Pipeline
@@ -51,10 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      short_sha: ${{ steps.vars.outputs.short_sha }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,10 +64,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Get short SHA
-        id: vars
-        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Docker meta
         id: meta
@@ -89,60 +82,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  # ===========================================================================
-  # Deploy to EC2
-  # ===========================================================================
-  deploy:
-    name: Deploy to EC2
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
-          chmod 600 ~/.ssh/ec2_key.pem
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Deploy to EC2
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          IMAGE_TAG: ${{ needs.build-and-push.outputs.short_sha }}
-        run: |
-          # Copy deployment files to EC2
-          scp -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no \
-            docker-compose.prod.yml start.sh \
-            ec2-user@${EC2_HOST}:/opt/mediasapi/
-
-          scp -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no \
-            nginx/nginx.prod.conf \
-            ec2-user@${EC2_HOST}:/opt/mediasapi/nginx/
-
-          # SSH and deploy
-          ssh -i ~/.ssh/ec2_key.pem -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} \
-            "chmod +x /opt/mediasapi/start.sh && /opt/mediasapi/start.sh ${IMAGE_TAG}"
-
-      - name: Health check
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-        run: |
-          echo "Waiting for application to start..."
-          sleep 30
-
-          for i in {1..10}; do
-            if curl -sk -o /dev/null https://${EC2_HOST}/; then
-              echo "Application is responding!"
-              exit 0
-            fi
-            echo "Attempt $i: Application not ready yet, waiting..."
-            sleep 10
-          done
-
-          echo "Application failed to respond"
-          exit 1
