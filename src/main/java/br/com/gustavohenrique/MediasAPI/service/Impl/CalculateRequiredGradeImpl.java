@@ -30,8 +30,24 @@ public class CalculateRequiredGradeImpl implements ICalculateRequiredGrade {
     public void calculateRequiredGrade(Projection projection, Course course){
 
         var polishNotation = convertToPolishNotation.convertToPolishNotation(course.getAverageMethod());
-        double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
         double cutOffGrade = course.getCutOffGrade();
+
+        // Verifica se a nota de corte ainda é atingível simulando todas as avaliações pendentes na nota máxima
+        double maxPossible = simulationResult.simulate(Double.MAX_VALUE, projection, polishNotation);
+        if (maxPossible < cutOffGrade) {
+            for (int j = 0; j < polishNotation.size(); j++) {
+                if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")) {
+                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
+                            .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?", ""), projection.getId());
+                    if (!assessment.isFixed()) assessment.setRequiredGrade(-1);
+                    else assessment.setRequiredGrade(0.00);
+                    assessmentRepository.save(assessment);
+                }
+            }
+            return;
+        }
+
+        double biggerMaxValue = assessmentRepository.getBiggerMaxValue(projection.getId());
         double requiredGrade = 0;
         double result = 0;
         int i;
@@ -59,27 +75,14 @@ public class CalculateRequiredGradeImpl implements ICalculateRequiredGrade {
                 }
             }
         }
-        if(result<cutOffGrade){//------------------ tratar caso em que a nota de corte não vai ser alcançada
-            for (int j = 0; j < polishNotation.size(); j++) {
-                if(polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")) {
-                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
-                            .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""), projection.getId());
-                    if (!assessment.isFixed())assessment.setRequiredGrade(assessment.getMaxValue());
-                    else assessment.setRequiredGrade(0.00);
-                    assessmentRepository.save(assessment);
-                }
-            }
-        }
-        else {
-            for (int j = 0; j < polishNotation.size(); j++) {
-                if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                    var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
-                            .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
-                    if (!assessment.isFixed())
-                        assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
-                    else assessment.setRequiredGrade(0.00);
-                    assessmentRepository.save(assessment);
-                }
+        for (int j = 0; j < polishNotation.size(); j++) {
+            if (polishNotation.get(j).matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
+                var assessment = assessmentRepository.findByIndentifier(polishNotation.get(j)
+                        .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId());
+                if (!assessment.isFixed())
+                    assessment.setRequiredGrade(Double.min(requiredGrade,assessment.getMaxValue()));
+                else assessment.setRequiredGrade(0.00);
+                assessmentRepository.save(assessment);
             }
         }
     }
