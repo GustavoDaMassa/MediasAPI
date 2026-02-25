@@ -11,6 +11,9 @@ services:
       JWT_PUBLIC_KEY_CONTENT: ${JWT_PUBLIC_KEY_CONTENT}
       JWT_PRIVATE_KEY_CONTENT: ${JWT_PRIVATE_KEY_CONTENT}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+    ports:
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
