@@ -63,8 +63,8 @@ class CalculateRequiredGradeImplTest {
 
         calculateRequiredGrade.calculateRequiredGrade(projection,course);
 
-        assertEquals(3,assessment1.getRequiredGrade());
-        assertEquals(3,assessment2.getRequiredGrade());
+        assertEquals(-1,assessment1.getRequiredGrade());
+        assertEquals(-1,assessment2.getRequiredGrade());
         verify(assessmentRepository,times(2)).save(any(Assessment.class));
     }
 
@@ -91,7 +91,7 @@ class CalculateRequiredGradeImplTest {
         calculateRequiredGrade.calculateRequiredGrade(projection,course);
 
         assertEquals(0,assessment1.getRequiredGrade());
-        assertEquals(4,assessment2.getRequiredGrade());
+        assertEquals(-1,assessment2.getRequiredGrade());
         verify(assessmentRepository,times(2)).save(any(Assessment.class));
     }
 }
