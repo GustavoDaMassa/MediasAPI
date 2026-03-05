@@ -4,6 +4,7 @@ import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
+import br.com.gustavohenrique.MediasAPI.service.FormulaTokens;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IConvertToPolishNotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,14 +42,14 @@ public class CalculateFinalGradeImpl implements ICalculateFinalGrade{
         ArrayList<Double> values = new ArrayList<>();
         for (int i = 0; i < polishNotation.size(); i++) {
             String token = polishNotation.get(i);
-            if(token.matches("(\\d+(([.,])?\\d+)?)"))
+            if(FormulaTokens.isNumber(token))
                 stackDouble.push(Double.parseDouble(token.replaceAll(",",".")));
-            else if(token.matches("\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?")){
-                stackDouble.push(assessmentRepository.findByIndentifier(token
-                        .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""),projection.getId()).getGrade());
+            else if(FormulaTokens.isIdentifier(token)){
+                stackDouble.push(assessmentRepository.findByIndentifier(FormulaTokens.cleanBrackets(token),
+                        projection.getId()).getGrade());
             }
             else {
-                if(token.matches("[+*\\-/]")){
+                if(FormulaTokens.isOperator(token)){
                     double b = stackDouble.pop();
                     double a = stackDouble.pop();
                     switch (token){
@@ -62,7 +63,7 @@ public class CalculateFinalGradeImpl implements ICalculateFinalGrade{
                             break;
                     }
                 }else{
-                    if(token.matches("@M(\\[\\d+]\\()?")){ // @M
+                    if(FormulaTokens.isFunction(token)){ // @M
                         double result = 0;
                         values.add(stackDouble.pop());
 

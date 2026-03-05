@@ -3,6 +3,7 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
+import br.com.gustavohenrique.MediasAPI.service.FormulaTokens;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,10 @@ public class IdentifiersDefinitionImpl implements IIdentifiersDefinition {
 
     @Transactional
     public void defineIdentifiers(String averageMethod, Projection projection) {
-        String identifierRegex = "(?<!@)\\w*[A-Za-z]\\w*(\\[(\\d+(([.,])?\\d+)?)])?";
-        Pattern pattern = Pattern.compile(identifierRegex);
+        Pattern pattern = Pattern.compile(FormulaTokens.FORMULA_IDENTIFIER_REGEX);
         Matcher matcher = pattern.matcher(averageMethod.replaceAll("\\s",""));
         while (matcher.find()){
-            String identifier = matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?", "");
+            String identifier = FormulaTokens.cleanBrackets(matcher.group());
             if (assessmentRepository.existsByProjectionAndIdentifier(projection, identifier)) continue;
             Pattern p = Pattern.compile("(?<=\\[)(\\d+(([.,])?\\d+)?)");
             Matcher m = p.matcher(matcher.group());
