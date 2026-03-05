@@ -10,7 +10,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -19,23 +19,27 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
+    @Setter
     @NotBlank
-    String name;
+    private String name;
 
+    @Setter
     @NotBlank
     @Email
     @Column(unique = true)
-    String email;
+    private String email;
 
+    @Setter
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Course> course;
 
-
+    @Setter
     @NotBlank
-    String password;
+    private String password;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 

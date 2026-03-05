@@ -10,7 +10,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -21,19 +21,24 @@ public class Course {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
+        @Setter
         @ManyToOne
         @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_course_user"
                 ,foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"))
         private Users user;
 
+        @Setter
         @NotBlank
         private String name;
 
-
+        @Setter
         @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
         private List<Projection> projection;
 
+        @Setter
         @NotBlank
         private String averageMethod;
+
+        @Setter
         private double cutOffGrade = 6.00;
 }

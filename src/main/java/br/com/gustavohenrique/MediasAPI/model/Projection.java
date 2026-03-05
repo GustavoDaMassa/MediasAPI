@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -22,18 +22,20 @@ public class Projection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false, foreignKey = @ForeignKey(name = "fk_projection_course",
             foreignKeyDefinition = "FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE"))
     private Course course;
 
-    @Getter
     @OneToMany(mappedBy = "projection", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Assessment> assessment = new ArrayList<>();
 
+    @Setter
     @NotBlank
     private String name;
 
+    @Setter
     private double finalGrade;
 
     //----------------------------------------------------------
