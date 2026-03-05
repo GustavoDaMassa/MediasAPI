@@ -2,7 +2,8 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
-import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.CourseNotFoundException;
+import br.com.gustavohenrique.MediasAPI.exception.UserNotFoundException;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Course;
@@ -58,7 +59,7 @@ public class CourseServiceImpl implements CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         if (courseRepository.existsByUserAndName(user,nameDto.string()))throw new DataIntegrityException(nameDto.string());
         var course = courseRepository.findByUserAndId(user,id)
-                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+                .orElseThrow(() -> new CourseNotFoundException(id, userId));
         course.setName(nameDto.string());
         return courseRepository.save(course);
     }
@@ -67,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
         var course = courseRepository.findByUserAndId(user,id)
-                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+                .orElseThrow(() -> new CourseNotFoundException(id, userId));
         projectionService.deleteAllProjections(course.getId(), userId);
         course.setAverageMethod(averageMethodDto.string());
         courseRepository.save(course);
@@ -79,7 +80,7 @@ public class CourseServiceImpl implements CourseService {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
         var course = courseRepository.findByUserAndId(user,id)
-                .orElseThrow(() -> new NotFoundArgumentException("Course id "+ id+" not found for UserId "+userId));
+                .orElseThrow(() -> new CourseNotFoundException(id, userId));
         course.setCutOffGrade(cutOffGradeDto.value());
         return courseRepository.save(course);
     }
@@ -89,14 +90,14 @@ public class CourseServiceImpl implements CourseService {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
         var course  = courseRepository.findByUserAndId(user,id)
-                .orElseThrow(() -> new NotFoundArgumentException("Course id "+id+" not found for UserId "+userId));
+                .orElseThrow(() -> new CourseNotFoundException(id, userId));
         courseRepository.deleteCourse(id, userId);
         return course;
     }
 
 
     private void validateUser(Long userId) {
-        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
+        if(!userRepository.existsById(userId))throw new UserNotFoundException(userId);
     }
 
     @Override

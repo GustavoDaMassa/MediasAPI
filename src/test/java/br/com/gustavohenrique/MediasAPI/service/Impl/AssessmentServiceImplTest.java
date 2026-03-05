@@ -2,6 +2,7 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.ProjectionNotFoundException;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -104,7 +105,7 @@ class AssessmentServiceImplTest {
     void listAssessmentProjectionNotFound() {
         var projection = new Projection(1L,null,null,"Projection test",9.8);
 
-        when(projectionRepository.findById(projection.getId())).thenThrow(NotFoundArgumentException.class);
+        when(projectionRepository.findById(projection.getId())).thenThrow(new ProjectionNotFoundException(projection.getId()));
 
         assertThrows(NotFoundArgumentException.class,()-> assessmentService.listAssessment(projection.getId()));
 
@@ -153,7 +154,7 @@ class AssessmentServiceImplTest {
         var course = new Course(1L,null,"BD",List.of(projection),"P1+P@",6);
         projection.setCourse(course);
 
-        when(projectionRepository.findById(projection.getId())).thenThrow(NotFoundArgumentException.class);
+        when(projectionRepository.findById(projection.getId())).thenThrow(new ProjectionNotFoundException(projection.getId()));
 
         assertThrows(NotFoundArgumentException.class,
                 ()-> assessmentService.insertGrade(projection.getId(),assessment.getId(),gradeDto));
@@ -180,7 +181,7 @@ class AssessmentServiceImplTest {
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
         when(assessmentRepository.findByProjectionIdAndId(projection.getId(), assessment.getId()))
-                .thenThrow(NotFoundArgumentException.class);
+                .thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class,
                 ()-> assessmentService.insertGrade(projection.getId(),assessment.getId(),gradeDto));

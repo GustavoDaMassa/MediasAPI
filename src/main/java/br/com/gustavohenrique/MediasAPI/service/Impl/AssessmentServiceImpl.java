@@ -6,7 +6,8 @@ import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
-import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.AssessmentNotFoundException;
+import br.com.gustavohenrique.MediasAPI.exception.ProjectionNotFoundException;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
@@ -59,7 +60,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
         var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() ->
-                new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
+                new AssessmentNotFoundException(id, projectionId));
         var course = assessment.getProjection().getCourse();
 
         assessment.applyGrade(gradeDto.value());
@@ -70,14 +71,14 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     public void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
-            throw  new NotFoundArgumentException("Projection Id "+projectionId+" not found");
+            throw  new ProjectionNotFoundException(projectionId);
     }
 
     @Override
     public void getAuthenticatedUserByProjectionId(Long projectionId) {
         var user = userService.getAuthenticatedUser();
         var projection = projectionRepository.findById(projectionId)
-                .orElseThrow(() -> new NotFoundArgumentException("Projection id " + projectionId + " not found"));
+                .orElseThrow(() -> new ProjectionNotFoundException(projectionId));
         if (!projection.getCourse().getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You are not authorized to access this resource.");
         }

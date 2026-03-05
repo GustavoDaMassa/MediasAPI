@@ -5,6 +5,7 @@ import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.UserNotFoundException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.Role;
@@ -152,7 +153,7 @@ class CourseServiceImplTest {
                 6);
 
         when(courseRepository.existsByUserAndName(eq(user),eq("BD"))).thenReturn(false);
-        when(courseRepository.findByUserAndId(eq(user),eq(course.getId()))).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.findByUserAndId(eq(user),eq(course.getId()))).thenReturn(Optional.empty());
 
 
         assertThrows(NotFoundArgumentException.class, () -> courseService.updateCourseName(userId,course.getId(),nameDto));
@@ -169,7 +170,7 @@ class CourseServiceImplTest {
         var averageMethodDto = new StringRequestDTO("Atividade + Prova");
         var course = new Course(null,null,"BD",null,averageMethodDto.string(),6);
 
-        when(courseRepository.findByUserAndId(any(Users.class),eq(course.getId()))).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.findByUserAndId(any(Users.class),eq(course.getId()))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class,
                 ()-> courseService.updateCourseAverageMethod(userId,course.getId(),averageMethodDto));
@@ -229,7 +230,7 @@ class CourseServiceImplTest {
         var course = new Course(null,null,"BD",null,"Atividade + Prova",
                 cutOffGradeDto.value());
 
-        when(courseRepository.findByUserAndId(any(Users.class),eq(course.getId()))).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.findByUserAndId(any(Users.class),eq(course.getId()))).thenReturn(Optional.empty());
 
 
         assertThrows(NotFoundArgumentException.class,
@@ -261,7 +262,7 @@ class CourseServiceImplTest {
     void deleteCourseNotFound() {
         var course = new Course();
 
-        when(courseRepository.findByUserAndId(user, course.getId())).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.findByUserAndId(user, course.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class, () -> courseService.deleteCourse(userId, course.getId()));
 
@@ -276,7 +277,7 @@ class CourseServiceImplTest {
     void courseFailureUserNotFound(){
         var courseDto = new RequestCourseDto("SGBD","P1+P2",6.0);
 
-        when(userRepository.findById(userId)).thenThrow(NotFoundArgumentException.class);
+        when(userRepository.findById(userId)).thenThrow(new UserNotFoundException(userId));
 
 
         assertThrows(NotFoundArgumentException.class, ()-> courseService.createCourse(userId,courseDto));

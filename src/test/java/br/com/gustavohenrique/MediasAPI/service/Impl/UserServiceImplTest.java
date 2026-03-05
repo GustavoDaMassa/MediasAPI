@@ -133,7 +133,7 @@ class UserServiceImplTest {
         var newUser = new Users(null,nameDto.string(),"gustavo.pereira@discente.ufg.br",new ArrayList<>(),
                 "Senha criptografada", Role.USER);
 
-        when(userRepository.findById(newUser.getId())).thenThrow(NotFoundArgumentException.class);
+        when(userRepository.findById(newUser.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class, () -> userService.updateName(newUser.getId(), nameDto));
 
@@ -165,7 +165,7 @@ class UserServiceImplTest {
         var newUser = new Users(null, "Gustavo Pereira", emailDTO.email(), new ArrayList<>(),
                 "Senha criptografada", Role.USER);
 
-        when(userRepository.findById(newUser.getId())).thenThrow(NotFoundArgumentException.class);
+        when(userRepository.findById(newUser.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class, () -> userService.updateEmail(newUser.getId(), emailDTO));
 
@@ -196,7 +196,7 @@ class UserServiceImplTest {
         var user = new Users(null, "Gustavo Pereira","gustavohenrique3gb@gmail.com", new ArrayList<>(),
                 "Senha criptografada", Role.USER);
 
-        when(userRepository.findById(user.getId())).thenThrow(NotFoundArgumentException.class);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class, () -> userService.deleteUser(user.getId()));
 

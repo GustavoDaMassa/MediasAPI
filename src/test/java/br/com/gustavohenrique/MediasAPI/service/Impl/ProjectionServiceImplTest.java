@@ -2,6 +2,7 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
+import br.com.gustavohenrique.MediasAPI.exception.CourseNotFoundException;
 import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -154,7 +155,7 @@ class ProjectionServiceImplTest {
         var projection = new Projection(1L,null,null, newProjectionName.string(),10);
 
         when(projectionRepository.findByCourseAndId(course, projection.getId()))
-                .thenThrow(NotFoundArgumentException.class);
+                .thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class,
                 ()-> projectionService.updateProjectionName(courseId,projection.getId(),newProjectionName));
@@ -185,7 +186,7 @@ class ProjectionServiceImplTest {
     void deleteProjectionNotFound() {
         var projection = new Projection(1L,null,null,"BD",3);
 
-        when(projectionRepository.findByCourseAndId(course,projection.getId())).thenThrow(NotFoundArgumentException.class);
+        when(projectionRepository.findByCourseAndId(course,projection.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class,()-> projectionService.deleteProjection(courseId,projection.getId()));
 
@@ -210,7 +211,7 @@ class ProjectionServiceImplTest {
     @DisplayName("deleteAllProjection - Should return exception when the user not exist")
     void deleteAllProjectionUserNotFound(){
         var userId = 1L;
-        when(courseRepository.existsById(courseId)).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.existsById(courseId)).thenReturn(false);
 
         assertThrows(NotFoundArgumentException.class,()-> projectionService.deleteAllProjections(courseId, userId));
 
@@ -241,7 +242,7 @@ class ProjectionServiceImplTest {
     @DisplayName("listAllProjection - Should return exception when the user not exist")
     void listAllProjectionUserNotFound(){
 
-        when(userRepository.existsById(anyLong())).thenThrow(NotFoundArgumentException.class);
+        when(userRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(NotFoundArgumentException.class,()-> projectionService.listAllProjection(anyLong()));
 
@@ -255,7 +256,7 @@ class ProjectionServiceImplTest {
         var projectionName = new StringRequestDTO("Projection default");
         var projection = new Projection(null,null,null,projectionName.string(),10);
 
-        when(courseRepository.findById(courseId)).thenThrow(NotFoundArgumentException.class);
+        when(courseRepository.findById(courseId)).thenThrow(new CourseNotFoundException(courseId));
 
         assertThrows(NotFoundArgumentException.class, () -> projectionService.createProjection(courseId,projectionName));
         assertThrows(NotFoundArgumentException.class, () -> projectionService.listProjection(courseId));

@@ -1,8 +1,8 @@
 package br.com.gustavohenrique.MediasAPI.exception;
 
-public class NotFoundArgumentException extends RuntimeException {
+public abstract class NotFoundArgumentException extends RuntimeException {
 
-    public NotFoundArgumentException(String message) {
+    protected NotFoundArgumentException(String message) {
         super(message);
     }
 }

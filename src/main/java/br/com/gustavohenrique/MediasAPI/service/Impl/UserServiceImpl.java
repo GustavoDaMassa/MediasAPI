@@ -3,7 +3,7 @@ package br.com.gustavohenrique.MediasAPI.service.Impl;
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
 import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
-import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.UserNotFoundException;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Role;
@@ -56,14 +56,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Users updateName(Long id, @Valid StringRequestDTO nameDto) {
         Users newUsers = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
         newUsers.setName(nameDto.string());
         return userRepository.save(newUsers);
     }
     @Transactional
     public Users updateEmail(Long id, @Valid EmailUpdateDTO emailDTO) {
         Users newUsers = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
         if (userRepository.existsByEmail(emailDTO.email()))throw new DataIntegrityException(emailDTO.email());
         newUsers.setEmail(emailDTO.email());
         return userRepository.save(newUsers);
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Users deleteUser(Long id) {
             var user  = userRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundArgumentException("User Id "+id+" not found"));
+                    .orElseThrow(() -> new UserNotFoundException(id));
             userRepository.delete(user);
             return user;
     }
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Users findusers(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->new NotFoundArgumentException("User email "+email+" not found"));
+        return userRepository.findByEmail(email).orElseThrow(() ->new UserNotFoundException(email));
     }
 
     @Override
@@ -102,6 +102,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
         }
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundArgumentException("User email " + email + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 }

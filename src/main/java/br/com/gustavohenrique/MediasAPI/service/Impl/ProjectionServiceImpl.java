@@ -1,7 +1,9 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
-import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
+import br.com.gustavohenrique.MediasAPI.exception.CourseNotFoundException;
+import br.com.gustavohenrique.MediasAPI.exception.ProjectionNotFoundException;
+import br.com.gustavohenrique.MediasAPI.exception.UserNotFoundException;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -63,7 +65,7 @@ public class ProjectionServiceImpl implements ProjectionService {
         if (projectionRepository.existsByCourseAndName(course,newProjectionName.string()))
             throw new DataIntegrityException(newProjectionName.string());
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
-                (()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
+                (()-> new ProjectionNotFoundException(id, courseId));
         projection.setName(newProjectionName.string());
         return projection;
     }
@@ -73,7 +75,7 @@ public class ProjectionServiceImpl implements ProjectionService {
         validateCourse(courseId);
         var course = courseRepository.findById(courseId).orElseThrow();
         var projection = projectionRepository.findByCourseAndId(course,id).orElseThrow
-                (()-> new NotFoundArgumentException("Projection id "+id+" not found for the course id "+courseId));
+                (()-> new ProjectionNotFoundException(id, courseId));
         projectionRepository.deleteProjection(id, courseId);
         return projection;
     }
@@ -85,20 +87,20 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     public List<Projection> listAllProjection(Long userId) {
-        if(!userRepository.existsById(userId))throw new NotFoundArgumentException("User id "+ userId +" not found");
+        if(!userRepository.existsById(userId))throw new UserNotFoundException(userId);
         return projectionRepository.findAllByUserId(userId);
     }
 
     private void validateCourse(Long courseId){
         if(!courseRepository.existsById(courseId))
-            throw new NotFoundArgumentException("Course id "+courseId+" not found");
+            throw new CourseNotFoundException(courseId);
     }
 
     @Override
     public void getAuthenticatedUserByCourseId(Long courseId) {
         var user = userService.getAuthenticatedUser();
         var course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundArgumentException("Course id " + courseId + " not found"));
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
         if (!course.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You are not authorized to access this resource.");
         }
