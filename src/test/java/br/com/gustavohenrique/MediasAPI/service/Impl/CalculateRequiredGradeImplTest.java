@@ -72,8 +72,8 @@ class CalculateRequiredGradeImplTest {
     @DisplayName("calculateRequiredGrade - Takes successive test to find the necessary grade with one of the grades fixed")
     void calculateRequiredGradeSuccessfullyAnyFixed() {
         var course = new Course(1L,null,"BD",null,"p1+p2",6);
-        var assessment1 = new Assessment("p1",2,10,null);
-        assessment1.setFixed(true);
+        var assessment1 = new Assessment("p1",0,10,null);
+        assessment1.applyGrade(2);
         var assessment2 = new Assessment("p2",0,10,null);
         var projection = new Projection(1L,course, List.of(assessment1,assessment2),
                 "Projection test",0);

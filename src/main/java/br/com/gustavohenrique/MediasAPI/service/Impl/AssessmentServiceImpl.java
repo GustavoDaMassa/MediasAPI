@@ -62,10 +62,7 @@ public class AssessmentServiceImpl implements AssessmentService {
                 new NotFoundArgumentException("Assessment id "+id+" not found for the Projection id "+projectionId));
         var course = assessment.getProjection().getCourse();
 
-        if (gradeDto.value() <= assessment.getMaxValue())assessment.setGrade(gradeDto.value());
-        else throw new
-                IllegalArgumentException("It is not allowed to enter a grade higher than "+assessment.getMaxValue());
-        assessment.setFixed(true);
+        assessment.applyGrade(gradeDto.value());
         calculateFinalGrade.calculateResult(projection,course.getAverageMethod());
         calculateRequiredGrade.calculateRequiredGrade(projection,course);
         return assessment;

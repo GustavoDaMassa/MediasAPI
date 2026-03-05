@@ -26,14 +26,12 @@ public class IdentifiersDefinitionImpl implements IIdentifiersDefinition {
         Pattern pattern = Pattern.compile(identifierRegex);
         Matcher matcher = pattern.matcher(averageMethod.replaceAll("\\s",""));
         while (matcher.find()){
-            var assessment = new Assessment();
+            String identifier = matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?", "");
+            if (assessmentRepository.existsByProjectionAndIdentifier(projection, identifier)) continue;
             Pattern p = Pattern.compile("(?<=\\[)(\\d+(([.,])?\\d+)?)");
             Matcher m = p.matcher(matcher.group());
-            if(assessmentRepository.existsByProjectionAndIdentifier(projection,matcher.group()
-                    .replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?","")))continue;
-            if(m.find()) assessment.setMaxValue(Double.parseDouble(m.group().replaceAll(",",".")));
-            assessment.setIdentifier(matcher.group().replaceAll("(\\[(\\d+(([.,])?\\d+)?)])?",""));
-            assessment.setProjection(projection);
+            double maxValue = m.find() ? Double.parseDouble(m.group().replaceAll(",", ".")) : 10.0;
+            var assessment = new Assessment(identifier, maxValue, projection);
             projection.addAssessment(assessmentRepository.save(assessment));
         }
     }
