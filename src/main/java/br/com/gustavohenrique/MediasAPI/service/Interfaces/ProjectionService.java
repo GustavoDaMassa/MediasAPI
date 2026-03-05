@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-public interface ProjectionService {
+public interface ProjectionService extends OwnershipValidator {
     Projection createProjection(Long courseId, @Valid StringRequestDTO projectionName);
 
     List<Projection> listProjection(Long courseId);
@@ -19,5 +19,4 @@ public interface ProjectionService {
 
     List<Projection> listAllProjection(Long userId);
 
-    void getAuthenticatedUserByCourseId(Long courseId);
 }

@@ -101,7 +101,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void getAuthenticatedUser(Long userId) {
+    public void validateOwnership(Long userId) {
         var user = userService.getAuthenticatedUser();
         if (!user.getId().equals(userId)) {
             throw new AccessDeniedException("You are not authorized to access this resource.");

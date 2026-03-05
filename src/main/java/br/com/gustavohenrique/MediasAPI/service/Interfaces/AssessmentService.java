@@ -6,7 +6,7 @@ import br.com.gustavohenrique.MediasAPI.model.Projection;
 
 import java.util.List;
 
-public interface AssessmentService {
+public interface AssessmentService extends OwnershipValidator {
 
     void createAssessment(Projection projectionId);
 
@@ -14,5 +14,4 @@ public interface AssessmentService {
 
     Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto);
 
-    void getAuthenticatedUserByProjectionId(Long projectionId);
 }

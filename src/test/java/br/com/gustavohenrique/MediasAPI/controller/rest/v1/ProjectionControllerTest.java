@@ -78,7 +78,7 @@ class ProjectionControllerTest {
     @DisplayName("Should create a projection")
     @WithMockUser
     void testCreateProjection() throws Exception {
-        doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
+        doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.createProjection(any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
@@ -93,7 +93,7 @@ class ProjectionControllerTest {
     @DisplayName("Should return a list of projections")
     @WithMockUser
     void testShowProjections() throws Exception {
-        doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
+        doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.listProjection(1L)).thenReturn(List.of(projection));
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
@@ -106,7 +106,7 @@ class ProjectionControllerTest {
     @DisplayName("Should update projection name")
     @WithMockUser
     void testUpdateProjectionName() throws Exception {
-        doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
+        doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.updateProjectionName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
 
         mockMvc.perform(patch("/api/v1/1/projections/1").with(csrf())
@@ -119,7 +119,7 @@ class ProjectionControllerTest {
     @DisplayName("Should delete a projection")
     @WithMockUser
     void testDeleteProjection() throws Exception {
-        doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
+        doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.deleteProjection(any(Long.class), any(Long.class))).thenReturn(projection);
 
         mockMvc.perform(delete("/api/v1/1/projections/1").with(csrf()))
@@ -130,7 +130,7 @@ class ProjectionControllerTest {
     @DisplayName("Should delete all projections")
     @WithMockUser
     void testDeleteAllProjections() throws Exception {
-        doNothing().when(projectionService).getAuthenticatedUserByCourseId(1L);
+        doNothing().when(projectionService).validateOwnership(1L);
         when(userService.getAuthenticatedUser()).thenReturn(new Users());
         doNothing().when(projectionService).deleteAllProjections(any(Long.class), any(Long.class));
 

@@ -72,7 +72,7 @@ class CourseControllerTest {
     @DisplayName("Should create a course")
     @WithMockUser
     void testCreateCourse() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.createCourse(any(Long.class), any(RequestCourseDto.class))).thenReturn(course);
 
         mockMvc.perform(post("/api/v1/1/courses").with(csrf())
@@ -86,7 +86,7 @@ class CourseControllerTest {
     @DisplayName("Should return a list of courses")
     @WithMockUser
     void testShowCourses() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.listCourses(1L)).thenReturn(List.of(course));
 
         mockMvc.perform(get("/api/v1/1/courses"))
@@ -98,7 +98,7 @@ class CourseControllerTest {
     @DisplayName("Should update course name")
     @WithMockUser
     void testUpdateCourseName() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
         mockMvc.perform(patch("/api/v1/1/courses/1/name").with(csrf())
@@ -111,7 +111,7 @@ class CourseControllerTest {
     @DisplayName("Should update course method")
     @WithMockUser
     void testUpdateCourseMethod() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseAverageMethod(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
         mockMvc.perform(patch("/api/v1/1/courses/1/method").with(csrf())
@@ -124,7 +124,7 @@ class CourseControllerTest {
     @DisplayName("Should update course cut off grade")
     @WithMockUser
     void testUpdateCourseCutOffGrade() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseCutOffGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(course);
 
         mockMvc.perform(patch("/api/v1/1/courses/1/cutoffgrade").with(csrf())
@@ -137,7 +137,7 @@ class CourseControllerTest {
     @DisplayName("Should delete a course")
     @WithMockUser
     void testDeleteCourse() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(courseService.deleteCourse(any(Long.class), any(Long.class))).thenReturn(course);
 
         mockMvc.perform(delete("/api/v1/1/courses/1").with(csrf()))
@@ -148,7 +148,7 @@ class CourseControllerTest {
     @DisplayName("Should return a list of projections")
     @WithMockUser
     void testShowAllProjections() throws Exception {
-        doNothing().when(courseService).getAuthenticatedUser(1L);
+        doNothing().when(courseService).validateOwnership(1L);
         when(projectionService.listAllProjection(1L)).thenReturn(List.of(new Projection()));
 
         mockMvc.perform(get("/api/v1/1/courses/projections"))

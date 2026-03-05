@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-public interface CourseService {
+public interface CourseService extends OwnershipValidator {
     Course createCourse(Long userId, @Valid RequestCourseDto course);
 
     List<Course> listCourses(Long userId);
@@ -21,5 +21,4 @@ public interface CourseService {
 
     Course deleteCourse(Long userId, Long id);
 
-    void getAuthenticatedUser(Long userId);
 }

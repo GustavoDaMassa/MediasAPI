@@ -97,7 +97,7 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public void getAuthenticatedUserByCourseId(Long courseId) {
+    public void validateOwnership(Long courseId) {
         var user = userService.getAuthenticatedUser();
         var course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));

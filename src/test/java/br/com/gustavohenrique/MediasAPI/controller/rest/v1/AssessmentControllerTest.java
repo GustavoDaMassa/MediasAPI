@@ -61,7 +61,7 @@ class AssessmentControllerTest {
     @DisplayName("Should insert a grade in an assessment")
     @WithMockUser
     void testInsertGrade() throws Exception {
-        doNothing().when(assessmentService).getAuthenticatedUserByProjectionId(1L);
+        doNothing().when(assessmentService).validateOwnership(1L);
         when(assessmentService.insertGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(assessment);
 
         mockMvc.perform(patch("/api/v1/1/assessments/1").with(csrf())
@@ -74,7 +74,7 @@ class AssessmentControllerTest {
     @DisplayName("Should return a list of assessments")
     @WithMockUser
     void testShowAssessment() throws Exception {
-        doNothing().when(assessmentService).getAuthenticatedUserByProjectionId(1L);
+        doNothing().when(assessmentService).validateOwnership(1L);
         when(assessmentService.listAssessment(1L)).thenReturn(List.of(assessment));
 
         mockMvc.perform(get("/api/v1/1/assessments"))

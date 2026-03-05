@@ -75,7 +75,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public void getAuthenticatedUserByProjectionId(Long projectionId) {
+    public void validateOwnership(Long projectionId) {
         var user = userService.getAuthenticatedUser();
         var projection = projectionRepository.findById(projectionId)
                 .orElseThrow(() -> new ProjectionNotFoundException(projectionId));

@@ -41,7 +41,7 @@ public class ProjectionController {
     public ResponseEntity<ProjectionDTO> createProjection(@PathVariable Long courseId,
                                                           @RequestBody @Valid StringRequestDTO projectionName){
             logger.info("Request to create projection for course ID: {}", courseId);
-            projectionService.getAuthenticatedUserByCourseId(courseId);
+            projectionService.validateOwnership(courseId);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(mapDTO.projectionDTO(projectionService.createProjection(courseId,projectionName)));
     }
@@ -51,7 +51,7 @@ public class ProjectionController {
             "lista de avaliações equivalentes.")
     public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long courseId){
             logger.info("Request to list projections for course ID: {}", courseId);
-            projectionService.getAuthenticatedUserByCourseId(courseId);
+            projectionService.validateOwnership(courseId);
             return ResponseEntity.ok(projectionService.listProjection(courseId).stream()
                     .map(mapDTO::projectionDTO).collect(Collectors.toList()));
     }
@@ -61,7 +61,7 @@ public class ProjectionController {
     public ResponseEntity<ProjectionDTO> updateProjectionName(@PathVariable Long courseId, @PathVariable Long id,
                                                               @RequestBody StringRequestDTO newProjectNameDto){
             logger.info("Request to update projection name for course ID: {} and projection ID: {}", courseId, id);
-            projectionService.getAuthenticatedUserByCourseId(courseId);
+            projectionService.validateOwnership(courseId);
             return ResponseEntity.status(HttpStatus.OK).body(modelMapper
                     .map(projectionService.updateProjectionName(courseId, id, newProjectNameDto),ProjectionDTO.class));
     }
@@ -70,7 +70,7 @@ public class ProjectionController {
     @Operation(summary = "Deletar projeção", description = "Deleta apenas a projeção especificada")
     public ResponseEntity<ProjectionDTO> deleteProjection(@PathVariable Long courseId, @PathVariable Long id){
             logger.info("Request to delete projection for course ID: {} and projection ID: {}", courseId, id);
-            projectionService.getAuthenticatedUserByCourseId(courseId);
+            projectionService.validateOwnership(courseId);
             return ResponseEntity.ok(modelMapper.map(projectionService.deleteProjection(courseId,id),ProjectionDTO.class));
     }
 
@@ -79,7 +79,7 @@ public class ProjectionController {
             "projeção default")
     public void deleteAllProjections(@PathVariable Long courseId){
         logger.info("Request to delete all projections for course ID: {}", courseId);
-        projectionService.getAuthenticatedUserByCourseId(courseId);
+        projectionService.validateOwnership(courseId);
         var user = userService.getAuthenticatedUser();
         projectionService.deleteAllProjections(courseId, user.getId());
     }
