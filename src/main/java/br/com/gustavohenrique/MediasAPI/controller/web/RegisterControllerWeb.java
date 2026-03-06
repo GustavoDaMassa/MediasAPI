@@ -18,12 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RegisterControllerWeb {
 
     private final UserServiceImpl userService;
-    private final ModelMapper modelMapper;
-
     @Autowired
     public RegisterControllerWeb(UserServiceImpl userService, ModelMapper modelMapper) {
         this.userService = userService;
-        this.modelMapper = modelMapper;
     }
 
     @GetMapping

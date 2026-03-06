@@ -1,7 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 import br.com.gustavohenrique.MediasAPI.dtos.*;
-import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import io.swagger.v3.oas.annotations.Operation;

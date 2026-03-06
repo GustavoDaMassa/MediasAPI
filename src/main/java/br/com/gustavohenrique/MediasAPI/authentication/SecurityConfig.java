@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final UserDetailsServiceImpl userDetailsService;
     private final MdcFilter mdcFilter;
 
     @Value("${JWT_PUBLIC_KEY_CONTENT}")
@@ -64,7 +63,6 @@ public class SecurityConfig {
 
     @Autowired
     public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter) {
-        this.userDetailsService = userDetailsService;
         this.mdcFilter = mdcFilter;
     }
 

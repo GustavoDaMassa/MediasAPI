@@ -1,6 +1,5 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
-import br.com.gustavohenrique.MediasAPI.controller.rest.v1.CourseController;
 import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;

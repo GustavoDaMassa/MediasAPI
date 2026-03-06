@@ -1,7 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
-import br.com.gustavohenrique.MediasAPI.controller.rest.v1.ProjectionController;
 import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;

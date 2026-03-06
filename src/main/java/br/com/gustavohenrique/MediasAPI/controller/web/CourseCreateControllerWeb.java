@@ -21,13 +21,10 @@ public class CourseCreateControllerWeb {
 
     private final CourseService courseService;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
-
     @Autowired
     public CourseCreateControllerWeb(CourseService courseService, UserRepository userRepository, ModelMapper modelMapper) {
         this.courseService = courseService;
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
     }
 
     @GetMapping

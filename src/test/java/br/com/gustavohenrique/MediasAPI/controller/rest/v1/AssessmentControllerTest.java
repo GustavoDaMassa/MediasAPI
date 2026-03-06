@@ -1,6 +1,5 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
-import br.com.gustavohenrique.MediasAPI.controller.rest.v1.AssessmentController;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;

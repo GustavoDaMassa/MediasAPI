@@ -1,7 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
-import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
 import br.com.gustavohenrique.MediasAPI.exception.DataIntegrityException;
 import br.com.gustavohenrique.MediasAPI.exception.UserNotFoundException;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
@@ -12,8 +11,6 @@ import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import jakarta.validation.Valid;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,12 +25,10 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final CourseService courseService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
     public UserServiceImpl(@Lazy CourseService courseService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.courseService = courseService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }

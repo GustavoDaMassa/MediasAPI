@@ -4,7 +4,6 @@ import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
-import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

@@ -8,7 +8,6 @@ import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;

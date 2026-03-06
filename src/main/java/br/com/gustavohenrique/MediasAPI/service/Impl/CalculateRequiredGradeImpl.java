@@ -4,7 +4,6 @@ import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.service.FormulaTokens;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IConvertToPolishNotation;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ISimulationResult;
