@@ -5,13 +5,12 @@ import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IConvertToPolishNotation;
+import br.com.gustavohenrique.MediasAPI.service.RpnEvaluator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,22 +22,22 @@ import static org.mockito.Mockito.*;
 
 class CalculateFinalGradeImplTest {
 
-    @Autowired
-    @InjectMocks
     private CalculateFinalGradeImpl calculateFinalGrade;
 
     @Mock
     private ProjectionRepository projectionRepository;
 
     @Mock
-    private  AssessmentRepository assessmentRepository;
+    private AssessmentRepository assessmentRepository;
 
     @Mock
-    private  IConvertToPolishNotation convertToPolishNotation;
+    private IConvertToPolishNotation convertToPolishNotation;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        calculateFinalGrade = new CalculateFinalGradeImpl(
+                projectionRepository, assessmentRepository, convertToPolishNotation, new RpnEvaluator());
     }
 
     @Test
@@ -78,7 +77,7 @@ class CalculateFinalGradeImplTest {
         when(assessmentRepository.findByIndentifier(assessment1.getIdentifier(),projection.getId())).thenReturn(assessment1);
         when(assessmentRepository.findByIndentifier(assessment2.getIdentifier(),projection.getId())).thenReturn(assessment2);
 
-        assertThrows(IllegalArgumentException.class, () ->calculateFinalGrade.calculateResult(projection,averageMethod));
+        assertThrows(IllegalArgumentException.class, () -> calculateFinalGrade.calculateResult(projection,averageMethod));
 
         verify(projectionRepository,never()).save(projection);
     }
@@ -98,7 +97,7 @@ class CalculateFinalGradeImplTest {
         when(assessmentRepository.findByIndentifier(assessment1.getIdentifier(),projection.getId())).thenReturn(assessment1);
         when(assessmentRepository.findByIndentifier(assessment2.getIdentifier(),projection.getId())).thenReturn(assessment2);
 
-        assertThrows(NoSuchElementException.class, () ->calculateFinalGrade.calculateResult(projection,averageMethod));
+        assertThrows(NoSuchElementException.class, () -> calculateFinalGrade.calculateResult(projection,averageMethod));
 
         verify(projectionRepository,never()).save(projection);
     }
