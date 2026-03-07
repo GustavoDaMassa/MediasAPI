@@ -11,14 +11,13 @@ import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +29,6 @@ import static org.mockito.Mockito.*;
 
 class AssessmentServiceImplTest {
 
-    @Autowired
-    @InjectMocks
     private AssessmentServiceImpl assessmentService;
 
     @Mock
@@ -49,9 +46,14 @@ class AssessmentServiceImplTest {
     @Mock
     private ICalculateRequiredGrade calculateRequiredGrade;
 
+    @Mock
+    private OwnershipValidationService ownershipValidationService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        assessmentService = new AssessmentServiceImpl(projectionRepository, assessmentRepository,
+                identifiersDefinition, calculateFinalGrade, calculateRequiredGrade, ownershipValidationService);
 
         when(projectionRepository.existsById(anyLong())).thenReturn(true);
     }

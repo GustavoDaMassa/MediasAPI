@@ -11,10 +11,9 @@ import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import jakarta.validation.Valid;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +25,15 @@ public class CourseServiceImpl implements CourseService {
     private final ProjectionService projectionService;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final OwnershipValidationService ownershipValidationService;
+
     @Autowired
     public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository,
-                             UserRepository userRepository, UserService userService) {
+                             UserRepository userRepository, OwnershipValidationService ownershipValidationService) {
         this.projectionService = projectionService;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
+        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -53,6 +53,7 @@ public class CourseServiceImpl implements CourseService {
         var user = userRepository.findById(userId).orElseThrow();
         return courseRepository.findByUser(user);
     }
+
     @Transactional
     public Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto) {
         validateUser(userId);
@@ -63,6 +64,7 @@ public class CourseServiceImpl implements CourseService {
         course.setName(nameDto.string());
         return courseRepository.save(course);
     }
+
     @Transactional
     public Course updateCourseAverageMethod(Long userId, Long id, @Valid StringRequestDTO averageMethodDto){
         validateUser(userId);
@@ -75,6 +77,7 @@ public class CourseServiceImpl implements CourseService {
         projectionService.createProjection(course.getId(), new StringRequestDTO(course.getName()));
         return course;
     }
+
     @Transactional
     public Course updateCourseCutOffGrade(Long userId, Long id, @Valid DoubleRequestDTO cutOffGradeDto) {
         validateUser(userId);
@@ -95,16 +98,12 @@ public class CourseServiceImpl implements CourseService {
         return course;
     }
 
-
     private void validateUser(Long userId) {
         if(!userRepository.existsById(userId))throw new UserNotFoundException(userId);
     }
 
     @Override
     public void validateOwnership(Long userId) {
-        var user = userService.getAuthenticatedUser();
-        if (!user.getId().equals(userId)) {
-            throw new AccessDeniedException("You are not authorized to access this resource.");
-        }
+        ownershipValidationService.validate(userId);
     }
 }

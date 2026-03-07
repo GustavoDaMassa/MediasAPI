@@ -10,14 +10,12 @@ import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +26,6 @@ import static org.mockito.Mockito.*;
 
 class ProjectionServiceImplTest {
 
-    @Autowired
-    @InjectMocks
     private ProjectionServiceImpl projectionService;
 
     @Mock
@@ -45,7 +41,7 @@ class ProjectionServiceImplTest {
     private ProjectionRepository projectionRepository;
 
     @Mock
-    private UserService userService;
+    private OwnershipValidationService ownershipValidationService;
 
     private final Long courseId = 1L;
     private final Course course = new Course(courseId,null,"BD",null,
@@ -53,6 +49,8 @@ class ProjectionServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        projectionService = new ProjectionServiceImpl(assessmentService, userRepository, courseRepository,
+                projectionRepository, ownershipValidationService);
 
         when(courseRepository.existsById(courseId)).thenReturn(true);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));

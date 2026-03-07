@@ -12,13 +12,12 @@ import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +29,6 @@ import static org.mockito.Mockito.*;
 
 class CourseServiceImplTest {
 
-    @Autowired
-    @InjectMocks
     private CourseServiceImpl courseService;
 
     @Mock
@@ -43,6 +40,9 @@ class CourseServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private OwnershipValidationService ownershipValidationService;
+
     private final Long userId = 1L;
     private final Users user = new Users(userId,"Gustavo","gustavo.pereira@discente.ufg.br",
             new ArrayList<>(),"Senha criptografada", Role.USER);
@@ -50,6 +50,7 @@ class CourseServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        courseService = new CourseServiceImpl(projectionService, courseRepository, userRepository, ownershipValidationService);
 
         when(userRepository.existsById(userId)).thenReturn(true);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));

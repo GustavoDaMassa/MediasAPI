@@ -12,10 +12,9 @@ import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import jakarta.validation.Valid;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,15 +27,17 @@ public class ProjectionServiceImpl implements ProjectionService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final ProjectionRepository projectionRepository;
-    private final UserService userService;
+    private final OwnershipValidationService ownershipValidationService;
+
     @Autowired
     public ProjectionServiceImpl(AssessmentService assessmentService, UserRepository userRepository,
-                                 CourseRepository courseRepository, ProjectionRepository projectionRepository, UserService userService) {
+                                 CourseRepository courseRepository, ProjectionRepository projectionRepository,
+                                 OwnershipValidationService ownershipValidationService) {
         this.assessmentService = assessmentService;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.projectionRepository = projectionRepository;
-        this.userService = userService;
+        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -98,12 +99,8 @@ public class ProjectionServiceImpl implements ProjectionService {
 
     @Override
     public void validateOwnership(Long courseId) {
-        var user = userService.getAuthenticatedUser();
         var course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
-        if (!course.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You are not authorized to access this resource.");
-        }
+        ownershipValidationService.validate(course.getUser().getId());
     }
 }
-

@@ -1,6 +1,5 @@
 package br.com.gustavohenrique.MediasAPI.service.Impl;
 
-
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
@@ -12,13 +11,12 @@ import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
-import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
+import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 public class AssessmentServiceImpl implements AssessmentService {
@@ -28,17 +26,19 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final IIdentifiersDefinition identifiersDefinition;
     private final ICalculateFinalGrade calculateFinalGrade;
     private final ICalculateRequiredGrade calculateRequiredGrade;
-    private final UserService userService;
+    private final OwnershipValidationService ownershipValidationService;
+
     @Autowired
     public AssessmentServiceImpl(ProjectionRepository projectionRepository, AssessmentRepository assessmentRepository,
                                  IIdentifiersDefinition identifiersDefinition, ICalculateFinalGrade calculateFinalGrade,
-                                 ICalculateRequiredGrade calculateRequiredGrade, UserService userService) {
+                                 ICalculateRequiredGrade calculateRequiredGrade,
+                                 OwnershipValidationService ownershipValidationService) {
         this.projectionRepository = projectionRepository;
         this.assessmentRepository = assessmentRepository;
         this.identifiersDefinition = identifiersDefinition;
         this.calculateFinalGrade = calculateFinalGrade;
         this.calculateRequiredGrade = calculateRequiredGrade;
-        this.userService = userService;
+        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -71,16 +71,13 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     public void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
-            throw  new ProjectionNotFoundException(projectionId);
+            throw new ProjectionNotFoundException(projectionId);
     }
 
     @Override
     public void validateOwnership(Long projectionId) {
-        var user = userService.getAuthenticatedUser();
         var projection = projectionRepository.findById(projectionId)
                 .orElseThrow(() -> new ProjectionNotFoundException(projectionId));
-        if (!projection.getCourse().getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You are not authorized to access this resource.");
-        }
+        ownershipValidationService.validate(projection.getCourse().getUser().getId());
     }
 }
