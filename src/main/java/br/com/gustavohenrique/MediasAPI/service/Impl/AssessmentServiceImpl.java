@@ -19,26 +19,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class AssessmentServiceImpl implements AssessmentService {
+public class AssessmentServiceImpl extends OwnedResourceService implements AssessmentService {
 
     private final ProjectionRepository projectionRepository;
     private final AssessmentRepository assessmentRepository;
     private final IIdentifiersDefinition identifiersDefinition;
     private final ICalculateFinalGrade calculateFinalGrade;
     private final ICalculateRequiredGrade calculateRequiredGrade;
-    private final OwnershipValidationService ownershipValidationService;
 
     @Autowired
     public AssessmentServiceImpl(ProjectionRepository projectionRepository, AssessmentRepository assessmentRepository,
                                  IIdentifiersDefinition identifiersDefinition, ICalculateFinalGrade calculateFinalGrade,
                                  ICalculateRequiredGrade calculateRequiredGrade,
                                  OwnershipValidationService ownershipValidationService) {
+        super(ownershipValidationService);
         this.projectionRepository = projectionRepository;
         this.assessmentRepository = assessmentRepository;
         this.identifiersDefinition = identifiersDefinition;
         this.calculateFinalGrade = calculateFinalGrade;
         this.calculateRequiredGrade = calculateRequiredGrade;
-        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -75,9 +74,9 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public void validateOwnership(Long projectionId) {
+    protected Long resolveOwnerId(Long projectionId) {
         var projection = projectionRepository.findById(projectionId)
                 .orElseThrow(() -> new ProjectionNotFoundException(projectionId));
-        ownershipValidationService.validate(projection.getCourse().getUser().getId());
+        return projection.getCourse().getUser().getId();
     }
 }

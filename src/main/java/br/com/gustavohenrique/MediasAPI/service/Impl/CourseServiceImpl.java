@@ -20,20 +20,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class CourseServiceImpl implements CourseService {
+public class CourseServiceImpl extends OwnedResourceService implements CourseService {
 
     private final ProjectionService projectionService;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
-    private final OwnershipValidationService ownershipValidationService;
 
     @Autowired
     public CourseServiceImpl(ProjectionService projectionService, CourseRepository courseRepository,
                              UserRepository userRepository, OwnershipValidationService ownershipValidationService) {
+        super(ownershipValidationService);
         this.projectionService = projectionService;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
-        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -103,7 +102,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void validateOwnership(Long userId) {
-        ownershipValidationService.validate(userId);
+    protected Long resolveOwnerId(Long userId) {
+        return userId;
     }
 }

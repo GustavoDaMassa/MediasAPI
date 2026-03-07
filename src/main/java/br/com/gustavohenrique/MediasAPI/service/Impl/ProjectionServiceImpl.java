@@ -21,23 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class ProjectionServiceImpl implements ProjectionService {
+public class ProjectionServiceImpl extends OwnedResourceService implements ProjectionService {
 
     private final AssessmentService assessmentService;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final ProjectionRepository projectionRepository;
-    private final OwnershipValidationService ownershipValidationService;
 
     @Autowired
     public ProjectionServiceImpl(AssessmentService assessmentService, UserRepository userRepository,
                                  CourseRepository courseRepository, ProjectionRepository projectionRepository,
                                  OwnershipValidationService ownershipValidationService) {
+        super(ownershipValidationService);
         this.assessmentService = assessmentService;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.projectionRepository = projectionRepository;
-        this.ownershipValidationService = ownershipValidationService;
     }
 
     @Transactional
@@ -98,9 +97,9 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public void validateOwnership(Long courseId) {
+    protected Long resolveOwnerId(Long courseId) {
         var course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
-        ownershipValidationService.validate(course.getUser().getId());
+        return course.getUser().getId();
     }
 }
