@@ -1,7 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.controller.web;
 
 import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
-import br.com.gustavohenrique.MediasAPI.service.Impl.UserServiceImpl;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/web/register")
 public class RegisterControllerWeb {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
     @Autowired
-    public RegisterControllerWeb(UserServiceImpl userService, ModelMapper modelMapper) {
+    public RegisterControllerWeb(UserService userService, ModelMapper modelMapper) {
         this.userService = userService;
     }
 
