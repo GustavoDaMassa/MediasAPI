@@ -783,7 +783,7 @@ docker compose down
 ```
 ### Aplicação no ar
 
-  **Produção:** `https://mediasapi.duckdns.org`
+  **Produção:** `https://apimediasapi.gustavohdev.com.br`
 
   **Local:** `https://localhost`
   - [Swagger UI (local)](https://localhost/swagger-ui/index.html)
@@ -887,22 +887,10 @@ Outro desafio foi a implementação desse cálculo dinâmico. A solução adotad
   - Modelagem do banco de dados relacional com definições de constraints
   - Consultas JPQL e SQL nativo com Spring Data JPA
 
-- **Infraestrutura como Código (IaC)**
-  - Provisionamento completo da infraestrutura AWS com Terraform
-  - EC2, RDS, Security Groups, IAM Roles, SSM Parameter Store, CloudWatch
-  - Reprodutível e versionado
-
-- **Cloud (AWS Free Tier)**
-  - EC2 t3.micro como servidor de aplicação com Docker
-  - RDS MySQL 8.0 gerenciado (backup automático, patching, storage criptografado)
-  - SSM Parameter Store para gestão segura de secrets
-  - Elastic IP para endereço público estável
-  - CloudWatch para centralização de logs
-
 - **CI/CD Completo com GitHub Actions**
   - Pipeline automatizado a cada push na branch `main`
-  - Etapas: testes automatizados, build da imagem Docker, push ao Docker Hub e deploy na EC2 via SSH
-  - Cada deploy gera uma imagem com tag do commit SHA para rastreabilidade e rollback
+  - Etapas: testes automatizados, build da imagem Docker e push ao Docker Hub
+  - Watchtower monitora o Docker Hub a cada 30s e atualiza o container automaticamente no servidor
   - Pull requests executam apenas os testes, sem deploy
 
 - **Certificado SSL (Let's Encrypt)**
