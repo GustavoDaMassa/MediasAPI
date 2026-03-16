@@ -464,7 +464,7 @@ DATABASE_PASSWORD=pass
 
 ### Base URL
 ```
-Production:  https://mediasapi.duckdns.org
+Production:  https://apimediasapi.gustavohdev.com.br
 Local:       https://localhost
 Swagger UI:  https://localhost/swagger-ui/index.html (local only)
 ```
@@ -1818,17 +1818,14 @@ See [`infra/README.md`](infra/README.md) for Terraform configuration details.
 Full automated pipeline triggered on every push to `main`:
 
 ```
-git push → Test → Build Docker Image → Push to Docker Hub → Deploy to EC2
+git push → Test → Build Docker Image → Push to Docker Hub → Watchtower detects → restart
 ```
 
 | Stage | Trigger | What it does |
 |-------|---------|--------------|
 | **Test** | Push or PR to `main` | Runs `./mvnw test` with JDK 17 |
 | **Build & Push** | Push to `main` only | Builds Docker image, pushes to Docker Hub with commit SHA tag |
-| **Deploy** | Push to `main` only | Copies configs to EC2 via SSH, fetches secrets from SSM, pulls new image, restarts containers |
-| **Health Check** | After deploy | Verifies application responds on HTTPS |
-
-Each deploy creates a tagged image (e.g., `gustavodamassa/medias-api:3df6f15`), enabling instant rollback by changing the tag.
+| **Auto-deploy** | After push to Docker Hub | Watchtower polls Docker Hub every 30s and restarts the container automatically |
 
 Pull requests only run tests — no deployment occurs.
 
