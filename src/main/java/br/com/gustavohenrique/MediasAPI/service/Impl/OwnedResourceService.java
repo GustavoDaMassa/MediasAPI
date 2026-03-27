@@ -14,7 +14,7 @@ public abstract class OwnedResourceService implements OwnershipValidator {
     protected abstract Long resolveOwnerId(Long resourceId);
 
     @Override
-    public final void validateOwnership(Long resourceId) {
+    public void validateOwnership(Long resourceId) {
         ownershipValidationService.validate(resolveOwnerId(resourceId));
     }
 }
