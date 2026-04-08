@@ -8,6 +8,7 @@ import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Mock
-    private CourseServiceImpl courseService;
+    private CourseService courseService;
 
     @Mock
     private UserRepository userRepository;

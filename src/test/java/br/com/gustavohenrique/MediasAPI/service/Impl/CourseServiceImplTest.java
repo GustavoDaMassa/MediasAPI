@@ -12,6 +12,7 @@ import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.CourseRepository;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +33,7 @@ class CourseServiceImplTest {
     private CourseServiceImpl courseService;
 
     @Mock
-    private ProjectionServiceImpl projectionService;
+    private ProjectionService projectionService;
 
     @Mock
     private CourseRepository courseRepository;
