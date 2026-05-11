@@ -14,4 +14,6 @@ public interface AssessmentService extends OwnershipValidator {
 
     Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto);
 
+    void resetAll(Long projectionId);
+
 }

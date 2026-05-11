@@ -19,4 +19,6 @@ public interface ProjectionService extends OwnershipValidator {
 
     List<Projection> listAllProjection(Long userId);
 
+    Projection resetProjection(Long courseId, Long projectionId);
+
 }

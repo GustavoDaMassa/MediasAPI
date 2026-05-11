@@ -74,6 +74,14 @@ public class ProjectionController {
             return ResponseEntity.ok(modelMapper.map(projectionService.deleteProjection(courseId,id),ProjectionDTO.class));
     }
 
+    @PatchMapping("/{id}/reset")
+    @Operation(summary = "Resetar projeção", description = "Zera todas as notas lançadas, mantendo a projeção intacta")
+    public ResponseEntity<ProjectionDTO> resetProjection(@PathVariable Long courseId, @PathVariable Long id) {
+            logger.info("Request to reset projection for course ID: {} and projection ID: {}", courseId, id);
+            projectionService.validateOwnership(courseId);
+            return ResponseEntity.ok(mapDTO.projectionDTO(projectionService.resetProjection(courseId, id)));
+    }
+
     @DeleteMapping("/all")
     @Operation(summary = "Deletar todas as projeções", description = "Deleta todas as projeções do curso, incluindo a " +
             "projeção default")

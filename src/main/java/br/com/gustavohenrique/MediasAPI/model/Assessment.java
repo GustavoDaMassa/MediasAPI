@@ -57,4 +57,9 @@ public class Assessment {
         this.grade = grade;
         this.fixed = true;
     }
+
+    public void reset() {
+        this.grade = 0.0;
+        this.fixed = false;
+    }
 }

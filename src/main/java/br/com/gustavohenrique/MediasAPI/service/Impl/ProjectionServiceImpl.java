@@ -91,6 +91,16 @@ public class ProjectionServiceImpl extends OwnedResourceService implements Proje
         return projectionRepository.findAllByUserId(userId);
     }
 
+    @Transactional
+    public Projection resetProjection(Long courseId, Long projectionId) {
+        validateCourse(courseId);
+        var course = courseRepository.findById(courseId).orElseThrow();
+        var projection = projectionRepository.findByCourseAndId(course, projectionId)
+                .orElseThrow(() -> new ProjectionNotFoundException(projectionId, courseId));
+        assessmentService.resetAll(projection.getId());
+        return projection;
+    }
+
     private void validateCourse(Long courseId){
         if(!courseRepository.existsById(courseId))
             throw new CourseNotFoundException(courseId);

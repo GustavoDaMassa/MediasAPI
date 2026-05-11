@@ -68,6 +68,16 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
         return assessment;
     }
 
+    @Transactional
+    public void resetAll(Long projectionId) {
+        validateProjection(projectionId);
+        var projection = projectionRepository.findById(projectionId).orElseThrow();
+        var course = projection.getCourse();
+        assessmentRepository.findByProjection(projection).forEach(Assessment::reset);
+        calculateFinalGrade.calculateResult(projection, course.getAverageMethod());
+        calculateRequiredGrade.calculateRequiredGrade(projection, course);
+    }
+
     public void validateProjection(Long projectionId){
         if(!projectionRepository.existsById(projectionId))
             throw new ProjectionNotFoundException(projectionId);
