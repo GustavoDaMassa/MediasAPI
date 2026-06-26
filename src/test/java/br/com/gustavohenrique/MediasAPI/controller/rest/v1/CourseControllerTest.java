@@ -82,7 +82,7 @@ class CourseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestCourseDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Math"));
+                .andExpect(jsonPath("$.data.name").value("Math"));
     }
 
     @Test

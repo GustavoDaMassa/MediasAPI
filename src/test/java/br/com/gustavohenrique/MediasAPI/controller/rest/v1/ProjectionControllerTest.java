@@ -89,7 +89,7 @@ class ProjectionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(stringRequestDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Projection 1"));
+                .andExpect(jsonPath("$.data.name").value("Projection 1"));
     }
 
     @Test

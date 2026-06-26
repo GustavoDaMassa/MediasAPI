@@ -31,13 +31,12 @@ public class CourseController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar curso", description = "Cria um novo curso, e através do método de cálculo das médias" +
-            " cria automaticamente uma projeção com o mesmo nome, identificando  e instânciando as avaliações definidas.")
-    public ResponseEntity<CourseDTO> createCourse(@PathVariable Long userId, @RequestBody @Valid RequestCourseDto course){
-           logger.info("Request to create course for user ID: {}", userId);
-           courseService.validateOwnership(userId);
-           return ResponseEntity.status(HttpStatus.CREATED)
-                   .body(modelMapper.map(courseService.createCourse(userId ,course), CourseDTO.class));
+    @Operation(summary = "Criar curso", description = "Cria um novo curso e automaticamente uma projeção com as avaliações definidas pelo método de cálculo.")
+    public ResponseEntity<ApiResponse<CourseDTO>> createCourse(@PathVariable Long userId, @RequestBody @Valid RequestCourseDto course) {
+        logger.info("Request to create course for user ID: {}", userId);
+        courseService.validateOwnership(userId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(modelMapper.map(courseService.createCourse(userId, course), CourseDTO.class)));
     }
 
     @GetMapping
@@ -52,41 +51,37 @@ public class CourseController {
 
     @PatchMapping("/{id}/name")
     @Operation(summary = "Alterar nome do curso")
-    public ResponseEntity<CourseDTO> updateCourseName(@PathVariable Long userId,@PathVariable Long id,
-                                                      @RequestBody @Valid StringRequestDTO nameDto){
-            logger.info("Request to update course name for user ID: {} and course ID: {}", userId, id);
-            courseService.validateOwnership(userId);
-            return ResponseEntity.ok(modelMapper.map(courseService.updateCourseName(userId, id, nameDto),
-                    CourseDTO.class));
+    public ResponseEntity<ApiResponse<CourseDTO>> updateCourseName(@PathVariable Long userId, @PathVariable Long id,
+                                                                   @RequestBody @Valid StringRequestDTO nameDto) {
+        logger.info("Request to update course name for user ID: {} and course ID: {}", userId, id);
+        courseService.validateOwnership(userId);
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(courseService.updateCourseName(userId, id, nameDto), CourseDTO.class)));
     }
 
     @PatchMapping("/{id}/method")
-    @Operation(summary = "Alterar método de cálculo", description = "Altera a forma como o método de cálculo da média " +
-            "final é definida. Deleta as projeções equivalentes e criar uma nova atualizada")
-    public ResponseEntity<CourseDTO> updateCourseMethod(@PathVariable Long userId ,@PathVariable Long id,
-                                                        @RequestBody @Valid StringRequestDTO averageMethodDto){
-            logger.info("Request to update course method for user ID: {} and course ID: {}", userId, id);
-            courseService.validateOwnership(userId);
-            return ResponseEntity.ok(modelMapper.map(courseService
-                    .updateCourseAverageMethod(userId, id, averageMethodDto), CourseDTO.class));
+    @Operation(summary = "Alterar método de cálculo", description = "Altera a fórmula de cálculo da média final. Recria projeção e avaliações.")
+    public ResponseEntity<ApiResponse<CourseDTO>> updateCourseMethod(@PathVariable Long userId, @PathVariable Long id,
+                                                                     @RequestBody @Valid StringRequestDTO averageMethodDto) {
+        logger.info("Request to update course method for user ID: {} and course ID: {}", userId, id);
+        courseService.validateOwnership(userId);
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(courseService.updateCourseAverageMethod(userId, id, averageMethodDto), CourseDTO.class)));
     }
 
     @PatchMapping("/{id}/cutoffgrade")
     @Operation(summary = "Alterar nota de corte")
-    public ResponseEntity<CourseDTO> updateCourseCutOffGrade(@PathVariable Long userId ,@PathVariable Long id,
-                                                             @RequestBody @Valid DoubleRequestDTO cutOffGradeDto){
-            logger.info("Request to update course cut-off grade for user ID: {} and course ID: {}", userId, id);
-            courseService.validateOwnership(userId);
-            return ResponseEntity.ok(modelMapper.map(courseService.updateCourseCutOffGrade(userId, id, cutOffGradeDto),
-                    CourseDTO.class));
+    public ResponseEntity<ApiResponse<CourseDTO>> updateCourseCutOffGrade(@PathVariable Long userId, @PathVariable Long id,
+                                                                          @RequestBody @Valid DoubleRequestDTO cutOffGradeDto) {
+        logger.info("Request to update course cut-off grade for user ID: {} and course ID: {}", userId, id);
+        courseService.validateOwnership(userId);
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(courseService.updateCourseCutOffGrade(userId, id, cutOffGradeDto), CourseDTO.class)));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar curso")
-    public ResponseEntity<CourseDTO> deleteCourse(@PathVariable Long userId, @PathVariable Long id){
-            logger.info("Request to delete course for user ID: {} and course ID: {}", userId, id);
-            courseService.validateOwnership(userId);
-            return ResponseEntity.ok(modelMapper.map(courseService.deleteCourse(userId, id), CourseDTO.class));
+    public ResponseEntity<ApiResponse<CourseDTO>> deleteCourse(@PathVariable Long userId, @PathVariable Long id) {
+        logger.info("Request to delete course for user ID: {} and course ID: {}", userId, id);
+        courseService.validateOwnership(userId);
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(courseService.deleteCourse(userId, id), CourseDTO.class)));
     }
 
     @GetMapping("/projections")

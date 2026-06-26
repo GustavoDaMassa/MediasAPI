@@ -43,57 +43,58 @@ public class UserController {
 
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Cadastrar usuário administrador", description = "Cria um novo perfil de usuário com role ADMIN. Perfil Admim necessário.")
-    public ResponseEntity<UserDTO> createAdminUser(@RequestBody @Valid LogOnDto users){
+    @Operation(summary = "Cadastrar usuário administrador", description = "Cria um novo perfil de usuário com role ADMIN. Perfil Admin necessário.")
+    public ResponseEntity<ApiResponse<UserDTO>> createAdminUser(@RequestBody @Valid LogOnDto users) {
         logger.info("Request to create admin user with email: {}", users.email());
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.createAdminUser(users), UserDTO.class));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(modelMapper.map(userService.createAdminUser(users), UserDTO.class)));
     }
 
     @PostMapping
     @Operation(summary = "Cadastrar usuário", description = "Cria um novo perfil de usuário, não é necessário autenticação.")
-    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid LogOnDto users){
+    public ResponseEntity<ApiResponse<UserDTO>> createUser(@RequestBody @Valid LogOnDto users) {
         logger.info("Request to create user with email: {}", users.email());
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(userService.create(users), UserDTO.class));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(modelMapper.map(userService.create(users), UserDTO.class)));
     }
 
     @PatchMapping("/{id}/name")
     @Operation(summary = "Atualizar nome de usuário")
-    public ResponseEntity<UserDTO> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
-           logger.info("Request to update name for user ID: {}", id);
-           var user = userService.getAuthenticatedUser();
-           if (!user.getId().equals(id)) {
-                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
-           }
-           return ResponseEntity.status(HttpStatus.OK).body(modelMapper
-                   .map(userService.updateName(id, nameDto), UserDTO.class));
+    public ResponseEntity<ApiResponse<UserDTO>> updateName(@PathVariable Long id, @RequestBody @Valid StringRequestDTO nameDto) {
+        logger.info("Request to update name for user ID: {}", id);
+        var user = userService.getAuthenticatedUser();
+        if (!user.getId().equals(id)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
+        }
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(userService.updateName(id, nameDto), UserDTO.class)));
     }
 
     @PatchMapping("/{id}/email")
     @Operation(summary = "Atualizar email de usuário")
-    public ResponseEntity<UserDTO> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO){
-            logger.info("Request to update email for user ID: {}", id);
-            var user = userService.getAuthenticatedUser();
-            if (!user.getId().equals(id)) {
-                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
-            }
-            return ResponseEntity.ok(modelMapper.map(userService.updateEmail(id, emailDTO), UserDTO.class));
+    public ResponseEntity<ApiResponse<UserDTO>> updateEmail(@PathVariable Long id, @RequestBody @Valid EmailUpdateDTO emailDTO) {
+        logger.info("Request to update email for user ID: {}", id);
+        var user = userService.getAuthenticatedUser();
+        if (!user.getId().equals(id)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this user.");
+        }
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(userService.updateEmail(id, emailDTO), UserDTO.class)));
     }
 
     @DeleteMapping("{id}")
     @Operation(summary = "Deletar o perfil de usuário")
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id){
-            logger.info("Request to delete user ID: {}", id);
-            var user = userService.getAuthenticatedUser();
-            if (!user.getId().equals(id)) {
-                throw new org.springframework.security.access.AccessDeniedException("You are not authorized to delete this user.");
-            }
-            return ResponseEntity.ok(modelMapper.map(userService.deleteUser(id), UserDTO.class));
+    public ResponseEntity<ApiResponse<UserDTO>> deleteUser(@PathVariable Long id) {
+        logger.info("Request to delete user ID: {}", id);
+        var user = userService.getAuthenticatedUser();
+        if (!user.getId().equals(id)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to delete this user.");
+        }
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(userService.deleteUser(id), UserDTO.class)));
     }
 
     @GetMapping("{email}")
-    @Operation(summary = "resgatar o id de um usuário pelo email")
-    public ResponseEntity<UserDTO> findUser(@PathVariable String email){
+    @Operation(summary = "Buscar usuário pelo email")
+    public ResponseEntity<ApiResponse<UserDTO>> findUser(@PathVariable String email) {
         logger.info("Request to find user by email: {}", email);
-        return  ResponseEntity.ok(modelMapper.map(userService.findusers(email),UserDTO.class));
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(userService.findusers(email), UserDTO.class)));
     }
 }

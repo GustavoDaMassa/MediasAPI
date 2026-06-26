@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 
+import br.com.gustavohenrique.MediasAPI.dtos.ApiResponse;
 import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.PageResponse;
@@ -29,15 +30,12 @@ public class AssessmentController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Inserir nota",description = "Posta a nota adquirida. Automaticamente a média final é " +
-            "calculada juntamente com o quanto de pontuação ainda falta em cada avaliação ainda não realizada," +
-            " para atingir a nota de corte")
-    public ResponseEntity<AssessmentDTO> insertGrade(@PathVariable Long projectionId, @PathVariable Long id,
-                                                     @RequestBody DoubleRequestDTO gradeDto){
-            logger.info("Request to insert grade for projection ID: {} and assessment ID: {}", projectionId, id);
-            assessmentService.validateOwnership(projectionId);
-            return ResponseEntity.ok(modelMapper.map(assessmentService.insertGrade(projectionId,id,gradeDto),
-                    AssessmentDTO.class));
+    @Operation(summary = "Inserir nota", description = "Posta a nota adquirida. Automaticamente a média final é calculada juntamente com o quanto de pontuação ainda falta em cada avaliação não realizada, para atingir a nota de corte.")
+    public ResponseEntity<ApiResponse<AssessmentDTO>> insertGrade(@PathVariable Long projectionId, @PathVariable Long id,
+                                                                  @RequestBody DoubleRequestDTO gradeDto) {
+        logger.info("Request to insert grade for projection ID: {} and assessment ID: {}", projectionId, id);
+        assessmentService.validateOwnership(projectionId);
+        return ResponseEntity.ok(ApiResponse.of(modelMapper.map(assessmentService.insertGrade(projectionId, id, gradeDto), AssessmentDTO.class)));
     }
 
     @GetMapping
