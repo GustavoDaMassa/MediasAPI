@@ -1,5 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.authentication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -30,6 +31,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.security.KeyFactory;
@@ -50,6 +52,7 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final MdcFilter mdcFilter;
+    private final ObjectMapper objectMapper;
 
     @Value("${JWT_PUBLIC_KEY_CONTENT}")
     private String publicKeyContent;
@@ -61,8 +64,14 @@ public class SecurityConfig {
     private RSAPrivateKey privateKey;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter) {
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter, ObjectMapper objectMapper) {
         this.mdcFilter = mdcFilter;
+        this.objectMapper = objectMapper;
+    }
+
+    @Bean
+    public RateLimitFilter rateLimitFilter() {
+        return new RateLimitFilter(objectMapper);
     }
 
     @PostConstruct
@@ -106,6 +115,7 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .addFilterBefore(rateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(mdcFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
