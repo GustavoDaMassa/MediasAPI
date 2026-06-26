@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class AssessmentServiceImpl extends OwnedResourceService implements AssessmentService {
@@ -48,10 +49,10 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
         calculateRequiredGrade.calculateRequiredGrade(projection,course);
     }
 
-    public List<Assessment> listAssessment(Long projectionId) {
+    public Page<Assessment> listAssessment(Long projectionId, Pageable pageable) {
         validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
-        return assessmentRepository.findByProjection(projection);
+        return assessmentRepository.findByProjection(projection, pageable);
     }
 
     @Transactional

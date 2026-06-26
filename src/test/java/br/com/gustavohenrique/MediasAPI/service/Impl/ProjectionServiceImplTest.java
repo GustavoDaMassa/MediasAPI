@@ -17,11 +17,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class ProjectionServiceImplTest {
@@ -98,14 +104,14 @@ class ProjectionServiceImplTest {
         var projection1 = new Projection(1L,null,null,"Projection1",0);
         var projection2 = new Projection(2L,null,null,"Projection2",10);
 
-        when(projectionRepository.findByCourse(course)).thenReturn(List.of(projection1,projection2));
+        when(projectionRepository.findByCourse(eq(course), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(projection1, projection2)));
 
-        var response = projectionService.listProjection(courseId);
+        Page<Projection> response = projectionService.listProjection(courseId, Pageable.unpaged());
 
-        AssertProjection(projection1,response.get(0));
-        AssertProjection(projection2,response.get(1));
+        AssertProjection(projection1, response.getContent().get(0));
+        AssertProjection(projection2, response.getContent().get(1));
         verify(courseRepository).findById(courseId);
-        verify(projectionRepository).findByCourse(course);
+        verify(projectionRepository).findByCourse(eq(course), any(Pageable.class));
     }
 
     @Test
@@ -221,14 +227,14 @@ class ProjectionServiceImplTest {
         var projection2 = new Projection(2L,null,null,"Projection2",10);
 
         when(userRepository.existsById(userId)).thenReturn(true);
-        when(projectionRepository.findAllByUserId(userId)).thenReturn(List.of(projection1,projection2));
+        when(projectionRepository.findAllByUserId(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(projection1, projection2)));
 
-        var response = projectionService.listAllProjection(userId);
+        Page<Projection> response = projectionService.listAllProjection(userId, Pageable.unpaged());
 
-        AssertProjection(projection1,response.get(0));
-        AssertProjection(projection2,response.get(1));
+        AssertProjection(projection1, response.getContent().get(0));
+        AssertProjection(projection2, response.getContent().get(1));
         verify(userRepository).existsById(userId);
-        verify(projectionRepository).findAllByUserId(userId);
+        verify(projectionRepository).findAllByUserId(eq(userId), any(Pageable.class));
 
     }
 
@@ -238,10 +244,10 @@ class ProjectionServiceImplTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(NotFoundArgumentException.class,()-> projectionService.listAllProjection(anyLong()));
+        assertThrows(NotFoundArgumentException.class, () -> projectionService.listAllProjection(anyLong(), Pageable.unpaged()));
 
         verify(userRepository).existsById(anyLong());
-        verify(projectionRepository,never()).findAllByUserId(anyLong());
+        verify(projectionRepository, never()).findAllByUserId(anyLong(), any(Pageable.class));
     }
 
     @Test
@@ -253,7 +259,7 @@ class ProjectionServiceImplTest {
         when(courseRepository.findById(courseId)).thenThrow(new CourseNotFoundException(courseId));
 
         assertThrows(NotFoundArgumentException.class, () -> projectionService.createProjection(courseId,projectionName));
-        assertThrows(NotFoundArgumentException.class, () -> projectionService.listProjection(courseId));
+        assertThrows(NotFoundArgumentException.class, () -> projectionService.listProjection(courseId, Pageable.unpaged()));
         assertThrows(NotFoundArgumentException.class,
                 () -> projectionService.updateProjectionName(courseId,projection.getId(),projectionName));
         assertThrows(NotFoundArgumentException.class,
@@ -263,7 +269,7 @@ class ProjectionServiceImplTest {
         verify(projectionRepository,never()).existsByCourseAndName(course,projectionName.string());
         verify(projectionRepository,never()).save(any(Projection.class));
         verify(assessmentService,never()).createAssessment(any(Projection.class));
-        verify(projectionRepository,never()).findByCourse(course);
+        verify(projectionRepository, never()).findByCourse(eq(course), any(Pageable.class));
         verify(projectionRepository,never()).findByCourseAndId(course,projection.getId());
     }
 

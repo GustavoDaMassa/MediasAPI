@@ -5,13 +5,13 @@ import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import jakarta.validation.Valid;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CourseService extends OwnershipValidator {
     Course createCourse(Long userId, @Valid RequestCourseDto course);
 
-    List<Course> listCourses(Long userId);
+    Page<Course> listCourses(Long userId, Pageable pageable);
 
     Course updateCourseName(Long userId, Long id, @Valid StringRequestDTO nameDto);
 

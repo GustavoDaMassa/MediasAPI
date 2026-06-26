@@ -9,12 +9,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/{userId}/courses")
@@ -42,12 +41,13 @@ public class CourseController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar cursos", description = "retorna os cursos pertencentes ao usuário autenticado.")
-    public  ResponseEntity<List<CourseDTO>> showCourses(@PathVariable Long userId){
-          logger.info("Request to list courses for user ID: {}", userId);
-          courseService.validateOwnership(userId);
-          return ResponseEntity.ok(courseService.listCourses(userId).stream()
-                  .map(course -> modelMapper.map(course,CourseDTO.class)).collect(Collectors.toList()));
+    @Operation(summary = "Listar cursos", description = "Retorna os cursos do usuário autenticado de forma paginada.")
+    public ResponseEntity<PageResponse<CourseDTO>> showCourses(@PathVariable Long userId,
+                                                               @PageableDefault(size = 20) Pageable pageable) {
+        logger.info("Request to list courses for user ID: {}", userId);
+        courseService.validateOwnership(userId);
+        var page = courseService.listCourses(userId, pageable).map(c -> modelMapper.map(c, CourseDTO.class));
+        return ResponseEntity.ok(PageResponse.from(page));
     }
 
     @PatchMapping("/{id}/name")
@@ -90,12 +90,13 @@ public class CourseController {
     }
 
     @GetMapping("/projections")
-    @Operation(summary = "Listar projeções", description = "Lista todas as projeções de um usuário")
-    public ResponseEntity<List<ProjectionDTO>> showAllProjections(@PathVariable Long userId){
+    @Operation(summary = "Listar todas as projeções do usuário", description = "Lista todas as projeções de todos os cursos do usuário, paginadas.")
+    public ResponseEntity<PageResponse<ProjectionDTO>> showAllProjections(@PathVariable Long userId,
+                                                                          @PageableDefault(size = 20) Pageable pageable) {
         logger.info("Request to list all projections for user ID: {}", userId);
         courseService.validateOwnership(userId);
-        return ResponseEntity.ok(projectionService.listAllProjection(userId).stream().map(projection ->
-                modelMapper.map(projection,ProjectionDTO.class)).collect(Collectors.toList()));
+        var page = projectionService.listAllProjection(userId, pageable).map(p -> modelMapper.map(p, ProjectionDTO.class));
+        return ResponseEntity.ok(PageResponse.from(page));
     }
 
 }

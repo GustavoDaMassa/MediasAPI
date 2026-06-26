@@ -22,10 +22,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -86,11 +90,11 @@ class CourseControllerTest {
     @WithMockUser
     void testShowCourses() throws Exception {
         doNothing().when(courseService).validateOwnership(1L);
-        when(courseService.listCourses(1L)).thenReturn(List.of(course));
+        when(courseService.listCourses(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(course)));
 
         mockMvc.perform(get("/api/v1/1/courses"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Math"));
+                .andExpect(jsonPath("$.data[0].name").value("Math"));
     }
 
     @Test
@@ -148,7 +152,7 @@ class CourseControllerTest {
     @WithMockUser
     void testShowAllProjections() throws Exception {
         doNothing().when(courseService).validateOwnership(1L);
-        when(projectionService.listAllProjection(1L)).thenReturn(List.of(new Projection()));
+        when(projectionService.listAllProjection(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new Projection())));
 
         mockMvc.perform(get("/api/v1/1/courses/projections"))
                 .andExpect(status().isOk());

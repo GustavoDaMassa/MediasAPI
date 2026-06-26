@@ -2,6 +2,8 @@ package br.com.gustavohenrique.MediasAPI.repository;
 
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +18,8 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
 
     List<Projection> findByCourse(Course course);
 
+    Page<Projection> findByCourse(Course course, Pageable pageable);
+
     Optional<Projection> findByCourseAndId(Course course, Long id);
 
     @Modifying
@@ -28,8 +32,11 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
     @Query(value = "DELETE FROM projection WHERE id = :id AND course_id = :courseId",nativeQuery = true)
     void deleteProjection(@Param("id") Long id, @Param("courseId") Long courseId);
 
-    @Query(value = "SELECT p.* FROM projection p JOIN course c ON p.course_id = c.id JOIN users u ON c.user_id = u.id" +
-            " WHERE u.id = :userId;",nativeQuery = true)
-    List<Projection> findAllByUserId(@Param("userId") Long userId);
+    @Query(
+            value = "SELECT p.* FROM projection p JOIN course c ON p.course_id = c.id JOIN users u ON c.user_id = u.id WHERE u.id = :userId",
+            countQuery = "SELECT COUNT(p.id) FROM projection p JOIN course c ON p.course_id = c.id JOIN users u ON c.user_id = u.id WHERE u.id = :userId",
+            nativeQuery = true
+    )
+    Page<Projection> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 
 }

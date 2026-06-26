@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class CourseServiceImpl extends OwnedResourceService implements CourseService {
@@ -47,10 +48,10 @@ public class CourseServiceImpl extends OwnedResourceService implements CourseSer
         return courseRepository.save(course);
     }
 
-    public List<Course> listCourses(Long userId) {
+    public Page<Course> listCourses(Long userId, Pageable pageable) {
         validateUser(userId);
         var user = userRepository.findById(userId).orElseThrow();
-        return courseRepository.findByUser(user);
+        return courseRepository.findByUser(user, pageable);
     }
 
     @Transactional

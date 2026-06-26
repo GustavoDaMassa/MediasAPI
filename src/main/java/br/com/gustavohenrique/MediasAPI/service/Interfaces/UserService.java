@@ -5,8 +5,8 @@ import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import jakarta.validation.Valid;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
     Users create(LogOnDto users);
@@ -19,7 +19,7 @@ public interface UserService {
 
     Users deleteUser(Long id);
 
-    List<Users> listUsers();
+    Page<Users> listUsers(Pageable pageable);
 
     Users findusers(String email);
 

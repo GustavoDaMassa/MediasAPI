@@ -20,12 +20,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class CourseServiceImplTest {
@@ -98,13 +103,13 @@ class CourseServiceImplTest {
         var course1 = new Course(1L,user,"BD1",null,"p1+p2",6);
         var course2 = new Course(2L,user,"BD2",null,"p1+p2+p3",6);
 
-        when(courseRepository.findByUser(user)).thenReturn(List.of(course1,course2));
+        when(courseRepository.findByUser(eq(user), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(course1, course2)));
 
-        var courses = courseService.listCourses(userId);
+        Page<Course> courses = courseService.listCourses(userId, Pageable.unpaged());
 
-        AssertCourse(course1,courses.get(0));
-        AssertCourse(course2,courses.get(1));
-        verify(courseRepository).findByUser(user);
+        AssertCourse(course1, courses.getContent().get(0));
+        AssertCourse(course2, courses.getContent().get(1));
+        verify(courseRepository).findByUser(eq(user), any(Pageable.class));
         verify(userRepository).findById(userId);
     }
 
@@ -281,7 +286,7 @@ class CourseServiceImplTest {
 
 
         assertThrows(NotFoundArgumentException.class, ()-> courseService.createCourse(userId,courseDto));
-        assertThrows(NotFoundArgumentException.class,()->courseService.listCourses(userId));
+        assertThrows(NotFoundArgumentException.class,()->courseService.listCourses(userId, Pageable.unpaged()));
         assertThrows(NotFoundArgumentException.class,()->courseService.updateCourseName(userId,1l,
                 new StringRequestDTO(courseDto.name())));
         assertThrows(NotFoundArgumentException.class,()->courseService.updateCourseAverageMethod(userId,1l,

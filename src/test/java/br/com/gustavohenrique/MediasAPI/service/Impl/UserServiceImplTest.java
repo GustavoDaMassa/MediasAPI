@@ -8,6 +8,9 @@ import br.com.gustavohenrique.MediasAPI.exception.NotFoundArgumentException;
 import br.com.gustavohenrique.MediasAPI.model.Role;
 import br.com.gustavohenrique.MediasAPI.model.Users;
 import br.com.gustavohenrique.MediasAPI.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -214,16 +217,16 @@ class UserServiceImplTest {
         Users users1 = new Users(null, "Gustavo","gustavo.pereira@discente.ufg.br", new ArrayList<>(),
                 "aula321", Role.USER);
 
-        when(userRepository.findAll()).thenReturn(List.of(users1,users2,users3));
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(users1,users2,users3)));
 
-        List<Users> users = userService.listUsers();
+        Page<Users> page = userService.listUsers(Pageable.unpaged());
 
-        AssertUser(users2,users.get(1));
-        AssertUser(users1,users.get(0));
-        AssertUser(users3,users.get(2));
-        assertEquals(3,users.size());
-        verify(userRepository).findAll();
-        assertEquals(Users.class,users.get(0).getClass());
+        AssertUser(users2, page.getContent().get(1));
+        AssertUser(users1, page.getContent().get(0));
+        AssertUser(users3, page.getContent().get(2));
+        assertEquals(3, page.getContent().size());
+        verify(userRepository).findAll(any(Pageable.class));
+        assertEquals(Users.class, page.getContent().get(0).getClass());
     }
 
 

@@ -17,9 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -74,10 +78,10 @@ class AssessmentControllerTest {
     @WithMockUser
     void testShowAssessment() throws Exception {
         doNothing().when(assessmentService).validateOwnership(1L);
-        when(assessmentService.listAssessment(1L)).thenReturn(List.of(assessment));
+        when(assessmentService.listAssessment(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(assessment)));
 
         mockMvc.perform(get("/api/v1/1/assessments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].identifier").value("P1"));
+                .andExpect(jsonPath("$.data[0].identifier").value("P1"));
     }
 }

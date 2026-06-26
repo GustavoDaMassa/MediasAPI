@@ -1,9 +1,6 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
-import br.com.gustavohenrique.MediasAPI.dtos.EmailUpdateDTO;
-import br.com.gustavohenrique.MediasAPI.dtos.LogOnDto;
-import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
-import br.com.gustavohenrique.MediasAPI.dtos.UserDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.*;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -11,13 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -38,12 +34,11 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Listar usuários", description = "Retorna uma lista com todos os usuarios da aplicação e " +
-            "seus id's. Perfil Admim necessário.")
-    public ResponseEntity<List<UserDTO>> showUsers(){
+    @Operation(summary = "Listar usuários", description = "Retorna todos os usuários paginados. Perfil Admin necessário.")
+    public ResponseEntity<PageResponse<UserDTO>> showUsers(@PageableDefault(size = 20) Pageable pageable) {
         logger.info("Request to list all users (Admin)");
-        return ResponseEntity.ok(userService.listUsers().stream().
-                map(users -> modelMapper.map(users,UserDTO.class)).collect(Collectors.toList()));
+        var page = userService.listUsers(pageable).map(u -> modelMapper.map(u, UserDTO.class));
+        return ResponseEntity.ok(PageResponse.from(page));
     }
 
     @PostMapping("/admin")

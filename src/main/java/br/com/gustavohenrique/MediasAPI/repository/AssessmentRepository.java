@@ -2,6 +2,8 @@ package br.com.gustavohenrique.MediasAPI.repository;
 
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,8 @@ import java.util.Optional;
 public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
 
     List<Assessment> findByProjection(Projection projectionId);
+
+    Page<Assessment> findByProjection(Projection projection, Pageable pageable);
 
     @Query(value = "SELECT * FROM assessment  WHERE identifier = :identifier AND projection_id = :projection",nativeQuery = true)
     Assessment findByIndentifier(@Param("identifier") String identifier,@Param("projection") Long projection);

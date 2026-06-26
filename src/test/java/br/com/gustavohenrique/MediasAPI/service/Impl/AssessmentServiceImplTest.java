@@ -19,6 +19,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -90,14 +94,14 @@ class AssessmentServiceImplTest {
                 List.of(assessment1,assessment2),"Projection test",9.8);
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
-        when(assessmentRepository.findByProjection(any(Projection.class))).thenReturn(projection.getAssessment());
+        when(assessmentRepository.findByProjection(any(Projection.class), any(Pageable.class))).thenReturn(new PageImpl<>(projection.getAssessment()));
 
-        var response = assessmentService.listAssessment(projection.getId());
+        Page<Assessment> response = assessmentService.listAssessment(projection.getId(), Pageable.unpaged());
 
-        AssertAssessment(assessment1, response.get(0));
-        AssertAssessment(assessment2, response.get(1));
+        AssertAssessment(assessment1, response.getContent().get(0));
+        AssertAssessment(assessment2, response.getContent().get(1));
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository).findByProjection(any(Projection.class));
+        verify(assessmentRepository).findByProjection(any(Projection.class), any(Pageable.class));
 
     }
 
@@ -108,10 +112,10 @@ class AssessmentServiceImplTest {
 
         when(projectionRepository.findById(projection.getId())).thenThrow(new ProjectionNotFoundException(projection.getId()));
 
-        assertThrows(NotFoundArgumentException.class,()-> assessmentService.listAssessment(projection.getId()));
+        assertThrows(NotFoundArgumentException.class, () -> assessmentService.listAssessment(projection.getId(), Pageable.unpaged()));
 
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository,never()).findByProjection(any(Projection.class));
+        verify(assessmentRepository, never()).findByProjection(any(Projection.class), any(Pageable.class));
 
     }
 

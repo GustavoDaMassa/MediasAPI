@@ -1,6 +1,7 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
 import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
+import br.com.gustavohenrique.MediasAPI.dtos.PageResponse;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
@@ -11,12 +12,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/{courseId}/projections")
@@ -47,13 +47,13 @@ public class ProjectionController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar projeções", description = "retorna todas as projeções de um determinido curso com uma" +
-            "lista de avaliações equivalentes.")
-    public ResponseEntity<List<ProjectionDTO>> showProjections(@PathVariable Long courseId){
-            logger.info("Request to list projections for course ID: {}", courseId);
-            projectionService.validateOwnership(courseId);
-            return ResponseEntity.ok(projectionService.listProjection(courseId).stream()
-                    .map(mapDTO::projectionDTO).collect(Collectors.toList()));
+    @Operation(summary = "Listar projeções", description = "Retorna as projeções de um curso de forma paginada, com lista de avaliações.")
+    public ResponseEntity<PageResponse<ProjectionDTO>> showProjections(@PathVariable Long courseId,
+                                                                       @PageableDefault(size = 20) Pageable pageable) {
+        logger.info("Request to list projections for course ID: {}", courseId);
+        projectionService.validateOwnership(courseId);
+        var page = projectionService.listProjection(courseId, pageable).map(mapDTO::projectionDTO);
+        return ResponseEntity.ok(PageResponse.from(page));
     }
 
     @PatchMapping("/{id}")

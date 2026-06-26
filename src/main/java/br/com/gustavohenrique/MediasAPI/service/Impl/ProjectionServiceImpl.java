@@ -18,7 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ProjectionServiceImpl extends OwnedResourceService implements ProjectionService {
@@ -52,10 +53,10 @@ public class ProjectionServiceImpl extends OwnedResourceService implements Proje
         return projection;
     }
 
-    public List<Projection> listProjection(Long courseId) {
+    public Page<Projection> listProjection(Long courseId, Pageable pageable) {
         validateCourse(courseId);
         Course course = courseRepository.findById(courseId).orElseThrow();
-        return projectionRepository.findByCourse(course);
+        return projectionRepository.findByCourse(course, pageable);
     }
 
     @Transactional
@@ -86,9 +87,9 @@ public class ProjectionServiceImpl extends OwnedResourceService implements Proje
         projectionRepository.deleteAllByCourse(courseId, userId);
     }
 
-    public List<Projection> listAllProjection(Long userId) {
+    public Page<Projection> listAllProjection(Long userId, Pageable pageable) {
         if(!userRepository.existsById(userId))throw new UserNotFoundException(userId);
-        return projectionRepository.findAllByUserId(userId);
+        return projectionRepository.findAllByUserId(userId, pageable);
     }
 
     @Transactional
