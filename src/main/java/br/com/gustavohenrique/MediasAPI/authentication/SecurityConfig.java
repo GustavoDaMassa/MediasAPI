@@ -101,7 +101,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers(new AntPathRequestMatcher("/api/v1/users", "POST")).permitAll();
                     auth.requestMatchers("/actuator/**").permitAll();
-                    auth.requestMatchers("/authenticate", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    auth.requestMatchers("/authenticate", "/authenticate/refresh", "/authenticate/logout",
+                            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
