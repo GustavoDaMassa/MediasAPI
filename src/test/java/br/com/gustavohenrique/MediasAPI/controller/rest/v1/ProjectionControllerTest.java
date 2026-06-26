@@ -1,12 +1,15 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
+import br.com.gustavohenrique.MediasAPI.authentication.ApiKeyService;
 import br.com.gustavohenrique.MediasAPI.controller.rest.v1.mapper.MapDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.AssessmentDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.ProjectionDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.Application;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.Users;
+import br.com.gustavohenrique.MediasAPI.repository.ApplicationRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,6 +65,12 @@ class ProjectionControllerTest {
     @MockBean
     private MapDTO mapDTO;
 
+    @MockBean
+    private ApplicationRepository applicationRepository;
+
+    @MockBean
+    private ApiKeyService apiKeyService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -75,6 +85,9 @@ class ProjectionControllerTest {
         projection = new Projection(1L, course, new ArrayList<>(), "Projection 1", 0.0);
         stringRequestDTO = new StringRequestDTO("Projection 1");
         projectionDTO = new ProjectionDTO(1L, "Projection 1", new ArrayList<AssessmentDTO>(), 0.0);
+        Application app = new Application("Test App", null, "test-hash", "mapi_test");
+        when(apiKeyService.hash(any())).thenReturn("test-hash");
+        when(applicationRepository.findByApiKeyHashAndActiveTrue("test-hash")).thenReturn(Optional.of(app));
     }
 
     @Test
@@ -85,7 +98,7 @@ class ProjectionControllerTest {
         when(projectionService.createProjection(any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
-        mockMvc.perform(post("/api/v1/1/projections").with(csrf())
+        mockMvc.perform(post("/api/v1/1/projections").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(stringRequestDTO)))
                 .andExpect(status().isCreated())
@@ -100,7 +113,7 @@ class ProjectionControllerTest {
         when(projectionService.listProjection(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(projection)));
         when(mapDTO.projectionDTO(any(Projection.class))).thenReturn(projectionDTO);
 
-        mockMvc.perform(get("/api/v1/1/projections"))
+        mockMvc.perform(get("/api/v1/1/projections").header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("Projection 1"));
     }
@@ -112,7 +125,7 @@ class ProjectionControllerTest {
         doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.updateProjectionName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(projection);
 
-        mockMvc.perform(patch("/api/v1/1/projections/1").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/projections/1").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("New Name"))))
                 .andExpect(status().isOk());
@@ -125,7 +138,7 @@ class ProjectionControllerTest {
         doNothing().when(projectionService).validateOwnership(1L);
         when(projectionService.deleteProjection(any(Long.class), any(Long.class))).thenReturn(projection);
 
-        mockMvc.perform(delete("/api/v1/1/projections/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/projections/1").with(csrf()).header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk());
     }
 
@@ -137,7 +150,7 @@ class ProjectionControllerTest {
         when(userService.getAuthenticatedUser()).thenReturn(new Users());
         doNothing().when(projectionService).deleteAllProjections(any(Long.class), any(Long.class));
 
-        mockMvc.perform(delete("/api/v1/1/projections/all").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/projections/all").with(csrf()).header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk());
     }
 }

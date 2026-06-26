@@ -1,11 +1,14 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
+import br.com.gustavohenrique.MediasAPI.authentication.ApiKeyService;
 import br.com.gustavohenrique.MediasAPI.dtos.RequestCourseDto;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
 import br.com.gustavohenrique.MediasAPI.dtos.StringRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.Application;
 import br.com.gustavohenrique.MediasAPI.model.Course;
 import br.com.gustavohenrique.MediasAPI.model.Projection;
 import br.com.gustavohenrique.MediasAPI.model.Users;
+import br.com.gustavohenrique.MediasAPI.repository.ApplicationRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.CourseService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ProjectionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,6 +61,12 @@ class CourseControllerTest {
     @MockBean
     private ProjectionService projectionService;
 
+    @MockBean
+    private ApplicationRepository applicationRepository;
+
+    @MockBean
+    private ApiKeyService apiKeyService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -69,6 +79,9 @@ class CourseControllerTest {
         user = new Users(1L, "Gustavo", "gustavo@test.com", new ArrayList<>(), "password", null);
         course = new Course(1L, user, "Math", new ArrayList<>(), "P1+P2", 6.0);
         requestCourseDto = new RequestCourseDto("Math", "P1+P2", 6.0);
+        Application app = new Application("Test App", null, "test-hash", "mapi_test");
+        when(apiKeyService.hash(any())).thenReturn("test-hash");
+        when(applicationRepository.findByApiKeyHashAndActiveTrue("test-hash")).thenReturn(Optional.of(app));
     }
 
     @Test
@@ -78,7 +91,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.createCourse(any(Long.class), any(RequestCourseDto.class))).thenReturn(course);
 
-        mockMvc.perform(post("/api/v1/1/courses").with(csrf())
+        mockMvc.perform(post("/api/v1/1/courses").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestCourseDto)))
                 .andExpect(status().isCreated())
@@ -92,7 +105,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.listCourses(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(course)));
 
-        mockMvc.perform(get("/api/v1/1/courses"))
+        mockMvc.perform(get("/api/v1/1/courses").header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("Math"));
     }
@@ -104,7 +117,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseName(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/api/v1/1/courses/1/name").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/name").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("New Math"))))
                 .andExpect(status().isOk());
@@ -117,7 +130,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseAverageMethod(any(Long.class), any(Long.class), any(StringRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/api/v1/1/courses/1/method").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/method").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new StringRequestDTO("P1+P2+P3"))))
                 .andExpect(status().isOk());
@@ -130,7 +143,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.updateCourseCutOffGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(course);
 
-        mockMvc.perform(patch("/api/v1/1/courses/1/cutoffgrade").with(csrf())
+        mockMvc.perform(patch("/api/v1/1/courses/1/cutoffgrade").with(csrf()).header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new DoubleRequestDTO(7.0))))
                 .andExpect(status().isOk());
@@ -143,7 +156,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(courseService.deleteCourse(any(Long.class), any(Long.class))).thenReturn(course);
 
-        mockMvc.perform(delete("/api/v1/1/courses/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/1/courses/1").with(csrf()).header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk());
     }
 
@@ -154,7 +167,7 @@ class CourseControllerTest {
         doNothing().when(courseService).validateOwnership(1L);
         when(projectionService.listAllProjection(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new Projection())));
 
-        mockMvc.perform(get("/api/v1/1/courses/projections"))
+        mockMvc.perform(get("/api/v1/1/courses/projections").header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk());
     }
 }

@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import br.com.gustavohenrique.MediasAPI.repository.ApplicationRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,8 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final MdcFilter mdcFilter;
+    private final ApplicationRepository applicationRepository;
+    private final ApiKeyService apiKeyService;
     private final ObjectMapper objectMapper;
 
     @Value("${JWT_PUBLIC_KEY_CONTENT}")
@@ -64,14 +67,18 @@ public class SecurityConfig {
     private RSAPrivateKey privateKey;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter, ObjectMapper objectMapper) {
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, MdcFilter mdcFilter,
+                          ApplicationRepository applicationRepository, ApiKeyService apiKeyService,
+                          ObjectMapper objectMapper) {
         this.mdcFilter = mdcFilter;
+        this.applicationRepository = applicationRepository;
+        this.apiKeyService = apiKeyService;
         this.objectMapper = objectMapper;
     }
 
     @Bean
-    public RateLimitFilter rateLimitFilter() {
-        return new RateLimitFilter(objectMapper);
+    public ApiKeyFilter apiKeyFilter() {
+        return new ApiKeyFilter(applicationRepository, apiKeyService, objectMapper);
     }
 
     @PostConstruct
@@ -109,13 +116,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers(new AntPathRequestMatcher("/api/v1/users", "POST")).permitAll();
+                    auth.requestMatchers(new AntPathRequestMatcher("/api/v1/applications", "POST")).permitAll();
+                    auth.requestMatchers("/api/v1/applications/me", "/api/v1/applications/me/rotate").permitAll();
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/v1/applications/me").permitAll();
                     auth.requestMatchers("/actuator/**").permitAll();
                     auth.requestMatchers("/authenticate", "/authenticate/refresh", "/authenticate/logout",
                             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(conf -> conf.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .addFilterBefore(rateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiKeyFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(mdcFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }

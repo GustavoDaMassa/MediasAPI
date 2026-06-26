@@ -1,7 +1,10 @@
 package br.com.gustavohenrique.MediasAPI.controller.rest.v1;
 
+import br.com.gustavohenrique.MediasAPI.authentication.ApiKeyService;
 import br.com.gustavohenrique.MediasAPI.dtos.DoubleRequestDTO;
+import br.com.gustavohenrique.MediasAPI.model.Application;
 import br.com.gustavohenrique.MediasAPI.model.Assessment;
+import br.com.gustavohenrique.MediasAPI.repository.ApplicationRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,6 +52,12 @@ class AssessmentControllerTest {
     @MockBean
     private AssessmentService assessmentService;
 
+    @MockBean
+    private ApplicationRepository applicationRepository;
+
+    @MockBean
+    private ApiKeyService apiKeyService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -58,6 +68,9 @@ class AssessmentControllerTest {
     void setUp() {
         assessment = new Assessment("P1", 8.0, 10.0, null);
         doubleRequestDTO = new DoubleRequestDTO(8.0);
+        Application app = new Application("Test App", null, "test-hash", "mapi_test");
+        when(apiKeyService.hash(any())).thenReturn("test-hash");
+        when(applicationRepository.findByApiKeyHashAndActiveTrue("test-hash")).thenReturn(Optional.of(app));
     }
 
     @Test
@@ -68,6 +81,7 @@ class AssessmentControllerTest {
         when(assessmentService.insertGrade(any(Long.class), any(Long.class), any(DoubleRequestDTO.class))).thenReturn(assessment);
 
         mockMvc.perform(patch("/api/v1/1/assessments/1").with(csrf())
+                        .header("X-Api-Key", "mapi_test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(doubleRequestDTO)))
                 .andExpect(status().isOk());
@@ -80,7 +94,8 @@ class AssessmentControllerTest {
         doNothing().when(assessmentService).validateOwnership(1L);
         when(assessmentService.listAssessment(eq(1L), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(assessment)));
 
-        mockMvc.perform(get("/api/v1/1/assessments"))
+        mockMvc.perform(get("/api/v1/1/assessments")
+                        .header("X-Api-Key", "mapi_test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].identifier").value("P1"));
     }
