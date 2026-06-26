@@ -28,6 +28,9 @@ public class Assessment {
     @Setter
     private double requiredGrade;
 
+    @Setter
+    private double requiredGradeMaxNear = 0.0;
+
     private boolean fixed = false;
 
     @Setter
@@ -61,5 +64,6 @@ public class Assessment {
     public void reset() {
         this.grade = 0.0;
         this.fixed = false;
+        this.requiredGradeMaxNear = 0.0;
     }
 }

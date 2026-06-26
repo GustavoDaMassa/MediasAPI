@@ -10,6 +10,7 @@ import br.com.gustavohenrique.MediasAPI.exception.ProjectionNotFoundException;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.AssessmentService;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGradeMaxNear;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
 import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,15 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
     private final IIdentifiersDefinition identifiersDefinition;
     private final ICalculateFinalGrade calculateFinalGrade;
     private final ICalculateRequiredGrade calculateRequiredGrade;
+    private final ICalculateRequiredGradeMaxNear calculateRequiredGradeMaxNear;
 
     @Autowired
-    public AssessmentServiceImpl(ProjectionRepository projectionRepository, AssessmentRepository assessmentRepository,
-                                 IIdentifiersDefinition identifiersDefinition, ICalculateFinalGrade calculateFinalGrade,
+    public AssessmentServiceImpl(ProjectionRepository projectionRepository,
+                                 AssessmentRepository assessmentRepository,
+                                 IIdentifiersDefinition identifiersDefinition,
+                                 ICalculateFinalGrade calculateFinalGrade,
                                  ICalculateRequiredGrade calculateRequiredGrade,
+                                 ICalculateRequiredGradeMaxNear calculateRequiredGradeMaxNear,
                                  OwnershipValidationService ownershipValidationService) {
         super(ownershipValidationService);
         this.projectionRepository = projectionRepository;
@@ -39,14 +44,16 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
         this.identifiersDefinition = identifiersDefinition;
         this.calculateFinalGrade = calculateFinalGrade;
         this.calculateRequiredGrade = calculateRequiredGrade;
+        this.calculateRequiredGradeMaxNear = calculateRequiredGradeMaxNear;
     }
 
     @Transactional
-    public void createAssessment(Projection projection){
+    public void createAssessment(Projection projection) {
         var course = projection.getCourse();
-        identifiersDefinition.defineIdentifiers(course.getAverageMethod(),projection);
-        calculateFinalGrade.calculateResult(projection,course.getAverageMethod());
-        calculateRequiredGrade.calculateRequiredGrade(projection,course);
+        identifiersDefinition.defineIdentifiers(course.getAverageMethod(), projection);
+        calculateFinalGrade.calculateResult(projection, course.getAverageMethod());
+        calculateRequiredGrade.calculateRequiredGrade(projection, course);
+        calculateRequiredGradeMaxNear.calculateRequiredGradeMaxNear(projection, course);
     }
 
     public Page<Assessment> listAssessment(Long projectionId, Pageable pageable) {
@@ -56,16 +63,17 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
     }
 
     @Transactional
-    public Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto){
+    public Assessment insertGrade(Long projectionId, Long id, DoubleRequestDTO gradeDto) {
         validateProjection(projectionId);
         var projection = projectionRepository.findById(projectionId).orElseThrow();
-        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId,id).orElseThrow(() ->
+        var assessment = assessmentRepository.findByProjectionIdAndId(projectionId, id).orElseThrow(() ->
                 new AssessmentNotFoundException(id, projectionId));
         var course = assessment.getProjection().getCourse();
 
         assessment.applyGrade(gradeDto.value());
-        calculateFinalGrade.calculateResult(projection,course.getAverageMethod());
-        calculateRequiredGrade.calculateRequiredGrade(projection,course);
+        calculateFinalGrade.calculateResult(projection, course.getAverageMethod());
+        calculateRequiredGrade.calculateRequiredGrade(projection, course);
+        calculateRequiredGradeMaxNear.calculateRequiredGradeMaxNear(projection, course);
         return assessment;
     }
 
@@ -77,10 +85,11 @@ public class AssessmentServiceImpl extends OwnedResourceService implements Asses
         assessmentRepository.findByProjection(projection).forEach(Assessment::reset);
         calculateFinalGrade.calculateResult(projection, course.getAverageMethod());
         calculateRequiredGrade.calculateRequiredGrade(projection, course);
+        calculateRequiredGradeMaxNear.calculateRequiredGradeMaxNear(projection, course);
     }
 
-    public void validateProjection(Long projectionId){
-        if(!projectionRepository.existsById(projectionId))
+    public void validateProjection(Long projectionId) {
+        if (!projectionRepository.existsById(projectionId))
             throw new ProjectionNotFoundException(projectionId);
     }
 

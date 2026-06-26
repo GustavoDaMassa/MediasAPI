@@ -13,6 +13,8 @@ public class AssessmentDTO {
     private Long id;
     private String identifier;
     private double grade;
+    private double maxValue;
     private double requiredGrade;
+    private double requiredGradeMaxNear;
 
 }

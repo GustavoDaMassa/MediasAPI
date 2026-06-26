@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -80,6 +81,45 @@ class SimulationImplTest {
         assertThrows(IllegalArgumentException.class, () -> simulation.simulate(0,projection,polishNotation));
 
         verify(assessmentRepository,times(2)).findByIndentifier(anyString(),anyLong());
+    }
+
+    @Test
+    @DisplayName("simulateWithMaxed - maxed identifier uses maxValue instead of requiredGrade")
+    void simulateWithMaxedUsesMaxValueForMaxedIdentifier() {
+        var p1 = new Assessment("p1", 0, 10, null);
+        var p2 = new Assessment("p2", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(p1, p2), "Projection test", 0);
+        p1.setProjection(projection);
+        p2.setProjection(projection);
+        var polishNotation = new ArrayList<>(List.of("p1", "p2", "+"));
+
+        when(assessmentRepository.findByIndentifier(p1.getIdentifier(), projection.getId())).thenReturn(p1);
+        when(assessmentRepository.findByIndentifier(p2.getIdentifier(), projection.getId())).thenReturn(p2);
+
+        // p1 is maxed (contributes 10), p2 uses requiredGrade=3 → expected 13
+        var result = simulation.simulateWithMaxed(3.0, projection, polishNotation, Set.of("p1"));
+
+        assertEquals(13.0, result);
+    }
+
+    @Test
+    @DisplayName("simulateWithMaxed - fixed assessment always uses actual grade, not maxValue")
+    void simulateWithMaxedFixedAssessmentUsesActualGrade() {
+        var p1 = new Assessment("p1", 0, 10, null);
+        p1.applyGrade(4.0);
+        var p2 = new Assessment("p2", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(p1, p2), "Projection test", 0);
+        p1.setProjection(projection);
+        p2.setProjection(projection);
+        var polishNotation = new ArrayList<>(List.of("p1", "p2", "+"));
+
+        when(assessmentRepository.findByIndentifier(p1.getIdentifier(), projection.getId())).thenReturn(p1);
+        when(assessmentRepository.findByIndentifier(p2.getIdentifier(), projection.getId())).thenReturn(p2);
+
+        // p1 is fixed at 4 (even though it's in maxedIdentifiers), p2 uses requiredGrade=3 → expected 7
+        var result = simulation.simulateWithMaxed(3.0, projection, polishNotation, Set.of("p1"));
+
+        assertEquals(7.0, result);
     }
 
     @Test

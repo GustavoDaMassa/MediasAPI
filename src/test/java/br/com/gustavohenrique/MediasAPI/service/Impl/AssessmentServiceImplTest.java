@@ -10,6 +10,7 @@ import br.com.gustavohenrique.MediasAPI.repository.AssessmentRepository;
 import br.com.gustavohenrique.MediasAPI.repository.ProjectionRepository;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateFinalGrade;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGrade;
+import br.com.gustavohenrique.MediasAPI.service.Interfaces.ICalculateRequiredGradeMaxNear;
 import br.com.gustavohenrique.MediasAPI.service.Interfaces.IIdentifiersDefinition;
 import br.com.gustavohenrique.MediasAPI.service.OwnershipValidationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,13 +52,17 @@ class AssessmentServiceImplTest {
     private ICalculateRequiredGrade calculateRequiredGrade;
 
     @Mock
+    private ICalculateRequiredGradeMaxNear calculateRequiredGradeMaxNear;
+
+    @Mock
     private OwnershipValidationService ownershipValidationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         assessmentService = new AssessmentServiceImpl(projectionRepository, assessmentRepository,
-                identifiersDefinition, calculateFinalGrade, calculateRequiredGrade, ownershipValidationService);
+                identifiersDefinition, calculateFinalGrade, calculateRequiredGrade,
+                calculateRequiredGradeMaxNear, ownershipValidationService);
 
         when(projectionRepository.existsById(anyLong())).thenReturn(true);
     }
@@ -65,33 +70,37 @@ class AssessmentServiceImplTest {
     @Test
     @DisplayName("createAssessment - Should call others method to create an assessment successfully")
     void createAssessmentSuccessfully() {
-        var projection = new Projection(2L,new Course(1L,null,"BD",null,
-                "P1+P@",6),null,"Projection default",10);
+        var projection = new Projection(2L, new Course(1L, null, "BD", null,
+                "P1+P@", 6), null, "Projection default", 10);
 
         doNothing().when(identifiersDefinition)
-                .defineIdentifiers(Mockito.eq(projection.getCourse().getAverageMethod()),Mockito.any(Projection.class));
+                .defineIdentifiers(Mockito.eq(projection.getCourse().getAverageMethod()), Mockito.any(Projection.class));
         doNothing().when(calculateFinalGrade)
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
         doNothing().when(calculateRequiredGrade)
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
+        doNothing().when(calculateRequiredGradeMaxNear)
+                .calculateRequiredGradeMaxNear(any(Projection.class), eq(projection.getCourse()));
 
         assessmentService.createAssessment(projection);
 
         verify(identifiersDefinition)
-                .defineIdentifiers(Mockito.eq(projection.getCourse().getAverageMethod()),Mockito.any(Projection.class));
+                .defineIdentifiers(Mockito.eq(projection.getCourse().getAverageMethod()), Mockito.any(Projection.class));
         verify(calculateFinalGrade)
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
         verify(calculateRequiredGrade)
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
+        verify(calculateRequiredGradeMaxNear)
+                .calculateRequiredGradeMaxNear(any(Projection.class), eq(projection.getCourse()));
     }
 
     @Test
     @DisplayName("listAssessment - Return a list of assessment successfully")
     void listAssessmentSuccessfully() {
-        var assessment1 = new Assessment("P1",0,10,null);
-        var assessment2 = new Assessment("P@",0,10,null);
-        var projection = new Projection(1L,null,
-                List.of(assessment1,assessment2),"Projection test",9.8);
+        var assessment1 = new Assessment("P1", 0, 10, null);
+        var assessment2 = new Assessment("P@", 0, 10, null);
+        var projection = new Projection(1L, null,
+                List.of(assessment1, assessment2), "Projection test", 9.8);
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
         when(assessmentRepository.findByProjection(any(Projection.class), any(Pageable.class))).thenReturn(new PageImpl<>(projection.getAssessment()));
@@ -102,13 +111,12 @@ class AssessmentServiceImplTest {
         AssertAssessment(assessment2, response.getContent().get(1));
         verify(projectionRepository).findById(projection.getId());
         verify(assessmentRepository).findByProjection(any(Projection.class), any(Pageable.class));
-
     }
 
     @Test
     @DisplayName("listAssessment - Return an exception when projection not exist")
     void listAssessmentProjectionNotFound() {
-        var projection = new Projection(1L,null,null,"Projection test",9.8);
+        var projection = new Projection(1L, null, null, "Projection test", 9.8);
 
         when(projectionRepository.findById(projection.getId())).thenThrow(new ProjectionNotFoundException(projection.getId()));
 
@@ -116,72 +124,72 @@ class AssessmentServiceImplTest {
 
         verify(projectionRepository).findById(projection.getId());
         verify(assessmentRepository, never()).findByProjection(any(Projection.class), any(Pageable.class));
-
     }
 
     @Test
     @DisplayName("insertGrade - Should return the assesment with the grade inserted successfully")
     void insertGradeSuccessfully() {
         var gradeDto = new DoubleRequestDTO(8);
-        var assessment = new Assessment("P1",0,10,null);
-        var projection = new Projection(1L,null,List.of(assessment),"projection test",0);
+        var assessment = new Assessment("P1", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(assessment), "projection test", 0);
         assessment.setProjection(projection);
-        var course = new Course(1L,null,"BD",List.of(projection),"P1+P@",6);
+        var course = new Course(1L, null, "BD", List.of(projection), "P1+P@", 6);
         projection.setCourse(course);
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
         when(assessmentRepository.findByProjectionIdAndId(projection.getId(), assessment.getId()))
                 .thenReturn(Optional.of(assessment));
         doNothing().when(calculateFinalGrade)
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
         doNothing().when(calculateRequiredGrade)
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
+        doNothing().when(calculateRequiredGradeMaxNear)
+                .calculateRequiredGradeMaxNear(any(Projection.class), eq(projection.getCourse()));
 
-        var response = assessmentService.insertGrade(projection.getId(),assessment.getId(),gradeDto);
+        var response = assessmentService.insertGrade(projection.getId(), assessment.getId(), gradeDto);
 
-        AssertAssessment(assessment,response);
+        AssertAssessment(assessment, response);
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(),assessment.getId());
+        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(), assessment.getId());
         verify(calculateFinalGrade)
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
         verify(calculateRequiredGrade)
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
-
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
+        verify(calculateRequiredGradeMaxNear)
+                .calculateRequiredGradeMaxNear(any(Projection.class), eq(projection.getCourse()));
     }
 
     @Test
     @DisplayName("insertGrade - Should return exception when projection not exist")
     void insertGradeProjectionNotFound() {
         var gradeDto = new DoubleRequestDTO(8);
-        var assessment = new Assessment("P1",0,10,null);
-        var projection = new Projection(1L,null,List.of(assessment),"projection test",0);
+        var assessment = new Assessment("P1", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(assessment), "projection test", 0);
         assessment.setProjection(projection);
-        var course = new Course(1L,null,"BD",List.of(projection),"P1+P@",6);
+        var course = new Course(1L, null, "BD", List.of(projection), "P1+P@", 6);
         projection.setCourse(course);
 
         when(projectionRepository.findById(projection.getId())).thenThrow(new ProjectionNotFoundException(projection.getId()));
 
         assertThrows(NotFoundArgumentException.class,
-                ()-> assessmentService.insertGrade(projection.getId(),assessment.getId(),gradeDto));
-
+                () -> assessmentService.insertGrade(projection.getId(), assessment.getId(), gradeDto));
 
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository,never()).findByProjectionIdAndId(projection.getId(),assessment.getId());
-        verify(calculateFinalGrade,never())
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
-        verify(calculateRequiredGrade,never())
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
-
+        verify(assessmentRepository, never()).findByProjectionIdAndId(projection.getId(), assessment.getId());
+        verify(calculateFinalGrade, never())
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
+        verify(calculateRequiredGrade, never())
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
     }
 
     @Test
     @DisplayName("insertGrade - Should return exception when assessment not exist")
     void insertGradeAssessmentNotFound() {
         var gradeDto = new DoubleRequestDTO(8);
-        var assessment = new Assessment("P1",0,10,null);
-        var projection = new Projection(1L,null,List.of(assessment),"projection test",0);
+        var assessment = new Assessment("P1", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(assessment), "projection test", 0);
         assessment.setProjection(projection);
-        var course = new Course(1L,null,"BD",List.of(projection),"P1+P@",6);
+        var course = new Course(1L, null, "BD", List.of(projection), "P1+P@", 6);
         projection.setCourse(course);
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
@@ -189,46 +197,43 @@ class AssessmentServiceImplTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(NotFoundArgumentException.class,
-                ()-> assessmentService.insertGrade(projection.getId(),assessment.getId(),gradeDto));
-
+                () -> assessmentService.insertGrade(projection.getId(), assessment.getId(), gradeDto));
 
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(),assessment.getId());
-        verify(calculateFinalGrade,never())
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
-        verify(calculateRequiredGrade,never())
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
-
+        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(), assessment.getId());
+        verify(calculateFinalGrade, never())
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
+        verify(calculateRequiredGrade, never())
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
     }
 
     @Test
     @DisplayName("insertGrade - Should return exception when de new value is bigger than the max value allowed")
     void insertGradeFailureGradeBiggerthanMaxValue() {
         var gradeDto = new DoubleRequestDTO(12);
-        var assessment = new Assessment("P1",0,10,null);
-        var projection = new Projection(1L,null,List.of(assessment),"projection test",0);
+        var assessment = new Assessment("P1", 0, 10, null);
+        var projection = new Projection(1L, null, List.of(assessment), "projection test", 0);
         assessment.setProjection(projection);
-        var course = new Course(1L,null,"BD",List.of(projection),"P1+P@",6);
+        var course = new Course(1L, null, "BD", List.of(projection), "P1+P@", 6);
         projection.setCourse(course);
 
         when(projectionRepository.findById(projection.getId())).thenReturn(Optional.of(projection));
         when(assessmentRepository.findByProjectionIdAndId(projection.getId(), assessment.getId()))
                 .thenReturn(Optional.of(assessment));
         doNothing().when(calculateFinalGrade)
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
         doNothing().when(calculateRequiredGrade)
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
 
-        assertThrows(IllegalArgumentException.class,()-> assessmentService
-                .insertGrade(projection.getId(),assessment.getId(),gradeDto));
+        assertThrows(IllegalArgumentException.class, () -> assessmentService
+                .insertGrade(projection.getId(), assessment.getId(), gradeDto));
 
         verify(projectionRepository).findById(projection.getId());
-        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(),assessment.getId());
-        verify(calculateFinalGrade,never())
-                .calculateResult(any(Projection.class),eq(projection.getCourse().getAverageMethod()));
-        verify(calculateRequiredGrade,never())
-                .calculateRequiredGrade(any(Projection.class),eq(projection.getCourse()));
-
+        verify(assessmentRepository).findByProjectionIdAndId(projection.getId(), assessment.getId());
+        verify(calculateFinalGrade, never())
+                .calculateResult(any(Projection.class), eq(projection.getCourse().getAverageMethod()));
+        verify(calculateRequiredGrade, never())
+                .calculateRequiredGrade(any(Projection.class), eq(projection.getCourse()));
     }
 
     private static void AssertAssessment(Assessment projection, Assessment response) {

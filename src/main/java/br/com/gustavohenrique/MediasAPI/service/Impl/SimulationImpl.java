@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 @Service
 public class SimulationImpl implements ISimulationResult {
@@ -29,6 +30,19 @@ public class SimulationImpl implements ISimulationResult {
                     return assessment.isFixed()
                             ? assessment.getGrade()
                             : Math.min(requiredGrade, assessment.getMaxValue());
+                });
+    }
+
+    @Override
+    public double simulateWithMaxed(double requiredGrade, Projection projection,
+                                    ArrayList<String> polishNotation,
+                                    Set<String> maxedIdentifiers) {
+        return rpnEvaluator.evaluate(polishNotation, projection.getId(),
+                (identifier, projId) -> {
+                    var assessment = assessmentRepository.findByIndentifier(identifier, projId);
+                    if (assessment.isFixed()) return assessment.getGrade();
+                    if (maxedIdentifiers.contains(identifier)) return assessment.getMaxValue();
+                    return Math.min(requiredGrade, assessment.getMaxValue());
                 });
     }
 }
