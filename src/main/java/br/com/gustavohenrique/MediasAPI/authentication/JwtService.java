@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
+
+    public static final long ACCESS_TOKEN_TTL = 900L;
+
     private final JwtEncoder encoder;
 
     @Autowired
@@ -21,25 +25,26 @@ public class JwtService {
         this.encoder = encoder;
     }
 
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
-        long time = 16000L;
 
-        String scopes = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+        String scopes = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
-        // Extrai a role do Authentication object
         String role = authentication.getAuthorities().stream()
                 .filter(a -> a.getAuthority().startsWith("ROLE_"))
                 .map(a -> a.getAuthority().substring("ROLE_".length()))
                 .findFirst()
                 .orElse("USER");
 
-        var claims = JwtClaimsSet.builder().issuer("medias-api")
+        var claims = JwtClaimsSet.builder()
+                .issuer("medias-api")
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(time))
+                .expiresAt(now.plusSeconds(ACCESS_TOKEN_TTL))
                 .subject(authentication.getName())
-                .claim("Scopes",scopes)
+                .id(UUID.randomUUID().toString())
+                .claim("Scopes", scopes)
                 .claim("roles", Collections.singletonList(role))
                 .build();
 
