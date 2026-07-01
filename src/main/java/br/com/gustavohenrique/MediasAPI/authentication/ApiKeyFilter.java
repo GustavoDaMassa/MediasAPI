@@ -41,13 +41,13 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
-        return "OPTIONS".equalsIgnoreCase(method)
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/actuator")
-                || path.startsWith("/authenticate")
-                || (path.equals("/api/v1/users") && "POST".equalsIgnoreCase(method))
-                || (path.equals("/api/v1/applications") && "POST".equalsIgnoreCase(method));
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+        boolean isAppKeyProtected =
+                (path.equals("/api/v1/applications/me") && ("GET".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)))
+                        || (path.equals("/api/v1/applications/me/rotate") && "POST".equalsIgnoreCase(method));
+        return !isAppKeyProtected;
     }
 
     @Override
